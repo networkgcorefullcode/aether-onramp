@@ -1,0 +1,14 @@
+srsran:
+  docker:
+    network:
+      data_iface: data
+      name: public_net
+      subnet: "172.20.0.0/16"
+      bridge:
+        name: rfsim5g-public
+
+core:
+  upf:
+    access_subnet: "192.168.252.1/24"
+  amf:
+    ip: "172.16.248.6"
