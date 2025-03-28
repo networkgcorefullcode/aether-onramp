@@ -1,6 +1,6 @@
 token: {{ k8s.rke2.config.token }}
 node-name: {{ inventory_hostname }}
-cni: multus,canal
+cni: multus,cilium
 cluster-cidr: 10.42.0.0/16
 service-cidr: 10.43.0.0/16
 kubelet-arg:
