@@ -1,6 +1,6 @@
 k8s:
   rke2:
-    version: v1.24.17+rke2r1
+    version: v1.31.3+rke2r1
     config:
       token: purdue-k8s-rke2
       port: 9345
@@ -13,7 +13,7 @@ k8s:
 
 core:
   standalone: true			# set to false to place under control of ROC
-  data_iface: ens18
+  data_iface: eth0
   values_file: "deps/5gc/roles/core/templates/sdcore-5g-values.yaml"
   ran_subnet: "172.20.0.0/16"		# set to empty string to get subnet from 'data_iface'
   helm:
@@ -31,20 +31,19 @@ core:
         core:   "192.168.250.3"
       ue_ip_pool: "192.168.100.0/24"
   amf:
-    ip: "10.76.28.113"
+    ip: "<cp ip>"
 
-gnbsim:
-  docker:
-    container:
-      image: omecproject/5gc-gnbsim:rel-1.6.1
-      prefix: gnbsim
-      count: 1
-    network:
-      macvlan:
-        name: gnbnet
+ueransim:
+  gnb:
+    ip: "<simulator ip>"
+  servers:
+    0:
+      gnb: "deps/ueransim/config/custom-gnb.yaml"
+      ue: "deps/ueransim/config/custom-ue.yaml"
+
 
   router:
-    data_iface: ens18
+    data_iface: eth0
     macvlan:
       subnet_prefix: "172.20"
 
