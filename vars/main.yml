@@ -31,11 +31,11 @@ core:
         core:   "192.168.250.3"
       ue_ip_pool: "192.168.100.0/24"
   amf:
-    ip: "<cp ip>"
+    ip: "192.168.12.14"
 
 ueransim:
   gnb:
-    ip: "<simulator ip>"
+    ip: "192.168.12.13"
   servers:
     0:
       gnb: "deps/ueransim/config/custom-gnb.yaml"
