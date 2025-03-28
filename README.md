@@ -1,5 +1,3 @@
-# aether
-
 # Aether OnRamp
 
 Aether OnRamp provides a low-overhead way to bring up a
@@ -138,4 +136,3 @@ deployed. By default, it is configured for the Quick Start deployment.
 The other files define other common configurations, any one of which
 you can copy to `main.yml`, and then edit to account for your local
 details. These alternative configurations are identified in the README.
->>>>>>> 79e6004 (First commit)
