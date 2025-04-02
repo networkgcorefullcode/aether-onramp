@@ -1,0 +1,4 @@
+{
+  "ansible.python.interpreterPath": "/home/linuxbrew/.linuxbrew/bin/python3",
+  "makefile.configureOnOpen": false
+}

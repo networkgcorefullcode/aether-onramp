@@ -1,11 +1,10 @@
 ---
-
 - name: remove incubator chart repo
   kubernetes.core.helm_repository:
     name: incubator
     state: absent
   when: inventory_hostname in groups['master_nodes']
-  ignore_errors: yes
+  ignore_errors: true
 
 - set_fact:
     script_dir: /tmp/helm
