@@ -1,0 +1,69 @@
+---
+- name: Add /var/lib/rancher/rke2/bin to PATH
+  become: true
+  ansible.builtin.lineinfile:
+    dest: "/root/.bashrc"
+    line: "PATH=$PATH:/var/lib/rancher/rke2/bin"
+    insertafter: EOF
+    create: true
+    mode: 0600
+
+- name: Symlink crictl config to /etc/crictl.yaml
+  become: true
+  ansible.builtin.file:
+    src: "/var/lib/rancher/rke2/agent/etc/crictl.yaml"
+    dest: "/etc/crictl.yaml"
+    state: link
+
+- name: Create .kube directory in /root
+  become: true
+  ansible.builtin.file:
+    path: /root/.kube
+    state: directory
+    mode: "0750"
+
+- name: Obtener variable de entorno del servidor
+  become: false
+  shell: echo $HOME
+  register: home_output
+
+- name: Guardar el home del usuario en una variable
+  set_fact:
+    home_path: "{{ home_output.stdout }}"
+
+- name: Obtener variable de entorno del servidor
+  become: false
+  shell: echo $USER
+  register: user_output
+
+- name: Guardar el home del usuario en una variable
+  set_fact:
+    user_name: "{{ user_output.stdout }}"
+
+- name: Debug
+  debug:
+    msg: "El home del usuario es {{ home_path }}"
+
+- name: Create .kube directory in {{ home_path }}
+  become: false
+  ansible.builtin.file:
+    path: "{{ home_path }}/.kube"
+    state: directory
+    mode: "0750"
+
+- name: Symlink kubectl config to /root/.kube/config
+  become: true
+  ansible.builtin.file:
+    src: "/var/lib/rancher/rke2/server/cred/admin.kubeconfig"
+    dest: "/root/.kube/config"
+    state: link
+
+- name: Copy kubectl config to {{ home_path }}/.kube/config
+  become: true
+  copy:
+    src: "/etc/rancher/rke2/rke2.yaml"
+    dest: "{{ home_path }}/.kube/config"
+    mode: "0750"
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    remote_src: yes
