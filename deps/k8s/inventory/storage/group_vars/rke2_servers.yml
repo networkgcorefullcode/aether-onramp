@@ -7,13 +7,16 @@ rke2_manifest_config_post_run_directory: "{{ playbook_dir }}/inventory/storage/p
 group_rke2_config:
   # Use Cilium as the CNI
   cni:
-    - multus
-    - cilium
+  - multus
+  - cilium
   # Cilium will replace this
-  disable-kube-proxy: true
-  profile: cis
-  pod-security-admission-config-file: /etc/rancher/rke2/pod-security-admission-config.yaml
-  audit-policy-file: /etc/rancher/rke2/audit-policy.yaml
-  kube-apiserver-arg:
-    - audit-policy-file=/etc/rancher/rke2/audit-policy.yaml
-    - audit-log-path=/var/lib/rancher/rke2/server/logs/audit.log
+  disable-kube-proxy: false
+  node-label:
+  - "node-role.aetherproject.org=omec-upf"
+  cluster-cidr: 10.42.0.0/16
+  service-cidr: 10.43.0.0/16
+  kubelet-arg:
+  - --allowed-unsafe-sysctls=net.*
+  kube-proxy-arg:
+  - --metrics-bind-address=0.0.0.0:10249
+  - --proxy-mode=ipvs
