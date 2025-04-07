@@ -2,6 +2,8 @@
 
 - name: provision upf
   hosts: all
+  environment:
+    KUBECONFIG: "/home/ubuntu/.kube/config"
   gather_facts: true
 
   vars_files:

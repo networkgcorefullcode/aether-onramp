@@ -16,7 +16,7 @@ omec-control-plane:
 5g-control-plane:
   enable5G: true
   images:
-    repository: "registry.aetherproject.org/proxy/"
+    repository: ""
     #tags:
     #  amf: <amf image tag>
     # refer to above Helm Chart to add other NF images
@@ -126,7 +126,7 @@ omec-control-plane:
 omec-sub-provision:
   enable: true
   images:
-    repository: "registry.aetherproject.org/proxy/"
+    repository: ""
     #tags:
     #  simapp: #add simapp override image
 
@@ -324,7 +324,7 @@ omec-user-plane:
   resources:
     enabled: true
   images:
-    repository: "registry.aetherproject.org/proxy/"
+    repository: ""
     # tags:
       # bess: <bess image tag>
       # pfcpiface: <pfcp image tag>
