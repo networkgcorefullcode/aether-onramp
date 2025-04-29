@@ -31,7 +31,7 @@ core:
         core:   "192.168.250.3"
       ue_ip_pool: "192.168.100.0/24"
   amf:
-    ip: "192.168.12.14"
+    ip: "192.168.12.16"
 
 ueransim:
   gnb:
@@ -42,14 +42,14 @@ ueransim:
       ue: "deps/ueransim/config/custom-ue.yaml"
 
 
-  router:
-    data_iface: eth0
-    macvlan:
-      subnet_prefix: "172.20"
+  # router:
+  #   data_iface: eth0
+  #   macvlan:
+  #     subnet_prefix: "172.20"
 
-  servers:
-    0:
-      - "deps/gnbsim/config/gnbsim-default.yaml"
+  # servers:
+  #   0:
+  #     - "deps/gnbsim/config/gnbsim-default.yaml"
 
 amp:
   roc_models: "deps/amp/roles/roc-load/templates/roc-5g-models.json"

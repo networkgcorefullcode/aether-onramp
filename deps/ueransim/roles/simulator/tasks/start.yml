@@ -55,29 +55,29 @@
     var: ue_ip
   when: inventory_hostname in groups['ueransim_nodes']
 
-- name: Run curl command for connectivity (Test 1)
-  shell: "./nr-binder {{ ue_ip }} curl google.com"
-  register: ue_output
-  args:
-    chdir: ueransim_onramp/build
-  when: "inventory_hostname in groups['ueransim_nodes']"
-  ignore_errors: true
+# - name: Run curl command for connectivity (Test 1)
+#   shell: "./nr-binder {{ ue_ip }} curl google.com"
+#   register: ue_output
+#   args:
+#     chdir: ueransim_onramp/build
+#   when: "inventory_hostname in groups['ueransim_nodes']"
+#   ignore_errors: true
 
-- name: Run curl command for connectivity (Test 2)
-  shell: "./nr-binder {{ ue_ip }} curl facebook.com"
-  register: ue_output
-  args:
-    chdir: ueransim_onramp/build
-  when: "inventory_hostname in groups['ueransim_nodes']"
-  ignore_errors: true
+# - name: Run curl command for connectivity (Test 2)
+#   shell: "./nr-binder {{ ue_ip }} curl facebook.com"
+#   register: ue_output
+#   args:
+#     chdir: ueransim_onramp/build
+#   when: "inventory_hostname in groups['ueransim_nodes']"
+#   ignore_errors: true
 
-- name: Run curl command for connectivity (Test 3)
-  shell: "./nr-binder {{ ue_ip }} curl amazon.com"
-  register: ue_output
-  args:
-    chdir: ueransim_onramp/build
-  when: "inventory_hostname in groups['ueransim_nodes']"
-  ignore_errors: true
+# - name: Run curl command for connectivity (Test 3)
+#   shell: "./nr-binder {{ ue_ip }} curl amazon.com"
+#   register: ue_output
+#   args:
+#     chdir: ueransim_onramp/build
+#   when: "inventory_hostname in groups['ueransim_nodes']"
+#   ignore_errors: true
 
 - name: Run ping command for connectivity (Test 4)
   shell: "./nr-binder {{ ue_ip }} ping google.com -c 200"

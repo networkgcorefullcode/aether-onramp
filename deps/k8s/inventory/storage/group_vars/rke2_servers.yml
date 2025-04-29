@@ -5,11 +5,16 @@ rke2_manifest_config_directory: "{{ playbook_dir }}/inventory/storage/pre-deploy
 rke2_manifest_config_post_run_directory: "{{ playbook_dir }}/inventory/storage/post-deploy-manifests/"
 
 group_rke2_config:
-  cluster-cidr: 10.42.0.0/16
   cni:
     - multus
     - canal
   disable-kube-proxy: false
+  node-label:
+    - node-role.aetherproject.org=omec-upf
+  service-cidr: 10.43.0.0/16
+  cluster-cidr: 10.42.0.0/16
+  kubelet-arg:
+    - --allowed-unsafe-sysctls=net.*
   kube-proxy-arg:
     - --metrics-bind-address=0.0.0.0:10249
     - --proxy-mode=ipvs
@@ -19,21 +24,15 @@ group_rke2_config:
     #- --feature-gates=SCTPSupport=true
     #- --enable-sctp-support=true
     ###
-    #para modod iptables
+    #para modo iptables
     #- --conntrack-max-per-core=131072 # Aumentar conexiones concurrentes (N2/N4)
     #- --iptables-sync-period=30s      # Sincronización más frecuente
-  kubelet-arg:
-    - --allowed-unsafe-sysctls=net.*
   kube-apiserver-arg:
     - --service-node-port-range=2000-36767
     #- --feature-gates=SCTPSupport=true
-  node-label:
-    - node-role.aetherproject.org=omec-upf
   selinux: false
   server: https://192.168.12.16:9345
-  service-cidr: 10.43.0.0/16
   pause-image: k8s.gcr.io/pause:3.3
-  token: K106c0deb00b24a7f2371f3928ad327fe9e9e65cc1f233d84537b3d7c3237a4616b::server:ee8c1626d190fee5125df248380e38c6
   # Configuración adicional para montar ipset del host
   #kube-proxy-extra-mount:
   #- "/usr/sbin/ipset:/usr/sbin/ipset"
