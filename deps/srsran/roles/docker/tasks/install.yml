@@ -7,7 +7,7 @@
 
 - name: print docker version output
   debug:
-    var: docker_valid.stdout
+    var: docker_valid
 
 - meta: end_play
   when: docker_valid.failed == false

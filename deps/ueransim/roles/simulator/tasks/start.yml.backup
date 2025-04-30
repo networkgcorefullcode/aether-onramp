@@ -1,4 +1,5 @@
 ---
+
 - name: check if servers and config server length are equal
   fail:
     msg: "Number of ueransim nodes and servers in config file are not equal"
@@ -21,7 +22,7 @@
   when: inventory_hostname in groups['ueransim_nodes']
 
 - name: Run gNB
-  shell: nohup ./nr-gnb -c "../config/custom-gnb.yaml" trace > /home/ubuntu/ueransim_onramp/gnb.log 2>&1 &
+  shell: nohup ./nr-gnb -c "../config/custom-gnb.yaml" > /dev/null 2>&1 &
   args:
     chdir: ueransim_onramp/build
   async: 30
@@ -32,7 +33,7 @@
     seconds: 5
 
 - name: Run UE
-  shell: nohup ./nr-ue -c "../config/custom-ue.yaml" trace > /home/ubuntu/ueransim_onramp/ue.log 2>&1 &
+  shell: nohup ./nr-ue -c "../config/custom-ue.yaml" > /dev/null 2>&1 &
   args:
     chdir: ueransim_onramp/build
   when: "inventory_hostname in groups['ueransim_nodes']"
@@ -54,41 +55,17 @@
     var: ue_ip
   when: inventory_hostname in groups['ueransim_nodes']
 
-- name: Run curl command for connectivity (Test 1)
+- name: Run curl command for connectivity
   shell: "./nr-binder {{ ue_ip }} curl google.com"
   register: ue_output
   args:
     chdir: ueransim_onramp/build
   when: "inventory_hostname in groups['ueransim_nodes']"
-#   ignore_errors: true
-
-# - name: Run curl command for connectivity (Test 2)
-#   shell: "./nr-binder {{ ue_ip }} curl facebook.com"
-#   register: ue_output
-#   args:
-#     chdir: ueransim_onramp/build
-#   when: "inventory_hostname in groups['ueransim_nodes']"
-#   ignore_errors: true
-
-# - name: Run curl command for connectivity (Test 3)
-#   shell: "./nr-binder {{ ue_ip }} curl amazon.com"
-#   register: ue_output
-#   args:
-#     chdir: ueransim_onramp/build
-#   when: "inventory_hostname in groups['ueransim_nodes']"
-#   ignore_errors: true
-
-# - name: Run ping command for connectivity (Test 4)
-#   shell: "./nr-binder {{ ue_ip }} ping google.com -c 200"
-#   register: ue_output
-#   args:
-#     chdir: ueransim_onramp/build
-#   when: "inventory_hostname in groups['ueransim_nodes']"
-#   ignore_errors: true
 
 - debug:
     var: ue_output.stdout_lines
   when: "inventory_hostname in groups['ueransim_nodes']"
+
 ### TODO: IPERF
 
 # - name: Get information about the pod

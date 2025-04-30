@@ -1,7 +1,11 @@
 ---
-- name: Helm play
+
+- name: provision helm
   hosts: all
-  any_errors_fatal: true
-  become: true
+  gather_facts: true
+
+  vars_files:
+    - "vars/main.yml"
+
   roles:
-    - role: helm
+    - helm

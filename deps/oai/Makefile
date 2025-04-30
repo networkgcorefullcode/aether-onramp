@@ -3,9 +3,16 @@
 export ROOT_DIR ?= $(PWD)
 export OAI_ROOT_DIR ?= $(ROOT_DIR)
 
+export ANSIBLE_NAME ?= ansible-oai
 export HOSTS_INI_FILE ?= hosts.ini
 
 export EXTRA_VARS ?= ""
+
+#### Start Ansible docker ####
+
+oai-ansible:
+	export ANSIBLE_NAME=$(ANSIBLE_NAME); \
+	sh $(OAI_ROOT_DIR)/scripts/ansible ssh-agent bash
 
 #### a. Debugging ####
 oai-pingall:
@@ -15,6 +22,9 @@ oai-pingall:
 #### b. Provision docker ####
 oai-docker-install:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(OAI_ROOT_DIR)/docker.yml --tags install \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+oai-docker-uninstall:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(OAI_ROOT_DIR)/docker.yml --tags uninstall \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
 oai-router-install:
@@ -41,3 +51,4 @@ oai-uesim-stop:
 # run oai-docker-install before running setup
 oai-gnb-install: oai-docker-install oai-router-install oai-gnb-start
 oai-gnb-uninstall:  oai-gnb-stop oai-router-uninstall
+

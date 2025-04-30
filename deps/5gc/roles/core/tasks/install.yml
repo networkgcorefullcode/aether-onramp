@@ -1,5 +1,4 @@
 ---
-
 - name: add aether chart repo
   kubernetes.core.helm_repository:
     name: aether
@@ -72,7 +71,18 @@
     helm dep up {{chart_ref_sd_core}}
   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
 
+# --- create aether-5gc namespace ---
+#- name: Create aether-5gc namespace if not exists
+#  shell: |
+#    kubectl create namespace aether-5gc
+#  when: inventory_hostname in groups['master_nodes']
+
 # TODO: add systems check to avoid issues (e.g., mongodb needing avx support)
+#- name: enable Istio sidecar injection for aether-5gc namespace
+#  shell: |
+#    kubectl label namespace aether-5gc istio-injection=enabled --overwrite
+#  when: inventory_hostname in groups['master_nodes']
+
 - name: deploy aether 5gc
   block:
     - name: deploy aether 5gc
@@ -80,7 +90,7 @@
         update_repo_cache: true
         name: sd-core
         release_namespace: aether-5gc
-        create_namespace: true
+        create_namespace: true # namespace created before in another task
         chart_ref: "{{ core.helm.chart_ref if core.helm.local_charts == false else chart_ref_sd_core }}"
         chart_version: "{{ core.helm.chart_version }}"
         values_files:

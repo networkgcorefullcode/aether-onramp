@@ -7,9 +7,9 @@
   when: inventory_hostname in groups['srsran_nodes']
   become: true
 
-- name: remove /tmp/gnb_config.yaml
+- name: remove /tmp/gnb_zmq.conf
   file:
-    path: "/tmp/gnb_config.yaml"
+    path: "/tmp/gnb_zmq.conf"
     state: absent
   when: inventory_hostname in groups['srsran_nodes']
   become: true

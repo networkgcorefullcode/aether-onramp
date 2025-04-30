@@ -4,9 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
+
 #####
-#gnbsim-all.yaml
+#gnbsim-default.yaml
 #####
+
 ---
 info:
   version: 1.0.0
@@ -15,7 +17,7 @@ info:
 configuration:
   runConfigProfilesAtStart: true
   singleInterface: false			# Default value
-  execInParallel: false				# Run all profiles in parallel
+  execInParallel: true				# Run all profiles in parallel
   httpServer:					# API to manage profiles at runtime
     enable: false
     ipAddr: "{{ container_ip }}"
@@ -96,10 +98,10 @@ configuration:
   profiles:
   - profileType: register	# UE Registration
     profileName: profile1
-    enable: true
+    enable: false
     gnbName: gnb1
-    execInParallel: true
-    startImsi: 208930100007500
+    execInParallel: false
+    startImsi: 208930100007487
     ueCount: 5
     defaultAs: "{{ ping_target }}"
     perUserTimeout: 100
@@ -114,8 +116,8 @@ configuration:
     profileName: profile2
     enable: true
     gnbName: gnb1
-    execInParallel: true
-    startImsi: 208930100007510
+    execInParallel: false
+    startImsi: 208930100007487
     ueCount: 5
     defaultAs: "{{ ping_target }}"
     perUserTimeout: 100
@@ -129,10 +131,10 @@ configuration:
 
   - profileType: anrelease          # AN Release
     profileName: profile3
-    enable: true
-    execInParallel: true
+    enable: false
+    execInParallel: false
     gnbName: gnb1
-    startImsi: 208930100007520
+    startImsi: 208930100007497
     ueCount: 5
     defaultAs: "{{ ping_target }}"
     perUserTimeout: 100
@@ -145,10 +147,10 @@ configuration:
 
   - profileType: uetriggservicereq  # UE Initiated Service Request
     profileName: profile4
-    enable: true
+    enable: false
     gnbName: gnb1
     execInParallel: false
-    startImsi: 208930100007530
+    startImsi: 208930100007497
     ueCount: 5
     plmnId:
       mcc: 208
@@ -162,10 +164,10 @@ configuration:
 
   - profileType: deregister         # UE Initiated De-registration
     profileName: profile5
-    enable: true
+    enable: false
     gnbName: gnb1
     execInParallel: false
-    startImsi: 208930100007540
+    startImsi: 208930100007497
     ueCount: 5
     defaultAs: "{{ ping_target }}"
     perUserTimeout: 100
@@ -180,8 +182,8 @@ configuration:
     profileName: profile6
     enable: false
     gnbName: gnb1
-    execInParallel: true
-    startImsi: 208930100007550
+    execInParallel: false
+    startImsi: 208930100007497
     ueCount: 5
     defaultAs: "{{ ping_target }}"
     perUserTimeout: 100
@@ -194,10 +196,10 @@ configuration:
 
   - profileType: uereqpdusessrelease  # UE Initiated Session Release
     profileName: profile7
-    enable: true
+    enable: false
     gnbName: gnb1
-    execInParallel: true
-    startImsi: 208930100007560
+    execInParallel: false
+    startImsi: 208930100007497
     ueCount: 5
     plmnId:
       mcc: 208
@@ -213,7 +215,7 @@ configuration:
     enable: false
     gnbName: gnb1
     execInParallel: false
-    startImsi: 208930100007570
+    startImsi: 208930100007497
     ueCount: 1
     plmnId:
       mcc: 208

@@ -6,10 +6,10 @@ oai:
       subnet: "172.20.0.0/16"
       bridge:
         name: rfsim5g-public
-
+        
 core:
   upf:
-    access_subnet: "192.168.252.1/24"
-    multihop_gnb: false
+    ip_prefix: "192.168.252.0/24"
+    iface: "access"
   amf:
     ip: "172.16.248.6"
