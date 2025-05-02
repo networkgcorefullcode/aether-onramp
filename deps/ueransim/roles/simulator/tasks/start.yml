@@ -29,7 +29,7 @@
   when: "inventory_hostname in groups['ueransim_nodes']"
 
 - pause:
-    seconds: 5
+    seconds: 15
 
 - name: Run UE
   shell: nohup ./nr-ue -c "../config/custom-ue.yaml" trace > /home/ubuntu/ueransim_onramp/ue.log 2>&1 &
@@ -39,7 +39,7 @@
   become: true
 
 - pause:
-    seconds: 5
+    seconds: 20
 
 - name: Get UE IP address
   shell: "ip a | grep -A 1 'uesimtun0' | grep inet | awk '{print $2}' | cut -d'/' -f1"
