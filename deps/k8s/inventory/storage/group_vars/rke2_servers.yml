@@ -19,8 +19,8 @@ group_rke2_config:
     - --metrics-bind-address=0.0.0.0:10249
     - --proxy-mode=ipvs
     #- --feature-gates=RemoveSelfLink=false
-    - --v=4
-    - --ipvs-strict-arp=true
+    #- --v=4
+    #- --ipvs-strict-arp=true
     #- --feature-gates=SCTPSupport=true
     #- --enable-sctp-support=true
     ###
