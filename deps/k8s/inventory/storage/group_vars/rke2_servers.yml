@@ -30,8 +30,8 @@ group_rke2_config:
   kube-apiserver-arg:
     - --service-node-port-range=2000-36767
     #- --feature-gates=SCTPSupport=true
-  selinux: false
-  server: https://192.168.12.16:9345
+  #selinux: false
+  #server: https://192.168.12.16:9345
   pause-image: k8s.gcr.io/pause:3.3
   # Configuración adicional para montar ipset del host
   #kube-proxy-extra-mount:
