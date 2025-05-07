@@ -1,11 +1,7 @@
 ---
-
-- name: provision rke2
-  hosts: master_nodes, worker_nodes
-  gather_facts: true
-
-  vars_files:
-    - "vars/main.yml"
-
+- name: RKE2 play
+  hosts: all
+  any_errors_fatal: true
+  become: true
   roles:
-    - rke2
+    - role: rke2

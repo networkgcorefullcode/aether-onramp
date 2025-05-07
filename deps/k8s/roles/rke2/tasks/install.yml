@@ -1,172 +1,135 @@
 ---
+- name: Populate service facts
+  ansible.builtin.service_facts: {}
 
-# prep Ubuntu to support RKE2-for-Aether
-- name: set fs.file-max to 2097152
-  ansible.posix.sysctl:
-    name: fs.file-max
-    value: '2097152'
-    sysctl_set: true
-    reload: true
-  when: inventory_hostname in groups['master_nodes']
-  become: true
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
 
-- name: set fs.inotify.max_user_watches to 524288
-  ansible.posix.sysctl:
-    name: fs.inotify.max_user_watches
-    value: '524288'
-    sysctl_set: true
-    reload: true
-  when: inventory_hostname in groups['master_nodes']
-  become: true
+- name: Set for install method of tarball
+  ansible.builtin.set_fact:
+    install_method: tarball
+  when: |-
+    ((ansible_facts['os_family'] != 'RedHat' and ansible_facts['os_family'] != 'Rocky') or
+    rke2_install_tarball_url != "" or
+    rke2_install_local_tarball_path != "" or
+    rke2_force_tarball_install|bool)
 
-- name: set fs.inotify.max_user_instances to 512
-  ansible.posix.sysctl:
-    name: fs.inotify.max_user_instances
-    value: '512'
-    sysctl_set: true
-    reload: true
-  when: inventory_hostname in groups['master_nodes']
-  become: true
+- name: Set for install method of rpm
+  ansible.builtin.set_fact:
+    install_method: rpm
+  when:
+    - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
+    - rke2_install_local_tarball_path == ""
+    - rke2_install_tarball_url == ""
+    - not rke2_force_tarball_install|bool
 
-# install RKE2-for-Aether
-- set_fact:
-    script_dir: /tmp/rke2
+- name: Set as server
+  ansible.builtin.set_fact:
+    service_name: rke2-server
+  when:
+    - inventory_hostname in groups['rke2_servers']
 
-- name: remove {{ script_dir }}
-  file:
-    path: "{{ script_dir }}"
-    state: absent
+- name: Set as agent
+  ansible.builtin.set_fact:
+    service_name: rke2-agent
+  when:
+    - inventory_hostname in groups.get('rke2_agents', [])
 
-- name: create {{ script_dir }}
-  file:
-    path: "{{ script_dir }}"
-    state: directory
+- name: Satisfy OS Pre-Reqs
+  ansible.builtin.include_tasks: pre_reqs.yml
 
-- name: download rke2
-  get_url:
-    url: https://get.rke2.io
-    validate_certs: false
-    dest: "{{ script_dir }}/install.sh"
-    mode: "a+x"
+- name: Has rke2 been installed already
+  ansible.builtin.include_tasks: previous_install.yml
 
-- name: create /etc/rancher/rke2
-  file:
-    path: "/etc/rancher/rke2"
-    state: directory
-  become: true
+- name: Check for images bundle
+  ansible.builtin.include_tasks: images_bundle.yml
+  when:
+    - rke2_images_urls != [] or
+      rke2_images_local_tarball_path != []
 
-- name: install rke2 on masters
-  shell: "{{ script_dir }}/install.sh"
-  environment:
-    INSTALL_RKE2_CHANNEL: "{{ k8s.rke2.version }}"
-  when: inventory_hostname in groups['master_nodes']
-  become: true
+- name: Determine rke2_version to install
+  ansible.builtin.include_tasks: calculate_rke2_version.yml
+  when:
+    - rke2_install_local_tarball_path == ""
+    - rke2_install_tarball_url == ""
 
-- name: enable rke2-server on masters
-  systemd:
-    name: rke2-server
-    enabled: true
-  when: inventory_hostname in groups['master_nodes']
-  become: true
+- name: Start check_node_ready.yml
+  ansible.builtin.include_tasks: check_node_ready.yml
+  vars:
+    check_node_ready_timeout: 2
+    check_node_ready_retries: 10
+    check_node_ready_delay: 5
+    check_node_ready_ignore_errors: true
+  when:
+    - inventory_hostname in groups['rke2_servers']
 
-# TODO: fix multi-master issue (tls-san)
-- name: copy master-config.yaml to /etc/rancher/rke2/config.yaml
-  template:
-    src: "{{ ROOT_DIR }}/{{ k8s.rke2.config.params_file.master }}"
-    dest: /etc/rancher/rke2/config.yaml
-  when: inventory_hostname in groups['master_nodes']
-  become: true
+- name: Create a list of ready servers
+  ansible.builtin.set_fact:
+    ready_servers: "{{ groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
+  delegate_to: localhost
+  run_once: true
 
-- name: start rke2-server on masters
-  systemd:
-    name: rke2-server
-    state: started
-  when: inventory_hostname in groups['master_nodes']
-  become: true
+- name: Tarball Install
+  ansible.builtin.include_tasks: tarball_install.yml
+  when:
+    - install_method == "tarball"
 
-- name: copy kubectl
-  copy:
-    src: /var/lib/rancher/rke2/bin/kubectl
-    dest: /usr/local/bin/kubectl
-    mode: "a+x"
-    remote_src: true
-  when: inventory_hostname in groups['master_nodes']
-  become: true
 
-- name: waiting for the master node(s) to get ready
-  shell: |
-    kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml wait nodes --for=condition=Ready --all --timeout=300s
-    kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml wait deployment -n kube-system --for=condition=available --all --timeout=300s
-  when: inventory_hostname in groups['master_nodes']
-  become: true
+- name: RPM Install
+  ansible.builtin.include_tasks: rpm_install.yml
+  when:
+    - install_method == "rpm"
 
-- name: force systemd to reread configs
-  systemd:
-    daemon_reload: true
-  when: inventory_hostname in groups['master_nodes']
-  become: true
+- name: Set rke2 configuration files
+  ansible.builtin.include_tasks: configure_rke2.yml
 
-- pause:
-    seconds: 5
+- name: Include task file add_manifest_addons.yml
+  ansible.builtin.include_tasks: add_manifest_addons.yml
+  vars:
+    source_directory: "{{ rke2_manifest_config_directory }}"
+    destination_directory: /var/lib/rancher/rke2/server/manifests/ansible_managed_0
+  when:
+    - rke2_manifest_config_directory is defined
+    - rke2_manifest_config_directory | length > 0
+    - inventory_hostname in groups['rke2_servers'][0]
 
-- name: install rke2 agent on workers
-  shell: "{{ script_dir }}/install.sh"
-  environment:
-    INSTALL_RKE2_CHANNEL: "{{ k8s.rke2.version }}"
-    INSTALL_RKE2_TYPE: "agent"
-  when: inventory_hostname in groups['worker_nodes']
-  become: true
+# is the ready_servers array is empty, we assume it's a new cluster and use the first server in groups['rke2_servers']
+- name: Start the first rke2 node
+  ansible.builtin.include_tasks: first_server.yml
+  when:
+    - inventory_hostname in groups['rke2_servers'][0]
+    - ready_servers | length == 0
 
-- name: enable rke2-agent on workers
-  systemd:
-    name: rke2-agent
-    enabled: true
-  when: inventory_hostname in groups['worker_nodes']
-  become: true
+- name: Save_generated_token.yml
+  ansible.builtin.include_tasks: save_generated_token.yml
+  vars:
+    token_source_node: "{{ groups['rke2_servers'][0] }}"
+  when:
+    - ready_servers | length == 0
 
-- name: copy worker-config.yaml to /etc/rancher/rke2/config.yaml
-  template:
-    src: "{{ ROOT_DIR }}/{{ k8s.rke2.config.params_file.worker }}"
-    dest: /etc/rancher/rke2/config.yaml
-  when: inventory_hostname in groups['worker_nodes']
-  become: true
+# is the ready_servers array is > 0, we assume it's an established cluster and treat all nodes equally (no need for initial server procedure)
+- name: Save_generated_token.yml
+  ansible.builtin.include_tasks: save_generated_token.yml
+  vars:
+    token_source_node: "{{ ready_servers[0] }}"
+  when:
+    - ready_servers | length > 0
 
-- name: start rke2-agent on workers (sequentially)
-  systemd:
-    name: rke2-agent
-    state: started
-  throttle: 1
-  when: inventory_hostname in groups['worker_nodes']
-  become: true
+- name: Start all other rke2 nodes
+  ansible.builtin.include_tasks: other_nodes.yml
 
-- name: force systemd to reread configs
-  systemd:
-    daemon_reload: true
-  when: inventory_hostname in groups['worker_nodes']
-  become: true
+- name: Configure kubectl,crictl,ctr
+  ansible.builtin.include_tasks: utilities.yml
+  when:
+    - inventory_hostname in groups['rke2_servers']
 
-- name: create {{ ansible_env.HOME }}/.kube
-  file:
-    path: "{{ ansible_env.HOME }}/.kube"
-    state: directory
-  when: inventory_hostname in groups['master_nodes']
-
-- name: copy /etc/rancher/rke2/rke2.yaml {{ ansible_env.HOME }}/.kube/config
-  copy:
-    src: /etc/rancher/rke2/rke2.yaml
-    dest: "{{ ansible_env.HOME }}/.kube/config"
-    remote_src: yes
-  when: inventory_hostname in groups['master_nodes']
-  become: true
-
-- name: Replace //127.0.0.1 with {{ hostvars[groups['master_nodes'][0]]['ansible_default_ipv4']['address'] }}
-  replace:
-    path: "{{ ansible_env.HOME }}/.kube/config"
-    regexp: 'https://127\.0\.0\.1:6443'
-    replace: "https://{{ hostvars[groups['master_nodes'][0]]['ansible_default_ipv4']['address'] }}:6443"
-
-- name: change {{ ansible_env.HOME }}/.kube ownership
-  shell: |
-    chown -R $(shell id -u):$(shell id -g) {{ ansible_env.HOME }}/.kube
-  when: inventory_hostname in groups['master_nodes']
-  become: true
+- name: Include task file add_manifest_addons.yml
+  ansible.builtin.include_tasks: add_manifest_addons.yml
+  vars:
+    source_directory: "{{ rke2_manifest_config_post_run_directory }}"
+    destination_directory: /var/lib/rancher/rke2/server/manifests/ansible_managed_1
+  when:
+    - rke2_manifest_config_post_run_directory is defined
+    - rke2_manifest_config_post_run_directory | length > 0
+    - inventory_hostname in groups['rke2_servers'][0]

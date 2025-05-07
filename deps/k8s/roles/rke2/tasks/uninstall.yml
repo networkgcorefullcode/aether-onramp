@@ -1,27 +1,23 @@
 ---
-
-- name: delete {{ ansible_env.HOME }}/.kube
-  file:
-    path: "{{ ansible_env.HOME }}/.kube"
-    state: absent
-  when: inventory_hostname in groups['master_nodes']
-
-- name: delete /usr/local/bin/kubectl
-  file:
-    path: "/usr/local/bin/kubectl"
-    state: absent
-  when: inventory_hostname in groups['master_nodes']
+- name: Running uninstall RKE2 script
   become: true
+  shell: /usr/local/bin/rke2-uninstall.sh
+  register: script_output
 
-- set_fact:
-    script_dir: /tmp/rke2
+- name: Show script output
+  debug:
+    var: script_output.stdout_lines
+# - name: Show script output
+#   debug:
+#     msg: "{{ script_output.stdout_lines }}"
+#   when: script_output.stdout | length > 0
 
 - name: uninstall rke2 masters/workers
   command: "/usr/local/bin/rke2-uninstall.sh"
   environment:
     INSTALL_RKE2_CHANNEL: "{{ k8s.rke2.version }}"
   become: true
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: remove {{ script_dir }}
   file:
@@ -32,3 +28,8 @@
   systemd:
     daemon_reload: true
   become: true
+
+# - name: Show script errors
+#   debug:
+#     msg: "{{ script_output.stderr_lines }}"
+#   when: script_output.stderr | length > 0

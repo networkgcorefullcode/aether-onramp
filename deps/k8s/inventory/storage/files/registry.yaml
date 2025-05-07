@@ -1,0 +1,13 @@
+mirrors:
+  192.168.12.15:8084:
+    endpoint:
+      - "http://192.168.12.15:8084"
+  docker.io:
+    endpoint:
+      - "http://192.168.12.15:8084"
+configs:
+  "192.168.12.15:8084":
+    auth:
+      username: admin   # this is the registry username
+      password: Avangenio2023*   # this is the registry password
+

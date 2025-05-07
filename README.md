@@ -13,28 +13,28 @@ type:
 $ git clone --recursive https://github.com/opennetworkinglab/aether-onramp.git
 ```
 
-Taking a quick look at your ``aether-onramp`` directory, you will
+Taking a quick look at your `aether-onramp` directory, you will
 find the following.
 
-1. The ``deps`` directory contains Ansible deployment
+1. The `deps` directory contains Ansible deployment
    specifications for all the Aether subsystems. Each of these
-   subdirectories (e.g., ``deps/5gc``) is self-contained, but
+   subdirectories (e.g., `deps/5gc`) is self-contained, but
    the Makefile in the main OnRamp directory imports the
    per-subsystem Makefiles, meaning all the steps required
    to install Aether can be (and typically should be) managed from
    this main directory.
 
-2. File ``vars/main.yml`` defines all the Ansible variables you will
+2. File `vars/main.yml` defines all the Ansible variables you will
    potentially need to modify to specify your deployment scenario.
-   This file is the union of all the per-component ``var/main.yml``
-   files you find in the corresponding ``deps`` directory. This
-    top-level variable file overrides the per-component files, so
-   you will not need to modify the latter. The ``vars`` directory
-   contains several variants of ``main.yml``, each tailored for a
-   different deployment scenario, with the default ``main.yml``
+   This file is the union of all the per-component `var/main.yml`
+   files you find in the corresponding `deps` directory. This
+   top-level variable file overrides the per-component files, so
+   you will not need to modify the latter. The `vars` directory
+   contains several variants of `main.yml`, each tailored for a
+   different deployment scenario, with the default `main.yml`
    supporting the Quick Start deployment described below.
 
-3. File ``hosts.ini`` specifies the set of servers (physical or
+3. File `hosts.ini` specifies the set of servers (physical or
    virtual) that Ansible targets with various playbooks. The
    default version included with OnRamp is simplified to run
    everything on a single server (the one you've cloned the
@@ -43,7 +43,7 @@ find the following.
 Aether OnRamp assumes Ansible is installed. (See the
 [Aether Guide](https://docs.aetherproject.org/master/onramp/start.html#prep-environment)
 for instructions on doing this, along with additional guidance if this
-is your first attempt to install OnRamp.) Then, once you edit ``hosts.ini`` to
+is your first attempt to install OnRamp.) Then, once you edit `hosts.ini` to
 match your local details, type the following to verify the setup:
 
 ```
@@ -52,12 +52,12 @@ $ make aether-pingall
 
 ## Quick Start
 
-Edit ``vars/main.yml`` to reflect your local scenario. For
+Edit `vars/main.yml` to reflect your local scenario. For
 the Quick Start deployment, this means setting variable
-``data_iface`` to your server's network interface. Note there are
-**two** lines that define this variable, one in the ``core`` section
-and one in the ``gnbsim`` section. You also need to set the
-IP address of the AMF (in the ``core`` section) to your servers's
+`data_iface` to your server's network interface. Note there are
+**two** lines that define this variable, one in the `core` section
+and one in the `gnbsim` section. You also need to set the
+IP address of the AMF (in the `core` section) to your servers's
 IP address.
 
 You are now ready to install a one-node Kubernetes cluster. Type:
@@ -66,15 +66,15 @@ You are now ready to install a one-node Kubernetes cluster. Type:
 $ make aether-k8s-install
 ```
 
-Once Kubernetes is running (which you can verify with ``kubectl``),
+Once Kubernetes is running (which you can verify with `kubectl`),
 you are ready to intall the 5G version of SD-Core. Type:
 
 ```
 $ make aether-5gc-install
 ```
 
-Once the Core is running (which you can verify by using ``kubectl`` to
-check the ``omec`` name space), you are ready to emulate a RAN
+Once the Core is running (which you can verify by using `kubectl` to
+check the `omec` name space), you are ready to emulate a RAN
 workload. Type:
 
 ```
@@ -105,7 +105,7 @@ http://<server_ip>:31194
 http://<server_ip>:30950
 ```
 
-You will probably want to rerun ``make aether-gnbsim-run`` to generate
+You will probably want to rerun `make aether-gnbsim-run` to generate
 trafffic for the monitoring system to display.
 
 When you are ready to tear down your Quick Start deployment of Aether,
