@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-k8s:
-  rke2:
-    version: v1.31.3+rke2r1
-    config:
-      token: purdue-k8s-rke2
-      port: 9345
-      params_file:
-        master: ""
-        worker: ""
-=======
 ---
 rke2_kubernetes_api_server_host: ""
 rke2_tarball_install_dir: "/usr/local"
@@ -53,4 +42,3 @@ rke2_version_majmin: ""
 rke2_version_rpm: ""
 rke2_package_state: "installed"
 rke2_systemd_env_config_file_path: ""
->>>>>>> k8s-v1.31.3+rke2r1-aether-stable

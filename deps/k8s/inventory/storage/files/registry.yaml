@@ -10,4 +10,5 @@ configs:
     auth:
       username: admin   # this is the registry username
       password: Avangenio2023*   # this is the registry password
-
+    tls: 
+      insecure_skip_verify: true

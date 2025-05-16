@@ -12,23 +12,6 @@
 #     msg: "{{ script_output.stdout_lines }}"
 #   when: script_output.stdout | length > 0
 
-- name: uninstall rke2 masters/workers
-  command: "/usr/local/bin/rke2-uninstall.sh"
-  environment:
-    INSTALL_RKE2_CHANNEL: "{{ k8s.rke2.version }}"
-  become: true
-  ignore_errors: true
-
-- name: remove {{ script_dir }}
-  file:
-    path: "{{ script_dir }}"
-    state: absent
-
-- name: force systemd to reread configs
-  systemd:
-    daemon_reload: true
-  become: true
-
 # - name: Show script errors
 #   debug:
 #     msg: "{{ script_output.stderr_lines }}"

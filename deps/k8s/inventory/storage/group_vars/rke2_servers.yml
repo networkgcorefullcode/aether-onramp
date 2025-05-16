@@ -15,6 +15,7 @@ group_rke2_config:
   cluster-cidr: 10.42.0.0/16
   kubelet-arg:
     - --allowed-unsafe-sysctls=net.*
+  #kube-proxy-image: "192.168.12.15:8082/docker-hosted/kube-proxy-new-ipset:ipset-7.23"
   kube-proxy-arg:
     - --metrics-bind-address=0.0.0.0:10249
     - --proxy-mode=ipvs
