@@ -1,4 +1,4 @@
 mirrors:
-  "192.168.12.15:8082": # El nombre de tu registry tal como lo usas en la imagen
+  "192.168.12.15:8082": # El nombre de tu registry tal como se usa en la imagen
     endpoint:
-      - "http://192.168.12.15:8082" # Especifica explícitamente HTTP
+      - "http://192.168.12.15:8082" # Especificar explícitamente HTTP
