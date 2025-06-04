@@ -64,15 +64,15 @@ default-nssai:
 
 # Supported integrity algorithms by this UE
 integrity:
-  IA1: true
+  IA1: false
   IA2: false
-  IA3: false
+  IA3: true
 
 # Supported encryption algorithms by this UE
 ciphering:
   EA1: false
   EA2: false
-  EA3: false
+  EA3: true
 
 # Integrity protection maximum data rate for user plane
 integrityMaxRate:
