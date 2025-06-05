@@ -76,3 +76,10 @@
     owner: "{{ user_name }}"
     group: "{{ user_name }}"
     remote_src: yes
+
+- name: Restart shell
+  become: false
+  shell: bash -c 'source ~/.bashrc'
+
+- name: Include task file kube_proxy_modules.yml
+  ansible.builtin.include_tasks: kube_proxy_modules.yml

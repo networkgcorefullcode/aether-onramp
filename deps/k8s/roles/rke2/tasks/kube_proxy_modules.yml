@@ -1,0 +1,41 @@
+---
+
+- name: Actualizar índice de paquetes (Debian/Ubuntu)
+  apt:
+   update_cache: yes
+   cache_valid_time: 3600
+
+
+- name: Instalar paquetes requeridos
+  apt:
+    name:
+    - nftables
+    - libzstd1
+    - ipset
+    state: present
+    update_cache: yes
+
+
+- name: Cargar módulos del kernel temporalmente
+  modprobe:
+     name: "{{ item }}"
+     state: present
+  with_items:
+     - ip_vs
+     - ip_vs_rr
+     - ip_vs_wrr
+     - ip_vs_sh
+     - nf_conntrack
+
+- name: Crear archivo de persistencia para módulos
+  copy:
+    content: |
+      ip_vs
+      ip_vs_rr
+      ip_vs_wrr
+      ip_vs_sh
+      nf_conntrack
+    dest: /etc/modules-load.d/k8s.conf
+    owner: root
+    group: root
+    mode: '0644'
