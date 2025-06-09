@@ -23,8 +23,8 @@
 - name: Setup Local Store
   shell:
     cmd: |
-      kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/{{ amp.store.lpp.version }}/deploy/local-path-storage.yaml --wait=true;
-      kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}';
+      /var/lib/rancher/rke2/bin/kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/{{ amp.store.lpp.version }}/deploy/local-path-storage.yaml --wait=true;
+      /var/lib/rancher/rke2/bin/kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}';
   when: inventory_hostname in groups['master_nodes']
 
 - name: remove /tmp/roc-values.yaml
@@ -57,6 +57,8 @@
         values_files:
           - /tmp/roc-values.yaml
         wait: true
+        wait_timeout: "10m"  # Aumentar de 5m (default) a 10m
+        #timeout: "15m"       # Timeout general más alto
         force: true
       when: inventory_hostname in groups['master_nodes']
 
@@ -76,7 +78,7 @@
 
   rescue:
     - name: Get Pods Status
-      shell: kubectl get po -n kube-system
+      shell: /var/lib/rancher/rke2/bin/kubectl get po -n kube-system
       register: pod_status
       changed_when: false
       when: inventory_hostname in groups['master_nodes']
@@ -88,7 +90,7 @@
           status=$(echo "$line" | awk '{print $3}')
 
           if [[ "$status" != "Running" && "$status" != "Completed" ]]; then
-            kubectl delete pod "$name" -n kube-system
+            /var/lib/rancher/rke2/bin/kubectl delete pod "$name" -n kube-system
           fi
         done <<< "{{ pod_status.stdout }}"
       args:
@@ -113,7 +115,7 @@
 
   rescue:
     - name: Get Pods Status
-      shell: kubectl get po -n aether-roc
+      shell: /var/lib/rancher/rke2/bin/kubectl get po -n aether-roc
       register: pod_status
       changed_when: false
       when: inventory_hostname in groups['master_nodes']
@@ -125,7 +127,7 @@
           status=$(echo "$line" | awk '{print $3}')
 
           if [[ "$status" != "Running" && "$status" != "Completed" ]]; then
-            kubectl delete pod "$name" -n aether-roc
+            /var/lib/rancher/rke2/bin/kubectl delete pod "$name" -n aether-roc
           fi
         done <<< "{{ pod_status.stdout }}"
       args:
