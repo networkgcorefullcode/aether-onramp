@@ -47,10 +47,21 @@
     values_files:
       - /tmp/upf-{{item.key}}.yaml
     wait: true
-    wait_timeout: "1m30s"
+    wait_timeout: "10m30s"
     force: true
   with_dict: "{{ core.upf.additional_upfs}}"
   when: inventory_hostname in groups['master_nodes']
+
+# - name: wait for upf deployment with kubectl
+#   shell: |
+#     /var/lib/rancher/rke2/bin/kubectl wait --for=condition=available \
+#       --timeout=900s \
+#       StatefulSet/bess-upf \
+#       -n aether-5gc-upf-{{ item.key }}
+#   with_dict: "{{ core.upf.additional_upfs }}"
+#   when: inventory_hostname in groups['master_nodes']
+#   register: kubectl_wait
+#   failed_when: kubectl_wait.rc != 0
 
 - name: configure route for upf traffic on gnbsim node
   shell: |

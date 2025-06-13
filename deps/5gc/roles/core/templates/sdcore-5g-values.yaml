@@ -72,6 +72,13 @@ omec-control-plane:
       cfgFiles:
         amfcfg.yaml:
           configuration:
+            plmnSupportList: 
+              - plmnId:        # "20893" # PLMN local de Aether
+                  mcc: "208"
+                  mnc:  "93" 
+              - plmnId:        # "36801" # PLMN del operador visitante
+                  mcc: "368"
+                  mnc:  "01"
             enableDBStore: true # Store AMF subscribers in the datastore
             networkFeatureSupport5GS: # 5gs Network Feature Support IE, refer to TS 24.501 sec. 9.11.3.5
               imsVoPS: 1 # IMS voice over PS session indicator (uinteger, range: 0~1)
@@ -91,8 +98,10 @@ omec-control-plane:
         smfcfg.yaml:
           configuration:
             enableDBStore: true  # Store SMF subscribers in the datastore
-            # staticIpInfo:
-            #   - dnn: internet
+            staticIpInfo:
+              - dnn: "internet"
+                dns:
+                  ipv4: "8.8.8.8" # DNS a ser usado por los UEs
             #     imsiIpInfo:
             #       imsi-208930100007510: "172.250.0.100"
             #       imsi-208930100007511: "172.250.0.101"
@@ -160,6 +169,13 @@ omec-sub-provision:
               op: ""
               key: "5122250214c33e723a5dd523fc145fc0"
               sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "368010100007587" # roaming PLMN configs
+              ueId-end: "368010100007590"
+              plmnId: "36801"
+              opc: "rj64la209512kvm56as03ei12zxmg06a" # estos valores son credenciales que se deben  consultar en el operador. No se deben poner en claro aqui
+              op: ""
+              key: "vmx340a19gf4asl471zsruapl1av5gnz"
+              sequenceNumber: "1b4z8s9j4f7z0m"
 
             # Configure Device Groups (ignored if provision-network-slice is disabled)
             device-groups:
@@ -285,6 +301,32 @@ omec-sub-provision:
             # UPF allocates IP address if there is only 1 device-group
             # SMF allocates IP address if there is >1 device-group
 
+            - name: "roaming-group" # IMSIs for roaming UEs
+              imsis:
+                - "368010100007587"
+                - "368010100007588"
+                - "368010100007589"
+                - "368010100007590"
+              ip-domain-name: "pool-roaming"
+              ip-domain-expanded:
+                dnn: internet
+                dns-primary: "8.8.8.8"        # Value is sent to UE
+                mtu: 1460                     # Value is sent to UE when PDU Session Established
+                ue-ip-pool: "192.168.200.0/24"  # IP address pool for subscribers
+                ue-dnn-qos:
+                  dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
+                  dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
+                  bitrate-unit: Mbps          # Unit for above QoS rates
+                  traffic-class:              # Default bearer QCI/ARP (not used in 5G)
+                    name: "platinum"
+                    qci: 9
+                    arp: 6
+                    pdb: 300
+                    pelr: 6
+              site-info: "roaming"
+            # UPF allocates IP address if there is only 1 device-group
+            # SMF allocates IP address if there is >1 device-group
+              
             # Configure Network Slices (ignored if provision-network-slice is disabled)
             network-slices:
             - name: "default"      # can be any unique slice name
@@ -314,6 +356,36 @@ omec-sub-provision:
                 upf:
                   upf-name: "upf"  # associated UPF for this slice. One UPF per Slice.
                   upf-port: 8805
+            ###
+            # NEW CONFIGURATIONS FOR ROAMING
+            ###
+            - name: "roaming-slice"      # can be any unique slice name
+              slice-id:            # must match with slice configured in gNB, UE
+                sd: "010204"
+                sst: 2
+              site-device-group:
+              - "roaming-group"   # All UEs in this device-group are assigned to this slice
+              # Applicaiton filters control what each user can access.
+              # Default, allow access to all applications
+              application-filtering-rules:
+              - rule-name: "ROAMING-INTERNET"
+                priority: 240
+                action: "permit"
+                endpoint: "0.0.0.0/0"
+              site-info:
+                # Provide gNBs and UPF details and also PLMN for the site
+                gNodeBs:
+                - name: "gnb3"
+                  tac: 3
+                - name: "gnb4"
+                  tac: 4
+                plmn:
+                  mcc: "208"
+                  mnc: "93"
+                site-name: "roaming"
+                upf:
+                  upf-name: "upf-roaming"  # associated UPF for this slice. One UPF per Slice.
+                  upf-port: 8805
 
 # Override values for omec-user-plane Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/bess-upf/values.yaml
@@ -330,7 +402,7 @@ omec-user-plane:
       # pfcpiface: <pfcp image tag>
       # tools: omecproject/busybox:stable
   config:
-    upf:
+    upf: # default slice upf
       name: "oaisim"
       sriov:
         enabled: false    # SRIOV is disabled by default
@@ -366,7 +438,7 @@ omec-user-plane:
             hostname: "upf"
             #http_port: "8080"
             enable_ue_ip_alloc: false    # If true, UPF allocates address from following pool
-            ue_ip_pool: {{ core.upf.default_upf.ue_ip_pool }} # IP pool used UEs if enable_ue_ip_alloc=true
+            #ue_ip_pool: {{ core.upf.default_upf.ue_ip_pool }} # IP pool used UEs if enable_ue_ip_alloc=true
           slice_rate_limit_config:       # Slice-level rate limiting (also controlled by ROC)
             # Uplink
             n6_bps: 10000000000          # 10Gbps
@@ -374,3 +446,49 @@ omec-user-plane:
             # Downlink
             n3_bps: 10000000000          # 10Gbps
             n3_burst_bytes: 12500000     # 10ms * 10Gbps
+
+    # #new UPF for roaming        
+    # upf-roaming: # roaming slice upf
+    #   name: "roaming"
+    #   sriov:
+    #     enabled: false    # SRIOV is disabled by default
+    #   hugepage:
+    #     enabled: false    # Should be enabled if DPDK is enabled
+    #   routes:
+    #     - to: {{ ansible_default_ipv4.address }}
+    #       via: 169.254.1.1
+    #   enb:
+    #     subnet: {{ ran_subnet }} # Subnet for the gNB network
+    #   access:
+    #     ipam: static
+    #     cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
+    #     iface: {{ core.data_iface }}
+    #     gateway: {{ access_gw }}
+    #     ip: {{ access_ip }}
+    #   core:
+    #     ipam: static
+    #     cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
+    #     iface: {{ core.data_iface }}
+    #     gateway: {{ core_gw }}
+    #     ip: {{ core_ip }}
+    #   cfgFiles:
+    #     upf.jsonc:
+    #       mode: {{ core.upf.mode }}
+    #       hwcksum: true
+    #       log_level: "debug"
+    #       measure_upf: true
+    #       measure_flow: true
+    #       gtppsc: true                   # Extension header enabled in 5G.
+    #       cpiface:
+    #         dnn: "internet"              # Must match Slice dnn
+    #         hostname: "upf-roaming"
+    #         #http_port: "8080"
+    #         enable_ue_ip_alloc: false    # If true, UPF allocates address from following pool
+    #         #ue_ip_pool: "192.168.200.0/24" # IP pool used UEs if enable_ue_ip_alloc=true
+    #       slice_rate_limit_config:       # Slice-level rate limiting (also controlled by ROC)
+    #         # Uplink
+    #         n6_bps: 10000000000          # 10Gbps
+    #         n6_burst_bytes: 12500000     # 10ms * 10Gbps
+    #         # Downlink
+    #         n3_bps: 10000000000          # 10Gbps
+    #         n3_burst_bytes: 12500000     # 10ms * 10Gbps 
