@@ -1,0 +1,10 @@
+core:
+  standalone: true
+  data_iface: data
+  values_file: "/home/abelct/aether/aether-onramp-avangenio/deps/5gc/roles/udm-open5GS/templates/values-5g.yaml"
+  ran_subnet: "" # set it to empty to get subnet from 'data_iface'
+
+  helm:
+    local_charts: true
+    chart_ref: "/home/abelct/aether/aether-onramp-avangenio/deps/5gc/roles/udm-open5GS/local_chart/open5gs"
+    chart_version: 2.2.9

@@ -1,0 +1,123 @@
+---
+
+# - name: add aether chart repo
+#   kubernetes.core.helm_repository:
+#     name: aether
+#     repo_url: "https://charts.aetherproject.org"
+#   when: inventory_hostname in groups['master_nodes'] and not core.helm.local_charts
+
+- name: find {{ core.data_iface }}'s subnet for RAN
+  shell: ip route | grep {{ core.data_iface }} | awk '/kernel/ {print $1}' | head -1
+  register: result
+  when: inventory_hostname in groups['open5GS_node']
+  become: true
+
+# TODO: check if interface subnet is valid
+- set_fact:
+    ran_subnet: "{{ result.stdout if (core.ran_subnet == '') else core.ran_subnet }}"
+    access_gw: "{{ core.upf.access_subnet[:-3] }}"
+    access_ip: "{{ core.upf.default_upf.ip.access + '/24' }}"
+    core_gw: "{{ core.upf.core_subnet[:-3] }}"
+    core_ip: "{{ core.upf.default_upf.ip.core + '/24' }}"
+  when: inventory_hostname in groups['open5GS_node']
+
+- debug:
+    var: ran_subnet
+  when: inventory_hostname in groups['open5GS_node']
+
+- name: remove /tmp/values-5g.yaml
+  file:
+    path: "/tmp/values-5g.yaml"
+    state: absent
+  when: inventory_hostname in groups['open5GS_node']
+
+- name: copy {{ ROOT_DIR }}/{{ core.open5gs.values_file }} to /tmp/values-5g.yaml
+  copy:
+    src: "{{ ROOT_DIR }}/{{ core.open5gs.values_file }}"
+    dest: "/tmp/values-5g.yaml"
+  when: inventory_hostname in groups['open5GS_node']
+
+- set_fact:
+    chart_ref_open5Ggs_udm: "{{ core.open5gs_helm.chart_ref | regex_replace('^(.*)/.*$', '\\1')  }}"
+  when: inventory_hostname in groups['open5GS_node'] and core.open5gs_helm.local_charts
+
+- debug:
+    var: "chart_ref_open5Ggs_udm"
+  when: inventory_hostname in groups['open5GS_node'] and core.open5gs_helm.local_charts
+
+- name: copy local_charts "{{ chart_ref_open5Ggs_udm }}" to /tmp/open5gs-helm-chart
+  synchronize:
+    src: "{{ chart_ref_open5Ggs_udm }}/"
+    dest: /tmp/open5gs-helm-chart
+    recursive: yes
+    rsync_opts:
+      - "--exclude=.git"
+  when: inventory_hostname in groups['open5GS_node'] and core.open5gs_helm.local_charts
+
+- set_fact:
+    chart_ref_open5Ggs_udm: "/tmp/open5gs-helm-chart/{{ core.open5gs_helm.chart_ref | regex_replace('^.*/(.*)$', '\\1') }}"
+  when: inventory_hostname in groups['open5GS_node'] and core.open5gs_helm.local_charts
+
+- debug:
+    var: "chart_ref_open5Ggs_udm"
+  when: inventory_hostname in groups['open5GS_node'] and core.open5gs_helm.local_charts
+
+- name: Clean Helm cache and add bitnami repo
+  shell: |
+    helm repo add bitnami https://charts.bitnami.com/bitnami
+    helm repo update
+  args:
+    executable: /bin/bash
+  when: inventory_hostname in groups['open5GS_node'] and core.open5gs_helm.local_charts
+
+- name: update open5gs helm dependencies
+  shell: |
+    helm dep up /tmp/open5gs-helm-chart/open5gs
+  when: inventory_hostname in groups['open5GS_node'] and core.open5gs_helm.local_charts
+
+- name: update open5gs helm dependencies
+  shell: |
+    helm dep up {{chart_ref_open5Ggs_udm}}
+  when: inventory_hostname in groups['open5GS_node'] and core.open5gs_helm.local_charts
+
+# TODO: add systems check to avoid issues (e.g., mongodb needing avx support)
+- name: deploy open5gs
+  block:
+    - name: deploy open5gs
+      kubernetes.core.helm:
+        update_repo_cache: false
+        name: open5gs
+        release_namespace: open5gs
+        create_namespace: true
+        chart_ref: "{{ core.open5gs_helm.chart_ref if core.open5gs_helm.local_charts == false else chart_ref_open5Ggs_udm }}"
+        chart_version: "{{ core.open5gs_helm.chart_version }}"
+        values_files:
+          - /tmp/values-5g.yaml
+        wait: true
+        wait_timeout: "5m30s"
+        force: true
+      when: inventory_hostname in groups['open5GS_node']
+
+  rescue:
+    - name: Get Pods Status
+      shell: /var/lib/rancher/rke2/bin/kubectl get po -n open5gs
+      register: pod_status
+      changed_when: false
+      when: inventory_hostname in groups['open5GS_node']
+
+    - name: restart Pods if not running
+      shell: |
+        while IFS= read -r line; do
+          name=$(echo "$line" | awk '{print $1}')
+          status=$(echo "$line" | awk '{print $3}')
+
+          if [[ "$status" != "Running" ]]; then
+            /var/lib/rancher/rke2/bin/kubectl delete pod "$name" -n open5gs
+          fi
+        done <<< "{{ pod_status.stdout }}"
+      args:
+        executable: /bin/bash
+      when: inventory_hostname in groups['open5GS_node']
+  always:
+    - pause:
+        seconds: 60

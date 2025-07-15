@@ -48,6 +48,11 @@ aether-srsran-gnb-uninstall: srsran-gnb-uninstall
 aether-srsran-uesim-start: srsran-uesim-start
 aether-srsran-uesim-stop: srsran-uesim-stop
 
+
+###### OPEN5GS
+aether-open5gs-udm-install: open5gs-udm-install
+######
+
 #### Shortcut for QuickStart Only ####
 aether-install: k8s-install 5gc-install gnbsim-install amp-install
 aether-uninstall: monitor-uninstall roc-uninstall gnbsim-uninstall 5gc-uninstall k8s-uninstall

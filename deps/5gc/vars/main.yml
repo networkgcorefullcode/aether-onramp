@@ -2,12 +2,15 @@ core:
   standalone: true
   data_iface: ens18
   values_file: "roles/core/templates/sdcore-5g-values.yaml"
+  #values_file: "deps/5gc/roles/core/templates/sdcore-5g-values-local-chart.yaml"
   ran_subnet: "172.20.0.0/16"		 # set it to empty to get subnet from 'data_iface'
 
   helm:
     local_charts: false
     chart_ref: aether/sd-core
-    chart_version: 2.0.0
+    #chart_ref: /home/abelct/aether/aether-onramp-avangenio/deps/5gc/roles/core/local_chart/5g-control-plane
+    #chart_version: 2.0.0
+    chart_version: 2.2.8
 
   upf:
     access_subnet: "192.168.252.1/24"	# access subnet & gateway
@@ -31,3 +34,14 @@ core:
       #     access: "192.168.252.7"
       #     core:   "192.168.250.7"
       #   ue_ip_pool: "172.248.0.0/16"
+
+  open5gs:
+    standalone: true
+    data_iface: data
+    values_file: "deps/5gc/roles/udm-open5GS/templates/values-5g.yaml"
+    ran_subnet: "" # set it to empty to get subnet from 'data_iface'
+
+  open5gs_helm:
+    local_charts: true
+    chart_ref: "/home/abelct/aether/aether-onramp-avangenio/deps/5gc/roles/udm-open5GS/local_chart/open5gs"
+    chart_version: 2.2.9

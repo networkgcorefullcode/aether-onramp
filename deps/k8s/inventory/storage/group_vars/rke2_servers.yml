@@ -5,20 +5,22 @@ rke2_manifest_config_directory: "{{ playbook_dir }}/inventory/storage/pre-deploy
 rke2_manifest_config_post_run_directory: "{{ playbook_dir }}/inventory/storage/post-deploy-manifests/"
 
 group_rke2_config:
+  cluster-ip-family: ipv4
+  service-ip-family: ipv4
   cni:
     - multus
     - canal
   disable-kube-proxy: false
   node-label:
     - node-role.aetherproject.org=omec-upf
-  service-cidr: 10.43.0.0/16
-  cluster-cidr: 10.42.0.0/16
+  service-cidr: 10.53.0.0/16
+  cluster-cidr: 10.52.0.0/16
   kubelet-arg:
     - --allowed-unsafe-sysctls=net.*
   #kube-proxy-image: "192.168.12.15:8082/docker-hosted/kube-proxy-new-ipset:ipset-7.23"
   kube-proxy-arg:
     - --metrics-bind-address=0.0.0.0:10249
-    - --proxy-mode=ipvs
+    - --proxy-mode=iptables
   kube-proxy-image: 192.168.12.15:8082/kube-proxy-new-ipset:ipset-7.23.v4
     #- --feature-gates=RemoveSelfLink=false
     #- --v=4

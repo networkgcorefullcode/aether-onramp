@@ -51,3 +51,9 @@ export EXTRA_VARS ?= "@$(5GC_ROOT_DIR)/vars/main.yml"
 5gc-upf-uninstall:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/upf.yml --tags uninstall \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+
+
+#### g. Install Open5GS UDM
+open5gs-udm-install:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/open5gs-udm.yml --tags install \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)

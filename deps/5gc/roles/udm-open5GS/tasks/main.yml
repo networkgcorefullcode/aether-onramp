@@ -1,0 +1,9 @@
+---
+
+- name: install udm-open5GS
+  import_tasks: roles/udm-open5GS/tasks/install.yml
+  tags: install
+
+- name: uninstall udm-open5GS
+  import_tasks: roles/udm-open5GS/tasks/uninstall.yml
+  tags: uninstall

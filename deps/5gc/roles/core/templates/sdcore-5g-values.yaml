@@ -21,6 +21,34 @@ omec-control-plane:
     #  amf: <amf image tag>
     # refer to above Helm Chart to add other NF images
 
+  nfDeploy:
+    - "nrf"
+    - "udr"
+    - "ausf"
+    - "pcf"
+    - "smf"
+    - "amf"
+    - "webui"
+    - "sctplb"
+    - "nssf"
+    - "simapp"
+    - "metricfunc"
+    - "kafka"
+    - "mongodb"
+    # "udm" está ausente intencionalmente
+
+  # deshabilitar el UDM
+  udm:
+    enabled: false
+
+
+  ausf:
+    cfgFiles:
+      ausfcfg.yaml:
+        configuration:
+          udm:
+            url: http://192.168.12.13:7777  # Ej: http://10.10.20.30:80
+  
   kafka:
     deploy: true
 
@@ -72,7 +100,7 @@ omec-control-plane:
       cfgFiles:
         amfcfg.yaml:
           configuration:
-            enableDBStore: true # Store AMF subscribers in the datastore
+            enableDBStore: false # Store AMF subscribers in the datastore
             networkFeatureSupport5GS: # 5gs Network Feature Support IE, refer to TS 24.501 sec. 9.11.3.5
               imsVoPS: 1 # IMS voice over PS session indicator (uinteger, range: 0~1)
             security:
@@ -90,7 +118,9 @@ omec-control-plane:
       cfgFiles:
         smfcfg.yaml:
           configuration:
-            enableDBStore: true  # Store SMF subscribers in the datastore
+            udm:
+              url: http://192.168.12.13:7777
+            enableDBStore: false  # Store SMF subscribers in the datastore
             # staticIpInfo:
             #   - dnn: internet
             #     imsiIpInfo:
@@ -112,6 +142,11 @@ omec-control-plane:
             mongoDBStreamEnable: false    # enable/disable MongoDB stream in NRF
             nfProfileExpiryEnable: true   # If enabled, remove NF profile if no keepalive received
             nfKeepAliveTime: 60           # default timeout for NF profiles
+            nfServices:
+              udm:
+                - host: 192.168.12.13
+                  port: 7777
+                  scheme: http
 
     webui:
       cfgFiles:
@@ -345,14 +380,14 @@ omec-user-plane:
         ipam: static
         cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
         iface: {{ core.data_iface }}
-        gateway: {{ access_gw }}
-        ip: {{ access_ip }}
+        gateway: "192.168.253.1"
+        ip: "192.168.253.3/24"
       core:
         ipam: static
         cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
         iface: {{ core.data_iface }}
-        gateway: {{ core_gw }}
-        ip: {{ core_ip }}
+        gateway: "192.168.251.1"
+        ip: "192.168.251.3/24"
       cfgFiles:
         upf.jsonc:
           mode: {{ core.upf.mode }}

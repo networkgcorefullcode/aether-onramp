@@ -86,13 +86,13 @@
         values_files:
           - /tmp/sdcore-5g-values.yaml
         wait: true
-        wait_timeout: "2m30s"
+        wait_timeout: "5m30s"
         force: true
       when: inventory_hostname in groups['master_nodes']
 
   rescue:
     - name: Get Pods Status
-      shell: kubectl get po -n aether-5gc
+      shell: /var/lib/rancher/rke2/bin/kubectl get po -n aether-5gc
       register: pod_status
       changed_when: false
       when: inventory_hostname in groups['master_nodes']
@@ -104,7 +104,7 @@
           status=$(echo "$line" | awk '{print $3}')
 
           if [[ "$status" != "Running" ]]; then
-            kubectl delete pod "$name" -n aether-5gc
+            /var/lib/rancher/rke2/bin/kubectl delete pod "$name" -n aether-5gc
           fi
         done <<< "{{ pod_status.stdout }}"
       args:
