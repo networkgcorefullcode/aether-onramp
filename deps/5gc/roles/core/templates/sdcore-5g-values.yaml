@@ -16,7 +16,7 @@ omec-control-plane:
 5g-control-plane:
   enable5G: true
   images:
-    repository: ""
+    repository: "192.168.12.15:8082/"
     #tags:
     #  amf: <amf image tag>
     # refer to above Helm Chart to add other NF images
@@ -126,7 +126,7 @@ omec-control-plane:
 omec-sub-provision:
   enable: true
   images:
-    repository: ""
+    repository: "192.168.12.15:8082/"
     #tags:
     #  simapp: #add simapp override image
 
@@ -324,7 +324,7 @@ omec-user-plane:
   resources:
     enabled: false
   images:
-    repository: ""
+    repository: "192.168.12.15:8082/"
     # tags:
       # bess: <bess image tag>
       # pfcpiface: <pfcp image tag>

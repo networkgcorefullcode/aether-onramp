@@ -19,7 +19,7 @@ group_rke2_config:
   kube-proxy-arg:
     - --metrics-bind-address=0.0.0.0:10249
     - --proxy-mode=ipvs
-  kube-proxy-image: 192.168.12.15:8082/kube-proxy-new-ipset:ipset-7.23.v4
+  kube-proxy-image: 192.168.12.15:8083/kube-proxy-new-ipset:ipset-7.23.v4
     #- --feature-gates=RemoveSelfLink=false
     #- --v=4
     #- --ipvs-strict-arp=true

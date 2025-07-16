@@ -2,3 +2,9 @@ mirrors:
   "192.168.12.15:8082": # El nombre de tu registry tal como se usa en la imagen
     endpoint:
       - "http://192.168.12.15:8082" # Especificar explícitamente HTTP
+  "192.168.12.15:8083": # El nombre de tu registry tal como se usa en la imagen
+    endpoint:
+      - "http://192.168.12.15:8083" # Especificar explícitamente HTTP
+  "docker.io": # El nombre de tu registry tal como se usa en la imagen
+    endpoint:
+      - "http://192.168.12.15:8082" # Especificar explícitamente HTTP

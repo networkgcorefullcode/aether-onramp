@@ -1,12 +1,18 @@
 mirrors:
-  192.168.12.15:8084:
+  192.168.12.15:8083:
     endpoint:
-      - "http://192.168.12.15:8084"
+      - "http://192.168.12.15:8083"
   docker.io:
     endpoint:
-      - "http://192.168.12.15:8084"
+      - "http://192.168.12.15:8083"
 configs:
-  "192.168.12.15:8084":
+  "192.168.12.15:8083":
+    auth:
+      username: admin   # this is the registry username
+      password: Avangenio2023*   # this is the registry password
+    tls: 
+      insecure_skip_verify: true
+  "docker.io":
     auth:
       username: admin   # this is the registry username
       password: Avangenio2023*   # this is the registry password
