@@ -16,9 +16,19 @@ omec-control-plane:
 5g-control-plane:
   enable5G: true
   images:
-    repository: "192.168.12.15:8082/"
-    #tags:
-    #  amf: <amf image tag>
+    repository: "192.168.12.15:8083/"
+    tags:
+      amf: omecproject/5gc-amf:v1.2.1-new-dev
+      ausf: omecproject/5gc-ausf:v1.2.1-new-dev
+      smf: omecproject/5gc-smf:v1.2.1-new-dev
+      udm: omecproject/5gc-udm:v1.2.1-new-dev
+      udr: omecproject/5gc-udr:v1.2.1-new-dev
+      pcf: omecproject/5gc-pcf:v1.2.1-new-dev
+      nrf: omecproject/5gc-nrf:v1.2.1-new-dev
+      webui: omecproject/5gc-webui:v1.2.1-new-dev
+      sctplb: omecproject/sctplb:v1.2.1-new-dev
+      nssf: omecproject/5gc-nssf:v1.2.1-new-dev
+      upfadapter: omecproject/upfadapter:v1.2.2-new-dev
     # refer to above Helm Chart to add other NF images
 
   kafka:
@@ -84,6 +94,207 @@ omec-control-plane:
                  - NEA3
                  - NEA2
             #     - NEA0
+            amfName: AMF # the name of this AMF
+            amfDBName: "amf_db"   # Nombre de la base de datos MongoDB para el AMF
+            ngapIpList:  # the IP list of N2 interfaces on this AMF
+              - 0.0.0.0
+            ngappPort: 38412                      # Puerto UDP/TCP usado por NGAP
+            sctpGrpcPort: 9000                   # Puerto gRPC para comunicaciones SCTP
+            enableSctpLb: true                    # Habilitar el balanceador de carga SCTP
+            sbi: # Service-based interface information
+              scheme: http # the protocol for sbi (http or https)
+              registerIPv4: amf # IP used to register to NRF
+              bindingIPv4: 0.0.0.0  # IP used to bind the service
+              port: 8000 # port used to bind the service
+              # tls: # the local path of TLS key
+              #   key: /var/run/certs/tls.key # AMF TLS Private key
+              #   pem: /var/run/certs/tls.crt # AMF TLS Certificate
+            mongodb:                              # Configuración de conexión a MongoDB
+               name: "aether"                      # Nombre de la base de datos
+               url: "mongodb://mongodb-arbiter-headless"  # URL de conexión con credenciales y host:puerto
+            webuiUri: "http://webui:5001" # URI del WebUI del AMF
+            enableNrfCaching: true                # Habilitar caching de NRF
+            nrfCacheEvictionInterval: 300         # Intervalo (s) para expulsión de caché NRF
+            serviceNameList: # the SBI services provided by this AMF, refer to TS 29.518
+              - namf-comm # Namf_Communication service
+              - namf-evts # Namf_EventExposure service
+              - namf-mt   # Namf_MT service
+              - namf-loc  # Namf_Location service
+              - namf-oam  # OAM service
+            # servedGuamiList: # Guami (Globally Unique AMF ID) list supported by this AMF
+            #   # <GUAMI> = <MCC><MNC><AMF ID>
+            #   - plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
+            #       mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
+            #       mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+            #     amfId: cafe00 # AMF identifier (3 bytes hex string, range: 000000~FFFFFF)
+            # supportTaiList:  # the TAI (Tracking Area Identifier) list supported by this AMF
+            #   - plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
+            #       mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
+            #       mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+            #     tac: 1 # Tracking Area Code (uinteger, range: 0~16777215)
+            # plmnSupportList: # the PLMNs (Public land mobile network) list supported by this AMF
+            #   - plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
+            #       mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
+            #       mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+            #     snssaiList: # the S-NSSAI (Single Network Slice Selection Assistance Information) list supported by this AMF
+            #       - sst: 1 # Slice/Service Type (uinteger, range: 0~255)
+            #         sd: 010203 # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
+            #       - sst: 1 # Slice/Service Type (uinteger, range: 0~255)
+            #         sd: 112233 # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
+            supportDnnList:  # the DNN (Data Network Name) list supported by this AMF
+              - internet
+            nrfUri: "http://nrf:29510" # a valid URI of NRF
+            networkName:  # the name of this core network
+              full: Aether
+              short: Aether
+            networkFeatureSupport5GS: # 5gs Network Feature Support IE, refer to TS 24.501
+              enable: true # append this IE in Registration accept or not
+              imsVoPS: 0 # IMS voice over PS session indicator (uinteger, range: 0~1)
+              emc: 0 # Emergency service support indicator for 3GPP access (uinteger, range: 0~3)
+              emf: 0 # Emergency service fallback indicator for 3GPP access (uinteger, range: 0~3)
+              iwkN26: 0 # Interworking without N26 interface indicator (uinteger, range: 0~1)
+              mpsi: 0 # MPS indicator (uinteger, range: 0~1)
+              emcN3: 0 # Emergency service support indicator for Non-3GPP access (uinteger, range: 0~1)
+              mcsi: 0 # MCS indicator (uinteger, range: 0~1)
+            t3502Value: 720  # timer value (seconds) at UE side
+            t3512Value: 3600 # timer value (seconds) at UE side
+            non3gppDeregistrationTimerValue: 3240 # timer value (seconds) at UE side
+            # retransmission timer for paging message
+            t3513:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Deregistration Request message
+            t3522:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Registration Accept message
+            t3550:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Authentication Request/Security Mode Command message
+            t3560:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Notification message
+            t3565:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+
+            kafkaInfo:    # Información de Kafka para eventos y métricas
+              enableKafka: true
+              brokerUri: "kafka"
+              brokerPort: 9092 
+              topicName: "sdcore-data-source-amf"  # Topic donde publica AMF
+          # the kind of log output
+            # debugLevel: how detailed to output, value: trace, debug, info, warn, error, fatal, panic
+            # ReportCaller: enable the caller report or not, value: true or false
+          logger:
+            AMF:
+              debugLevel: info
+            NAS:
+              debugLevel: info
+            FSM:
+              debugLevel: info
+            NGAP:
+              debugLevel: info
+            Aper:
+              debugLevel: info
+            OpenApi:
+              debugLevel: info
+
+
+    ausf:
+      cfgFiles:
+        ausfcfg.yaml:
+          configuration:
+            enableDBStore: true 
+            groupId: ausfGroup001
+            sbi:
+              bindingIPv4: 0.0.0.0
+              port: 29509
+              registerIPv4: ausf
+              scheme: http
+              # tls: # the local path of TLS key
+              #   key: /var/run/certs/tls.key # AUSF TLS Private key
+              #   pem: /var/run/certs/tls.crt # AUSF TLS Certificate
+            serviceNameList:
+              - nausf-auth
+            nrfUri: "http://nrf:29510"
+            webuiUri: "http://webui:5001" # URI del WebUI del AMF
+          logger:
+            AUSF:
+              debugLevel: debug
+              ReportCaller: false
+
+
+    udr:
+      cfgFiles:
+        udrcfg.yaml:
+          configuration:
+            enableDBStore: true
+            sbi: # Service Based Interface
+              scheme: http
+              registerIPv4: udr
+              bindingIPv4: 0.0.0.0
+              port: 8000
+              # tls: # the local path of TLS key
+              #   key: /var/run/certs/tls.key # UDR TLS Private key
+              #   pem: /var/run/certs/tls.crt # UDR TLS Certificate
+            mongodb:
+               name: "aether"                      # Nombre de la base de datos
+               url: mongodb://mongodb-arbiter-headless  # URL de conexión con credenciales y host:puerto
+            nrfUri: "http://nrf:29510"
+            webuiUri: "http://webui:5001"
+          logger:
+            UDR:
+              debugLevel: debug
+              ReportCaller: false
+
+
+    udm:
+      cfgFiles:
+        udmcfg.yaml:
+          configuration:
+            enableDBStore: true
+            sbi:
+              bindingIPv4: 0.0.0.0
+              port: 29503
+              registerIPv4: udm
+              scheme: http
+              # tls:
+              #   log: /opt/sslkey.log
+              #   key: /var/run/certs/tls.key # UDM TLS Private key
+              #   pem: /var/run/certs/tls.crt # UDM TLS Certificate
+            nrfUri: "http://nrf:29510"
+            plmnList:
+            - plmnId:
+                mcc: "208"
+                mnc: "93"
+            - plmnId:
+                mcc: "222"
+                mnc: "88"
+            enableNrfCaching: true
+            nrfCacheEvictionInterval: 900
+            webuiUri: "http://webui:5001"
+            serviceList:
+              - nudm-sdm
+              - nudm-uecm
+              - nudm-ueau
+              - nudm-ee
+              - nudm-pp
+          info:
+            description: UDM initial local configuration
+            version: 1.0.0
+          logger:
+            UDM:
+              debugLevel: debug
+              ReportCaller: false
+
 
     # SMF config override. Refer to Helm Charts values for more options
     smf:
@@ -99,11 +310,165 @@ omec-control-plane:
             #       imsi-208930100007512: "172.250.0.102"
             #       imsi-208930100007513: "172.250.0.103"
             #       imsi-208930100007514: "172.250.0.104"
+          #   enableUPFAdapter: true
+          #   debugProfilePort: 5001
+          #   mongodb:
+          #     name: sdcore_smf
+          #     url: "mongodb://mongodb:27017"  # Cambiado para usar el nombre del contenedor
+          #   kafkaInfo:
+          #     brokerUri: "sd-core-kafka-headless"
+          #     brokerPort: 9092
+          #     topicName: "sdcore-data-source-smf"
+          #   webuiUri: http://webui:5001
+          #   staticIpInfo:
+          #     - dnn: internet_1
+          #       imsiIpInfo:
+          #         supi-123456789012341: "1.1.1.1"
+          #         supi-123456789012342: "2.2.2.2"
+          #         supi-123456789012343: "3.3.3.3"
+          #         supi-123456789012344: "4.4.4.4"
+          #     - dnn: internet_2
+          #       imsiIpInfo:
+          #         supi-123456789012345: "5.5.5.5"
+          #         supi-123456789012346: "6.6.6.6"
+          #         supi-123456789012347: "7.7.7.7"
+          #         supi-123456789012348: "8.8.8.8"
+          #   smfName: SMF # the name of this SMF
+          #   sbi: # Service-based interface information
+          #     scheme: http # the protocol for sbi (http or https)
+          #     registerIPv4: smf # IP used to register to NRF
+          #     bindingIPv4: 0.0.0.0  # IP used to bind the service
+          #     port: 29502 # Port used to bind the service
+          #     tls: # the local path of TLS key
+          #       key: /var/run/certs/smf.key # SMF TLS Private key
+          #       pem: /var/run/certs/smf.crt # SMF TLS Certificate
+          #   serviceNameList: # the SBI services provided by this SMF, refer to TS 29.502
+          #     - nsmf-pdusession # Nsmf_PDUSession service
+          #     - nsmf-event-exposure # Nsmf_EventExposure service
+          #     - nsmf-oam # OAM service
+          #   snssaiInfos: # the S-NSSAI (Single Network Slice Selection Assistance Information) list supported by this AMF
+          #     - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
+          #         sst: 1 # Slice/Service Type (uinteger, range: 0~255)
+          #         sd: "010203" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
+          #       dnnInfos: # DNN information list
+          #         - dnn: internet # Data Network Name
+          #           dns: # the IP address of DNS
+          #             ipv4: 8.8.8.8
+          #             ipv6: 2001:4860:4860::8888
+          #           ueSubnet: 60.60.0.0/16 # should be CIDR type
+          #           mtu: 1400
+          #       plmnId:
+          #         mcc: "111"
+          #         mnc: "222"
+          #     - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
+          #         sst: 1 # Slice/Service Type (uinteger, range: 0~255)
+          #         sd: "112233" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
+          #       dnnInfos: # DNN information list
+          #         - dnn: internet # Data Network Name
+          #           dns: # the IP address of DNS
+          #             ipv4: 8.8.8.8
+          #             ipv6: 2001:4860:4860::8888
+          #           ueSubnet: 60.61.0.0/16 # should be CIDR type
+          #           mtu: 1400
+          #       plmnId:
+          #         mcc: "333"
+          #         mnc: "444"
+          #   pfcp: # the IP address of N4 interface on this SMF (PFCP)
+          #     addr: smf
 
-    #pcf:
-    #  cfgFiles:
-    #    pcfcfg.yaml:
-    #      configuration:
+          #   enableUPFAdapter: false
+          #   userplane_information: # list of userplane information
+          #     up_nodes: # information of userplane node (AN or UPF)
+          #       gNB: # the name of the node
+          #         type: AN # the type of the node (AN or UPF)
+          #       UPF1:  # the name of the node
+          #         type: UPF # the type of the node (AN or UPF)
+          #         node_id: pause # the IP/FQDN of N4 interface on this UPF (PFCP)
+          #         sNssaiUpfInfos: # S-NSSAI information list for this UPF
+          #           - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
+          #               sst: 1 # Slice/Service Type (uinteger, range: 0~255)
+          #               sd: "010203" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
+          #             dnnUpfInfoList: # DNN information list for this S-NSSAI
+          #               - dnn: internet
+          #         interfaces: # Interface list for this UPF
+          #           - interfaceType: N3 # the type of the interface (N3 or N9)
+          #             endpoints: # the IP address of this N3/N9 interface on this UPF
+          #               - upf
+          #             networkInstance: internet # Data Network Name (DNN)
+          #         port: 8805
+
+          #     links: # the topology graph of userplane, A and B represent the two nodes of each link
+          #       - A: gNB
+          #         B: UPF1
+          #   nrfUri: http://nrf:8000 # a valid URI of NRF
+
+          #   kafkaInfo:                                # Configuración de Kafka para eventos y métricas (opcional)
+          #     enableKafka: true                      # Activar Kafka
+          #     brokerUri: "kafka"         # URI del broker Kafka
+          #     topicName: "smf-events"                # Topic para publicar eventos SMF
+          #     brokerPort: 9092                       # Puerto del broker Kafka
+
+          # # the kind of log output
+          #   # debugLevel: how detailed to output, value: trace, debug, info, warn, error, fatal, panic
+          #   # ReportCaller: enable the caller report or not, value: true or false
+          # logger:
+          #   SMF:
+          #     debugLevel: debug
+          #     ReportCaller: false
+          #   NAS:
+          #     debugLevel: debug
+          #     ReportCaller: false
+          #   NGAP:
+          #     debugLevel: debug
+          #     ReportCaller: false
+          #   Aper:
+          #     debugLevel: debug
+          #     ReportCaller: false
+          #   PathUtil:
+          #     debugLevel: debug
+          #     ReportCaller: false
+          #   OpenApi:
+          #     debugLevel: debug
+          #     ReportCaller: false
+          #   PFCP:
+          #     debugLevel: debug
+          #     ReportCaller: false
+
+
+    # pcf:
+    #   cfgFiles:
+    #     pcfcfg.yaml:
+    #       configuration:
+    #         defaultBdtRefId: BdtPolicyId-
+    #         nrfUri: http://nrf:8000
+    #         enableNrfCaching: true
+    #         nrfCacheEvictionInterval: 900
+    #         webuiUri: http://webui:5001
+    #         pcfName: PCF
+    #         sbi:
+    #           bindingIPv4: 0.0.0.0
+    #           port: 29507
+    #           registerIPv4: pcf
+    #           scheme: http
+    #           tls: # the local path of TLS key
+    #             key: /var/run/certs/pcf.key # PCF TLS Private key
+    #             pem: /var/run/certs/pcf.crt # PCF TLS Certificate
+    #         serviceList:
+    #         - serviceName: npcf-am-policy-control
+    #         - serviceName: npcf-smpolicycontrol
+    #           suppFeat: 3fff
+    #         - serviceName: npcf-bdtpolicycontrol
+    #         - serviceName: npcf-policyauthorization
+    #           suppFeat: 3
+    #         - serviceName: npcf-eventexposure
+    #         - serviceName: npcf-ue-policy-control
+    #       info:
+    #         description: PCF initial local configuration
+    #         version: 1.0.0
+    #       logger:
+    #         PCF:
+    #           debugLevel: debug
+    #           ReportCaller: false
 
     nrf:
       cfgFiles:
@@ -112,6 +477,20 @@ omec-control-plane:
             mongoDBStreamEnable: false    # enable/disable MongoDB stream in NRF
             nfProfileExpiryEnable: true   # If enabled, remove NF profile if no keepalive received
             nfKeepAliveTime: 60           # default timeout for NF profiles
+            MongoDBName: aether # database name in MongoDB
+            MongoDBUrl: mongodb://127.0.0.1:27017 # a valid URL of the mongodb
+            sbi: # Service-based interface information
+              scheme: http # the protocol for sbi (http or https)
+              registerIPv4: 127.0.0.10 # IP used to serve NFs or register to another NRF
+              bindingIPv4: 127.0.0.10  # IP used to bind the service
+              port: 29510 # port used to bind the service
+              # tls: # the local path of TLS key
+              #   pem: /var/run/certs/tls.crt # NRF TLS Certificate
+              #   key: /var/run/certs/tls.key # NRF TLS Private key
+            serviceNameList: # the SBI services provided by this NRF, refer to TS 29.510
+              - nnrf-nfm # Nnrf_NFManagement service
+              - nnrf-disc # Nnrf_NFDiscovery service
+            webuiUri: http://webui:5001
 
     webui:
       cfgFiles:
@@ -119,6 +498,28 @@ omec-control-plane:
           configuration:
             managedByConfigPod:
               enabled: {{ not core.standalone }}
+            mongodb:                    # Configuración de la base de datos MongoDB
+              name: "aether"              # (string) Nombre de la base de datos principal
+              url: "mongodb://mongodb-arbiter-headless" # (string) URL de conexión a MongoDB
+              authKeysDbName: "authdb"   # (string) Nombre de la base de datos de llaves de autenticación
+              authUrl: "mongodb://mongodb-arbiter-headless" # (string) URL de autenticación
+              webuiDbName: "webuiDB"       # (string, opcional) Nombre de la base de datos específica para WebUI
+              webuiDbUrl: "mongodb://mongodb-arbiter-headless" # (string, opcional) URL específica para la base de datos WebUI
+            # webui-tls:                  # Configuración TLS para el WebUI
+              # pem: "/var/run/certs/tls.crt" # (string) Ruta al archivo PEM del certificado TLS
+              # key: "/var/run/certs/tls.key" # (string) Ruta al archivo de clave privada TLS
+            # nfconfig-tls:               # Configuración TLS para la comunicación con NF Config
+              # pem: "/var/run/certs/tls.crt" # (string) Ruta al archivo PEM del certificado TLS de NF Config
+              # key: "/var/run/certs/tls.key" # (string) Ruta al archivo de clave privada TLS de NF Config
+
+            spec-compliant-sdf: false   # (bool) Cumplimiento estricto del SDF
+            enableAuthentication: false # (bool, opcional) Habilita autenticación en el WebUI
+            send-pebble-notifications: false # (bool, opcional) Habilita notificaciones Pebble
+
+          logger:
+            WEBUI:
+              debugLevel: debug
+              ReportCaller: false
 
 # Override values for omec-sub-provision (subscriber) Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml
@@ -126,9 +527,9 @@ omec-control-plane:
 omec-sub-provision:
   enable: true
   images:
-    repository: "192.168.12.15:8082/"
-    #tags:
-    #  simapp: #add simapp override image
+    repository: "192.168.12.15:8083/"
+    tags:
+      simapp: omecproject/simapp:v1.2.1-new-dev
 
   config:
     simapp:
@@ -325,9 +726,9 @@ omec-user-plane:
     enabled: false
   images:
     repository: "192.168.12.15:8082/"
-    # tags:
-      # bess: <bess image tag>
-      # pfcpiface: <pfcp image tag>
+     #tags:
+       #bess: omecproject/upf-epc-bess:v1.2.1-new-dev
+       #pfcpiface: omecproject/upf-epc-pfcpiface:v1.2.1-new-dev
       # tools: omecproject/busybox:stable
   config:
     upf:
