@@ -58,19 +58,87 @@
     chart_ref_sd_core: "/tmp/sdcore-helm-charts/{{ core.helm.chart_ref | regex_replace('^.*/(.*)$', '\\1') }}"
   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
 
+# - set_fact:
+#     chart_ref_sd_core: "/tmp/sdcore-helm-charts/sd-core/charts/{{ core.helm.chart_ref | regex_replace('^.*/(.*)$', '\\1') }}"
+#   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
+
 - debug:
     var: "chart_ref_sd_core"
   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
+
+
+# - name: Check if Bitnami repository is already added
+#   command: helm repo list -o yaml
+#   register: helm_repo_list
+#   changed_when: false
+#   check_mode: no # Esta tarea debe ejecutarse siempre, incluso en modo "dry run"
+#   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
+
+# - name: Add Bitnami Helm repository (if not present)
+#   command: helm repo add bitnami https://charts.bitnami.com/bitnami
+#   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts and "'bitnami' not in helm_repo_list.stdout"
+
+# - name: Update Helm repositories
+#   command: helm repo update
+#   changed_when: false # La actualización del repo no es un cambio de configuración en sí
+#   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
 
 - name: update aether 5gc-cp helm dependencies
   shell: |
     helm dep up /tmp/sdcore-helm-charts/5g-control-plane
   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
 
+# - name: update aether 5gc-cp helm dependencies
+#   shell: |
+#     helm dep up /tmp/sdcore-helm-charts/sd-core/charts/5g-control-plane
+#   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
+
 - name: update aether 5gc helm dependencies
   shell: |
     helm dep up {{chart_ref_sd_core}}
   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
+
+- name: Manage Kustomize installation on Kubernetes master nodes
+  when: inventory_hostname in groups['master_nodes']
+  block:
+  - name: Check if Kustomize is already installed
+    ansible.builtin.command: which kustomize
+    register: kustomize_exists
+    ignore_errors: true
+    changed_when: false
+    check_mode: no
+    #when: inventory_hostname in groups['master_nodes']
+
+  - name: Install Kustomize on master nodes
+    when: kustomize_exists.rc != 0 and inventory_hostname in groups['master_nodes'] 
+    block:
+      - name: Download Kustomize installation script
+        ansible.builtin.get_url:
+          url: "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
+          dest: /tmp/install_kustomize.sh
+          mode: '0755'
+
+      - name: Run Kustomize installation script
+        ansible.builtin.command: /tmp/install_kustomize.sh
+        args:
+          chdir: /tmp # Ejecutar en el directorio /tmp para que el binario se cree ahí
+        #when: inventory_hostname in groups['master_nodes'] 
+
+      - name: Move Kustomize binary to a standard path
+        ansible.builtin.copy:
+          src: /tmp/kustomize
+          dest: /usr/local/bin/kustomize
+          remote_src: yes # Importante: indica que el origen está en el nodo remoto
+          mode: '0755'
+        become: true # Necesitamos sudo para escribir en /usr/local/bin
+        #when: inventory_hostname in groups['master_nodes'] 
+
+- name: Copy Helm Kustomize patches to the master node
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/helm-patches/" # Ruta en tu máquina de control
+    dest: /tmp/helm-patches/ # Ruta en el nodo remoto (node1)
+    mode: '0755' # Asegura que los scripts sean ejecutables
+  when: inventory_hostname in groups['master_nodes']
 
 # TODO: add systems check to avoid issues (e.g., mongodb needing avx support)
 - name: deploy aether 5gc
@@ -87,6 +155,7 @@
           - /tmp/sdcore-5g-values.yaml
         wait: true
         wait_timeout: "2m30s"
+        post_renderer: "/tmp/helm-patches/webui/post-render.sh"
         force: true
       when: inventory_hostname in groups['master_nodes']
 

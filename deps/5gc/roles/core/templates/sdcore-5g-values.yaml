@@ -94,118 +94,122 @@ omec-control-plane:
                  - NEA3
                  - NEA2
             #     - NEA0
-            amfName: AMF # the name of this AMF
-            amfDBName: "amf_db"   # Nombre de la base de datos MongoDB para el AMF
-            ngapIpList:  # the IP list of N2 interfaces on this AMF
-              - 0.0.0.0
-            ngappPort: 38412                      # Puerto UDP/TCP usado por NGAP
-            sctpGrpcPort: 9000                   # Puerto gRPC para comunicaciones SCTP
-            enableSctpLb: true                    # Habilitar el balanceador de carga SCTP
-            sbi: # Service-based interface information
-              scheme: http # the protocol for sbi (http or https)
-              registerIPv4: amf # IP used to register to NRF
-              bindingIPv4: 0.0.0.0  # IP used to bind the service
-              port: 8000 # port used to bind the service
-              # tls: # the local path of TLS key
-              #   key: /var/run/certs/tls.key # AMF TLS Private key
-              #   pem: /var/run/certs/tls.crt # AMF TLS Certificate
-            mongodb:                              # Configuración de conexión a MongoDB
-               name: "aether"                      # Nombre de la base de datos
-               url: "mongodb://mongodb-arbiter-headless"  # URL de conexión con credenciales y host:puerto
-            webuiUri: "http://webui:5001" # URI del WebUI del AMF
-            enableNrfCaching: true                # Habilitar caching de NRF
-            nrfCacheEvictionInterval: 300         # Intervalo (s) para expulsión de caché NRF
-            serviceNameList: # the SBI services provided by this AMF, refer to TS 29.518
-              - namf-comm # Namf_Communication service
-              - namf-evts # Namf_EventExposure service
-              - namf-mt   # Namf_MT service
-              - namf-loc  # Namf_Location service
-              - namf-oam  # OAM service
-            # servedGuamiList: # Guami (Globally Unique AMF ID) list supported by this AMF
-            #   # <GUAMI> = <MCC><MNC><AMF ID>
-            #   - plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
-            #       mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
-            #       mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
-            #     amfId: cafe00 # AMF identifier (3 bytes hex string, range: 000000~FFFFFF)
-            # supportTaiList:  # the TAI (Tracking Area Identifier) list supported by this AMF
-            #   - plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
-            #       mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
-            #       mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
-            #     tac: 1 # Tracking Area Code (uinteger, range: 0~16777215)
-            # plmnSupportList: # the PLMNs (Public land mobile network) list supported by this AMF
-            #   - plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
-            #       mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
-            #       mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
-            #     snssaiList: # the S-NSSAI (Single Network Slice Selection Assistance Information) list supported by this AMF
-            #       - sst: 1 # Slice/Service Type (uinteger, range: 0~255)
-            #         sd: 010203 # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
-            #       - sst: 1 # Slice/Service Type (uinteger, range: 0~255)
-            #         sd: 112233 # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
-            supportDnnList:  # the DNN (Data Network Name) list supported by this AMF
-              - internet
-            nrfUri: "http://nrf:29510" # a valid URI of NRF
-            networkName:  # the name of this core network
-              full: Aether
-              short: Aether
-            networkFeatureSupport5GS: # 5gs Network Feature Support IE, refer to TS 24.501
-              enable: true # append this IE in Registration accept or not
-              imsVoPS: 0 # IMS voice over PS session indicator (uinteger, range: 0~1)
-              emc: 0 # Emergency service support indicator for 3GPP access (uinteger, range: 0~3)
-              emf: 0 # Emergency service fallback indicator for 3GPP access (uinteger, range: 0~3)
-              iwkN26: 0 # Interworking without N26 interface indicator (uinteger, range: 0~1)
-              mpsi: 0 # MPS indicator (uinteger, range: 0~1)
-              emcN3: 0 # Emergency service support indicator for Non-3GPP access (uinteger, range: 0~1)
-              mcsi: 0 # MCS indicator (uinteger, range: 0~1)
-            t3502Value: 720  # timer value (seconds) at UE side
-            t3512Value: 3600 # timer value (seconds) at UE side
-            non3gppDeregistrationTimerValue: 3240 # timer value (seconds) at UE side
-            # retransmission timer for paging message
-            t3513:
-              enable: true     # true or false
-              expireTime: 6s   # default is 6 seconds
-              maxRetryTimes: 4 # the max number of retransmission
-            # retransmission timer for NAS Deregistration Request message
-            t3522:
-              enable: true     # true or false
-              expireTime: 6s   # default is 6 seconds
-              maxRetryTimes: 4 # the max number of retransmission
-            # retransmission timer for NAS Registration Accept message
-            t3550:
-              enable: true     # true or false
-              expireTime: 6s   # default is 6 seconds
-              maxRetryTimes: 4 # the max number of retransmission
-            # retransmission timer for NAS Authentication Request/Security Mode Command message
-            t3560:
-              enable: true     # true or false
-              expireTime: 6s   # default is 6 seconds
-              maxRetryTimes: 4 # the max number of retransmission
-            # retransmission timer for NAS Notification message
-            t3565:
-              enable: true     # true or false
-              expireTime: 6s   # default is 6 seconds
-              maxRetryTimes: 4 # the max number of retransmission
+          #   amfName: AMF # the name of this AMF
+          #   amfDBName: "amf_db"   # Nombre de la base de datos MongoDB para el AMF
+          #   ngapIpList:  # the IP list of N2 interfaces on this AMF
+          #     - 0.0.0.0
+          #   ngappPort: 38412                      # Puerto UDP/TCP usado por NGAP
+          #   sctpGrpcPort: 9000                   # Puerto gRPC para comunicaciones SCTP
+          #   enableSctpLb: true                    # Habilitar el balanceador de carga SCTP
+          #   sbi: # Service-based interface information
+          #     scheme: https # the protocol for sbi (http or https)
+          #     registerIPv4: amf # IP used to register to NRF
+          #     bindingIPv4: 0.0.0.0  # IP used to bind the service
+          #     port: 8000 # port used to bind the service
+          #     tls: # the local path of TLS key
+          #       key: /var/run/certs/tls.key # AMF TLS Private key
+          #       pem: /var/run/certs/tls.crt # AMF TLS Certificate
+          #   mongodb:                              # Configuración de conexión a MongoDB
+          #      name: "aether"                      # Nombre de la base de datos
+          #      url: "mongodb://mongodb-arbiter-headless"  # URL de conexión con credenciales y host:puerto
+          #   webuiUri: "webui:9876" # URI del WebUI del AMF
+          #   enableNrfCaching: true                # Habilitar caching de NRF
+          #   nrfCacheEvictionInterval: 300         # Intervalo (s) para expulsión de caché NRF
+          #   serviceNameList: # the SBI services provided by this AMF, refer to TS 29.518
+          #     - namf-comm # Namf_Communication service
+          #     - namf-evts # Namf_EventExposure service
+          #     - namf-mt   # Namf_MT service
+          #     - namf-loc  # Namf_Location service
+          #     - namf-oam  # OAM service
+          #   # servedGuamiList: # Guami (Globally Unique AMF ID) list supported by this AMF
+          #   #   # <GUAMI> = <MCC><MNC><AMF ID>
+          #   #   - plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
+          #   #       mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
+          #   #       mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+          #   #     amfId: cafe00 # AMF identifier (3 bytes hex string, range: 000000~FFFFFF)
+          #   # supportTaiList:  # the TAI (Tracking Area Identifier) list supported by this AMF
+          #   #   - plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
+          #   #       mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
+          #   #       mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+          #   #     tac: 1 # Tracking Area Code (uinteger, range: 0~16777215)
+          #   # plmnSupportList: # the PLMNs (Public land mobile network) list supported by this AMF
+          #   #   - plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
+          #   #       mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
+          #   #       mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+          #   #     snssaiList: # the S-NSSAI (Single Network Slice Selection Assistance Information) list supported by this AMF
+          #   #       - sst: 1 # Slice/Service Type (uinteger, range: 0~255)
+          #   #         sd: 010203 # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
+          #   #       - sst: 1 # Slice/Service Type (uinteger, range: 0~255)
+          #   #         sd: 112233 # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
+          #   supportDnnList:  # the DNN (Data Network Name) list supported by this AMF
+          #     - internet
+          #   nrfUri: "https://nrf:29510" # a valid URI of NRF
+          #   networkName:  # the name of this core network
+          #     full: Aether
+          #     short: Aether
+          #   networkFeatureSupport5GS: # 5gs Network Feature Support IE, refer to TS 24.501
+          #     enable: true # append this IE in Registration accept or not
+          #     imsVoPS: 0 # IMS voice over PS session indicator (uinteger, range: 0~1)
+          #     emc: 0 # Emergency service support indicator for 3GPP access (uinteger, range: 0~3)
+          #     emf: 0 # Emergency service fallback indicator for 3GPP access (uinteger, range: 0~3)
+          #     iwkN26: 0 # Interworking without N26 interface indicator (uinteger, range: 0~1)
+          #     mpsi: 0 # MPS indicator (uinteger, range: 0~1)
+          #     emcN3: 0 # Emergency service support indicator for Non-3GPP access (uinteger, range: 0~1)
+          #     mcsi: 0 # MCS indicator (uinteger, range: 0~1)
+          #   t3502Value: 720  # timer value (seconds) at UE side
+          #   t3512Value: 3600 # timer value (seconds) at UE side
+          #   non3gppDeregistrationTimerValue: 3240 # timer value (seconds) at UE side
+          #   # retransmission timer for paging message
+          #   t3513:
+          #     enable: true     # true or false
+          #     expireTime: 8s   # default is 6 seconds
+          #     maxRetryTimes: 4 # the max number of retransmission
+          #   t3511:             # Timer que esta dando problemas (en su valor por defecto de 6s expira)
+          #     enable: true     # true or false
+          #     expireTime: 8s   # default is 6 seconds
+          #     maxRetryTimes: 4 # the max number of retransmission
+          #   # retransmission timer for NAS Deregistration Request message
+          #   t3522:
+          #     enable: true     # true or false
+          #     expireTime: 8s   # default is 6 seconds
+          #     maxRetryTimes: 4 # the max number of retransmission
+          #   # retransmission timer for NAS Registration Accept message
+          #   t3550:
+          #     enable: true     # true or false
+          #     expireTime: 8s   # default is 6 seconds
+          #     maxRetryTimes: 4 # the max number of retransmission
+          #   # retransmission timer for NAS Authentication Request/Security Mode Command message
+          #   t3560:
+          #     enable: true     # true or false
+          #     expireTime: 8s   # default is 6 seconds
+          #     maxRetryTimes: 4 # the max number of retransmission
+          #   # retransmission timer for NAS Notification message
+          #   t3565:
+          #     enable: true     # true or false
+          #     expireTime: 8s   # default is 6 seconds
+          #     maxRetryTimes: 4 # the max number of retransmission
 
-            kafkaInfo:    # Información de Kafka para eventos y métricas
-              enableKafka: true
-              brokerUri: "kafka"
-              brokerPort: 9092 
-              topicName: "sdcore-data-source-amf"  # Topic donde publica AMF
-          # the kind of log output
-            # debugLevel: how detailed to output, value: trace, debug, info, warn, error, fatal, panic
-            # ReportCaller: enable the caller report or not, value: true or false
-          logger:
-            AMF:
-              debugLevel: info
-            NAS:
-              debugLevel: info
-            FSM:
-              debugLevel: info
-            NGAP:
-              debugLevel: info
-            Aper:
-              debugLevel: info
-            OpenApi:
-              debugLevel: info
+          #   kafkaInfo:    # Información de Kafka para eventos y métricas
+          #     enableKafka: true
+          #     brokerUri: "kafka"
+          #     brokerPort: 9092 
+          #     topicName: "sdcore-data-source-amf"  # Topic donde publica AMF
+          # # the kind of log output
+          #   # debugLevel: how detailed to output, value: trace, debug, info, warn, error, fatal, panic
+          #   # ReportCaller: enable the caller report or not, value: true or false
+          # logger:
+          #   AMF:
+          #     debugLevel: info
+          #   NAS:
+          #     debugLevel: info
+          #   FSM:
+          #     debugLevel: info
+          #   NGAP:
+          #     debugLevel: info
+          #   Aper:
+          #     debugLevel: info
+          #   OpenApi:
+          #     debugLevel: info
 
 
     ausf:
@@ -218,13 +222,13 @@ omec-control-plane:
               bindingIPv4: 0.0.0.0
               port: 29509
               registerIPv4: ausf
-              scheme: http
-              # tls: # the local path of TLS key
-              #   key: /var/run/certs/tls.key # AUSF TLS Private key
-              #   pem: /var/run/certs/tls.crt # AUSF TLS Certificate
+              scheme: https
+              tls: # the local path of TLS key
+                key: /var/run/certs/tls.key # AUSF TLS Private key
+                pem: /var/run/certs/tls.crt # AUSF TLS Certificate
             serviceNameList:
               - nausf-auth
-            nrfUri: "http://nrf:29510"
+            nrfUri: "https://nrf:29510"
             webuiUri: "http://webui:5001" # URI del WebUI del AMF
           logger:
             AUSF:
@@ -238,17 +242,17 @@ omec-control-plane:
           configuration:
             enableDBStore: true
             sbi: # Service Based Interface
-              scheme: http
+              scheme: https
               registerIPv4: udr
               bindingIPv4: 0.0.0.0
-              port: 8000
-              # tls: # the local path of TLS key
-              #   key: /var/run/certs/tls.key # UDR TLS Private key
-              #   pem: /var/run/certs/tls.crt # UDR TLS Certificate
+              port: 29504
+              tls: # the local path of TLS key
+                key: /var/run/certs/tls.key # UDR TLS Private key
+                pem: /var/run/certs/tls.crt # UDR TLS Certificate
             mongodb:
                name: "aether"                      # Nombre de la base de datos
                url: mongodb://mongodb-arbiter-headless  # URL de conexión con credenciales y host:puerto
-            nrfUri: "http://nrf:29510"
+            nrfUri: "https://nrf:29510"
             webuiUri: "http://webui:5001"
           logger:
             UDR:
@@ -265,12 +269,11 @@ omec-control-plane:
               bindingIPv4: 0.0.0.0
               port: 29503
               registerIPv4: udm
-              scheme: http
-              # tls:
-              #   log: /opt/sslkey.log
-              #   key: /var/run/certs/tls.key # UDM TLS Private key
-              #   pem: /var/run/certs/tls.crt # UDM TLS Certificate
-            nrfUri: "http://nrf:29510"
+              scheme: https
+              tls:
+                key: /var/run/certs/tls.key # UDM TLS Private key
+                pem: /var/run/certs/tls.crt # UDM TLS Certificate
+            nrfUri: "https://nrf:29510"
             plmnList:
             - plmnId:
                 mcc: "208"
@@ -478,19 +481,19 @@ omec-control-plane:
             nfProfileExpiryEnable: true   # If enabled, remove NF profile if no keepalive received
             nfKeepAliveTime: 60           # default timeout for NF profiles
             MongoDBName: aether # database name in MongoDB
-            MongoDBUrl: mongodb://127.0.0.1:27017 # a valid URL of the mongodb
+            MongoDBUrl: "mongodb://mongodb-arbiter-headless" # a valid URL of the mongodb
             sbi: # Service-based interface information
-              scheme: http # the protocol for sbi (http or https)
-              registerIPv4: 127.0.0.10 # IP used to serve NFs or register to another NRF
-              bindingIPv4: 127.0.0.10  # IP used to bind the service
+              scheme: https # the protocol for sbi (http or https)
+              registerIPv4: nrf # IP used to serve NFs or register to another NRF
+              bindingIPv4: 0.0.0.0  # IP used to bind the service
               port: 29510 # port used to bind the service
-              # tls: # the local path of TLS key
-              #   pem: /var/run/certs/tls.crt # NRF TLS Certificate
-              #   key: /var/run/certs/tls.key # NRF TLS Private key
+              tls: # the local path of TLS key
+                pem: /var/run/certs/tls.crt # NRF TLS Certificate
+                key: /var/run/certs/tls.key # NRF TLS Private key
             serviceNameList: # the SBI services provided by this NRF, refer to TS 29.510
               - nnrf-nfm # Nnrf_NFManagement service
               - nnrf-disc # Nnrf_NFDiscovery service
-            webuiUri: http://webui:5001
+            webuiUri: "http://webui:5001"
 
     webui:
       cfgFiles:
@@ -498,28 +501,28 @@ omec-control-plane:
           configuration:
             managedByConfigPod:
               enabled: {{ not core.standalone }}
-            mongodb:                    # Configuración de la base de datos MongoDB
-              name: "aether"              # (string) Nombre de la base de datos principal
-              url: "mongodb://mongodb-arbiter-headless" # (string) URL de conexión a MongoDB
-              authKeysDbName: "authdb"   # (string) Nombre de la base de datos de llaves de autenticación
-              authUrl: "mongodb://mongodb-arbiter-headless" # (string) URL de autenticación
-              webuiDbName: "webuiDB"       # (string, opcional) Nombre de la base de datos específica para WebUI
-              webuiDbUrl: "mongodb://mongodb-arbiter-headless" # (string, opcional) URL específica para la base de datos WebUI
-            # webui-tls:                  # Configuración TLS para el WebUI
-              # pem: "/var/run/certs/tls.crt" # (string) Ruta al archivo PEM del certificado TLS
-              # key: "/var/run/certs/tls.key" # (string) Ruta al archivo de clave privada TLS
-            # nfconfig-tls:               # Configuración TLS para la comunicación con NF Config
-              # pem: "/var/run/certs/tls.crt" # (string) Ruta al archivo PEM del certificado TLS de NF Config
-              # key: "/var/run/certs/tls.key" # (string) Ruta al archivo de clave privada TLS de NF Config
+          #   mongodb:                    # Configuración de la base de datos MongoDB
+          #     name: "aether"              # (string) Nombre de la base de datos principal
+          #     url: "mongodb://mongodb-arbiter-headless" # (string) URL de conexión a MongoDB
+          #     authKeysDbName: "authdb"   # (string) Nombre de la base de datos de llaves de autenticación
+          #     authUrl: "mongodb://mongodb-arbiter-headless" # (string) URL de autenticación
+          #     webuiDbName: "webuiDB"       # (string, opcional) Nombre de la base de datos específica para WebUI
+          #     webuiDbUrl: "mongodb://mongodb-arbiter-headless" # (string, opcional) URL específica para la base de datos WebUI
+          #   # webui-tls:                  # Configuración TLS para el WebUI
+          #     # pem: "/var/run/certs/tls.crt" # (string) Ruta al archivo PEM del certificado TLS
+          #     # key: "/var/run/certs/tls.key" # (string) Ruta al archivo de clave privada TLS
+          #   # nfconfig-tls:               # Configuración TLS para la comunicación con NF Config
+          #     # pem: "/var/run/certs/tls.crt" # (string) Ruta al archivo PEM del certificado TLS de NF Config
+          #     # key: "/var/run/certs/tls.key" # (string) Ruta al archivo de clave privada TLS de NF Config
 
-            spec-compliant-sdf: false   # (bool) Cumplimiento estricto del SDF
-            enableAuthentication: false # (bool, opcional) Habilita autenticación en el WebUI
-            send-pebble-notifications: false # (bool, opcional) Habilita notificaciones Pebble
+          #   spec-compliant-sdf: false   # (bool) Cumplimiento estricto del SDF
+          #   enableAuthentication: false # (bool, opcional) Habilita autenticación en el WebUI
+          #   send-pebble-notifications: false # (bool, opcional) Habilita notificaciones Pebble
 
-          logger:
-            WEBUI:
-              debugLevel: debug
-              ReportCaller: false
+          # logger:
+          #   WEBUI:
+          #     debugLevel: debug
+          #     ReportCaller: false
 
 # Override values for omec-sub-provision (subscriber) Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml
