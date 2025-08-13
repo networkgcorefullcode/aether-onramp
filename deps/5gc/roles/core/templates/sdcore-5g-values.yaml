@@ -45,7 +45,9 @@ omec-control-plane:
     enabled: false
 
   config:
-    # logger:
+    logger:
+        NRF:
+          debugLevel: debug
     #   Util:
     #     debugLevel: warn
     #   AMF:
@@ -94,6 +96,15 @@ omec-control-plane:
                  - NEA3
                  - NEA2
             #     - NEA0
+            sbi: # Service-based interface information
+              scheme: http # the protocol for sbi (http or https)
+              registerIPv4: amf # IP used to register to NRF
+              bindingIPv4: 0.0.0.0  # IP used to bind the service
+              port: 29518 # port used to bind the service
+              # tls: # the local path of TLS key
+              #   key: /var/run/certs/tls.key # AMF TLS Private key
+              #   pem: /var/run/certs/tls.crt # AMF TLS Certificate
+            nrfUri: "http://nrf:29510" # a valid URI of NRF
           #   amfName: AMF # the name of this AMF
           #   amfDBName: "amf_db"   # Nombre de la base de datos MongoDB para el AMF
           #   ngapIpList:  # the IP list of N2 interfaces on this AMF
@@ -101,14 +112,6 @@ omec-control-plane:
           #   ngappPort: 38412                      # Puerto UDP/TCP usado por NGAP
           #   sctpGrpcPort: 9000                   # Puerto gRPC para comunicaciones SCTP
           #   enableSctpLb: true                    # Habilitar el balanceador de carga SCTP
-          #   sbi: # Service-based interface information
-          #     scheme: https # the protocol for sbi (http or https)
-          #     registerIPv4: amf # IP used to register to NRF
-          #     bindingIPv4: 0.0.0.0  # IP used to bind the service
-          #     port: 8000 # port used to bind the service
-          #     tls: # the local path of TLS key
-          #       key: /var/run/certs/tls.key # AMF TLS Private key
-          #       pem: /var/run/certs/tls.crt # AMF TLS Certificate
           #   mongodb:                              # Configuración de conexión a MongoDB
           #      name: "aether"                      # Nombre de la base de datos
           #      url: "mongodb://mongodb-arbiter-headless"  # URL de conexión con credenciales y host:puerto
@@ -143,7 +146,6 @@ omec-control-plane:
           #   #         sd: 112233 # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
           #   supportDnnList:  # the DNN (Data Network Name) list supported by this AMF
           #     - internet
-          #   nrfUri: "https://nrf:29510" # a valid URI of NRF
           #   networkName:  # the name of this core network
           #     full: Aether
           #     short: Aether
@@ -222,13 +224,13 @@ omec-control-plane:
               bindingIPv4: 0.0.0.0
               port: 29509
               registerIPv4: ausf
-              scheme: https
-              tls: # the local path of TLS key
-                key: /var/run/certs/tls.key # AUSF TLS Private key
-                pem: /var/run/certs/tls.crt # AUSF TLS Certificate
+              scheme: http
+              # tls: # the local path of TLS key
+              #   key: /var/run/certs/tls.key # AUSF TLS Private key
+              #   pem: /var/run/certs/tls.crt # AUSF TLS Certificate
             serviceNameList:
               - nausf-auth
-            nrfUri: "https://nrf:29510"
+            nrfUri: "http://nrf:29510"
             webuiUri: "http://webui:5001" # URI del WebUI del AMF
           logger:
             AUSF:
@@ -242,17 +244,17 @@ omec-control-plane:
           configuration:
             enableDBStore: true
             sbi: # Service Based Interface
-              scheme: https
+              scheme: http
               registerIPv4: udr
               bindingIPv4: 0.0.0.0
               port: 29504
-              tls: # the local path of TLS key
-                key: /var/run/certs/tls.key # UDR TLS Private key
-                pem: /var/run/certs/tls.crt # UDR TLS Certificate
+              # tls: # the local path of TLS key
+              #   key: /var/run/certs/tls.key # UDR TLS Private key
+              #   pem: /var/run/certs/tls.crt # UDR TLS Certificate
             mongodb:
                name: "aether"                      # Nombre de la base de datos
                url: mongodb://mongodb-arbiter-headless  # URL de conexión con credenciales y host:puerto
-            nrfUri: "https://nrf:29510"
+            nrfUri: "http://nrf:29510"
             webuiUri: "http://webui:5001"
           logger:
             UDR:
@@ -269,11 +271,11 @@ omec-control-plane:
               bindingIPv4: 0.0.0.0
               port: 29503
               registerIPv4: udm
-              scheme: https
-              tls:
-                key: /var/run/certs/tls.key # UDM TLS Private key
-                pem: /var/run/certs/tls.crt # UDM TLS Certificate
-            nrfUri: "https://nrf:29510"
+              scheme: http
+              # tls:
+              #   key: /var/run/certs/tls.key # UDM TLS Private key
+              #   pem: /var/run/certs/tls.crt # UDM TLS Certificate
+            nrfUri: "http://nrf:29510"
             plmnList:
             - plmnId:
                 mcc: "208"
@@ -305,6 +307,15 @@ omec-control-plane:
         smfcfg.yaml:
           configuration:
             enableDBStore: true  # Store SMF subscribers in the datastore
+            sbi: # Service-based interface information
+              scheme: http # the protocol for sbi (http or https)
+              registerIPv4: smf # IP used to register to NRF
+              bindingIPv4: 0.0.0.0  # IP used to bind the service
+              port: 29502 # Port used to bind the service
+              tls: # the local path of TLS key
+                key: /var/run/certs/smf.key # SMF TLS Private key
+                pem: /var/run/certs/smf.crt # SMF TLS Certificate
+            nrfUri: http://nrf:29510 # a valid URI of NRF
             # staticIpInfo:
             #   - dnn: internet
             #     imsiIpInfo:
@@ -337,14 +348,6 @@ omec-control-plane:
           #         supi-123456789012347: "7.7.7.7"
           #         supi-123456789012348: "8.8.8.8"
           #   smfName: SMF # the name of this SMF
-          #   sbi: # Service-based interface information
-          #     scheme: http # the protocol for sbi (http or https)
-          #     registerIPv4: smf # IP used to register to NRF
-          #     bindingIPv4: 0.0.0.0  # IP used to bind the service
-          #     port: 29502 # Port used to bind the service
-          #     tls: # the local path of TLS key
-          #       key: /var/run/certs/smf.key # SMF TLS Private key
-          #       pem: /var/run/certs/smf.crt # SMF TLS Certificate
           #   serviceNameList: # the SBI services provided by this SMF, refer to TS 29.502
           #     - nsmf-pdusession # Nsmf_PDUSession service
           #     - nsmf-event-exposure # Nsmf_EventExposure service
@@ -378,7 +381,6 @@ omec-control-plane:
           #         mnc: "444"
           #   pfcp: # the IP address of N4 interface on this SMF (PFCP)
           #     addr: smf
-
           #   enableUPFAdapter: false
           #   userplane_information: # list of userplane information
           #     up_nodes: # information of userplane node (AN or UPF)
@@ -403,7 +405,6 @@ omec-control-plane:
           #     links: # the topology graph of userplane, A and B represent the two nodes of each link
           #       - A: gNB
           #         B: UPF1
-          #   nrfUri: http://nrf:8000 # a valid URI of NRF
 
           #   kafkaInfo:                                # Configuración de Kafka para eventos y métricas (opcional)
           #     enableKafka: true                      # Activar Kafka
@@ -437,25 +438,45 @@ omec-control-plane:
           #     debugLevel: debug
           #     ReportCaller: false
 
+    nssf:
+      cfgFiles:
+        nssfcfg.yaml:
+          configuration:
+            nrfUri: http://nrf:29510
+            nsiList:
+            - nsiInformationList:
+              - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+                nsiId: 22
+              snssai:
+                sd: "010203"
+                sst: 1
+            nssfName: NSSF
+            sbi:
+              bindingIPv4: 0.0.0.0
+              port: 29531
+              registerIPv4: nssf
+              scheme: http
+              # tls:
+              #   key: /var/run/certs/tls.key
+              #   pem: /var/run/certs/tls.crt
 
-    # pcf:
-    #   cfgFiles:
-    #     pcfcfg.yaml:
-    #       configuration:
-    #         defaultBdtRefId: BdtPolicyId-
-    #         nrfUri: http://nrf:8000
-    #         enableNrfCaching: true
-    #         nrfCacheEvictionInterval: 900
-    #         webuiUri: http://webui:5001
-    #         pcfName: PCF
-    #         sbi:
-    #           bindingIPv4: 0.0.0.0
-    #           port: 29507
-    #           registerIPv4: pcf
-    #           scheme: http
-    #           tls: # the local path of TLS key
-    #             key: /var/run/certs/pcf.key # PCF TLS Private key
-    #             pem: /var/run/certs/pcf.crt # PCF TLS Certificate
+    pcf:
+      cfgFiles:
+        pcfcfg.yaml:
+          configuration:
+            defaultBdtRefId: BdtPolicyId-
+            enableNrfCaching: true
+            nrfCacheEvictionInterval: 900
+            pcfName: PCF
+            nrfUri: http://nrf:29510
+            sbi:
+              bindingIPv4: 0.0.0.0
+              port: 29507
+              registerIPv4: pcf
+              scheme: http
+              # tls: # the local path of TLS key
+              #   key: /var/run/certs/pcf.key # PCF TLS Private key
+              #   pem: /var/run/certs/pcf.crt # PCF TLS Certificate
     #         serviceList:
     #         - serviceName: npcf-am-policy-control
     #         - serviceName: npcf-smpolicycontrol
@@ -483,13 +504,13 @@ omec-control-plane:
             MongoDBName: aether # database name in MongoDB
             MongoDBUrl: "mongodb://mongodb-arbiter-headless" # a valid URL of the mongodb
             sbi: # Service-based interface information
-              scheme: https # the protocol for sbi (http or https)
+              scheme: http # the protocol for sbi (http or https)
               registerIPv4: nrf # IP used to serve NFs or register to another NRF
               bindingIPv4: 0.0.0.0  # IP used to bind the service
               port: 29510 # port used to bind the service
-              tls: # the local path of TLS key
-                pem: /var/run/certs/tls.crt # NRF TLS Certificate
-                key: /var/run/certs/tls.key # NRF TLS Private key
+              # tls: # the local path of TLS key
+              #   pem: /var/run/certs/tls.crt # NRF TLS Certificate
+              #   key: /var/run/certs/tls.key # NRF TLS Private key
             serviceNameList: # the SBI services provided by this NRF, refer to TS 29.510
               - nnrf-nfm # Nnrf_NFManagement service
               - nnrf-disc # Nnrf_NFDiscovery service
