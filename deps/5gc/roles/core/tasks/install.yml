@@ -38,7 +38,7 @@
   when: inventory_hostname in groups['master_nodes']
 
 - set_fact:
-    chart_ref_sd_core: "{{ core.helm.chart_ref | regex_replace('^(.*)/.*$', '\\1')  }}"
+    chart_ref_sd_core: "{{ core.helm.chart_ref }}"
   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
 
 - debug:
