@@ -5,8 +5,8 @@ core:
   ran_subnet: "172.20.0.0/16"		 # set it to empty to get subnet from 'data_iface'
 
   helm:
-    local_charts: false
-    chart_ref: aether/sd-core
+    local_charts: true
+    chart_ref: local_charts/sd-core
     chart_version: 2.0.0
 
   upf:
