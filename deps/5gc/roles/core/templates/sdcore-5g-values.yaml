@@ -29,7 +29,7 @@ omec-control-plane:
       webui: 5gc-webui:1.8.9-dev
       #sctplb: sctplb:1.6.6-dev
       #upfadapter: upfadapter:2.0.6-dev
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
 
   kafka:
     deploy: false
