@@ -18,7 +18,7 @@ core:
   ran_subnet: "172.20.0.0/16"		# set to empty string to get subnet from 'data_iface'
   helm:
     local_charts: true			# set chart_ref to local path name if true
-    chart_ref: "local-charts/sd-core"
+    chart_ref: "local-charts"
     chart_version: 2.2.4
   upf:
     access_subnet: "192.168.252.1/24"	# access subnet & gateway
