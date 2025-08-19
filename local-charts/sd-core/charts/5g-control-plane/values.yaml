@@ -258,13 +258,6 @@ config:
           webuiUri: http://webui:5001
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
-          # plmnList:
-          #   - plmnId:
-          #       mcc: "208"
-          #       mnc: "93"
-          #   - plmnId:
-          #       mcc: "222"
-          #       mnc: "88"
           serviceList:
             - nudm-sdm
             - nudm-uecm
@@ -300,13 +293,6 @@ config:
         configuration:
           nrfUri: http://nrf:29510
           webuiUri: http://webui:5001
-          # plmnSupportList:
-          #   - plmnId:
-          #       mcc: "208"
-          #       mnc: "93"
-          #   - plmnId:
-          #       mcc: "333"
-          #       mnc: "88"
           sbi:
             scheme: http
             bindingIPv4: "0.0.0.0"
@@ -373,7 +359,7 @@ config:
         configuration:
           nssfName: NSSF
           nrfUri: http://nrf:29510
-          webuiUri: webui:9876
+          webuiUri: http://webui:5001
           sbi:
             scheme: http
             bindingIPv4: "0.0.0.0"
@@ -384,16 +370,6 @@ config:
           serviceNameList:
             - nnssf-nsselection
             - nnssf-nssaiavailability
-          supportedPlmnList:
-            - mcc: "208"
-              mnc: "93"
-          supportedNssaiInPlmnList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-              supportedSnssaiList:
-                - sst: 1
-                  sd: "010203"
           nsiList:
             - snssai:
                 sst: 1
@@ -469,7 +445,7 @@ config:
             - "0.0.0.0"
           amfName: AMF
           nrfUri: http://nrf:29510
-          webuiUri: webui:9876
+          webuiUri: http://webui:5001
           sbi:
             scheme: http
             bindingIPv4: "0.0.0.0"
@@ -483,23 +459,6 @@ config:
             - namf-mt
             - namf-loc
             - namf-oam
-          servedGuamiList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-              amfId: cafe00
-          supportTaiList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-              tac: 1
-          plmnSupportList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-              snssaiList:
-                - sst: 1
-                  sd: "010203"
           supportDnnList:
             - internet
           security:
@@ -618,7 +577,7 @@ config:
             addr: "POD_IP"
           smfName: SMF
           nrfUri: http://nrf:29510
-          webuiUri: webui:9876
+          webuiUri: http://webui:5001
           sbi:
             scheme: http
             bindingIPv4: "0.0.0.0"
@@ -629,49 +588,7 @@ config:
           serviceNameList:
             - nsmf-pdusession
             - nsmf-event-exposure
-          snssaiInfos:
-            - dnnInfos:
-              - dnn: "internet"
-                dns: # the IP address of DNS
-                  ipv4: "8.8.8.8"
-                  ipv6: "2001:4860:4860::8888"
-                ueSubnet: 172.250.0.0/16 # should be CIDR type
-              sNssai:
-                sd: "010203"
-                sst: 1
-          userplane_information:
-            up_nodes:
-              gNB1:
-                type: AN
-              UPF:
-                type: UPF
-                node_id: upf
-                sNssaiUpfInfos: # S-NSSAI information list for this UPF
-                  - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
-                      sst: 1 # Slice/Service Type (uinteger, range: 0~255)
-                      sd: "010203" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
-                    dnnUpfInfoList: # DNN information list for this S-NSSAI
-                      - dnn: "internet"
-                    plmnId:
-                      mcc: "208"
-                      mnc: "93"
-                  - sNssai: # S-NSSAI (Single Network Slice Selection Assistance Information)
-                      sst: 1 # Slice/Service Type (uinteger, range: 0~255)
-                      sd: "112233" # Slice Differentiator (3 bytes hex string, range: 000000~FFFFFF)
-                    dnnUpfInfoList: # DNN information list for this S-NSSAI
-                      - dnn: "internet"
-                    plmnId:
-                      mcc: "208"
-                      mnc: "93"
-                interfaces: # Interface list for this UPF
-                  - interfaceType: N3 # the type of the interface (N3 or N9)
-                    endpoints: # the IP address of this N3/N9 interface on this UPF
-                      - upf
-                    networkInstance: internet # Data Network Name (DNN)
-
-            links:
-              - A: gNB1
-                B: UPF
+          
   ausf:
     deploy: true
     #podAnnotations:
@@ -700,9 +617,6 @@ config:
               key: /var/run/certs/tls.key
           serviceNameList:
             - nausf-auth
-          plmnSupportList:
-            - mcc: "208"
-              mnc: "93"
           groupId: ausfGroup001
   metricfunc:
     deploy: false
