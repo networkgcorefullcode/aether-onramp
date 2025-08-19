@@ -16,110 +16,288 @@ omec-control-plane:
 5g-control-plane:
   enable5G: true
   images:
-    repository: "registry.aetherproject.org/proxy/"
-    #tags:
-    #  amf: <amf image tag>
-    # refer to above Helm Chart to add other NF images
+    repository: "" #default docker hub
+    tags:
+      amf: 5gc-amf:2.0.1-dev
+      nrf: 5gc-nrf:2.0.3-dev
+      smf: 5gc-smf:2.0.7-dev
+      ausf: 5gc-ausf:2.0.2-dev
+      nssf: 5gc-nssf:1.6.6
+      pcf: 5gc-pcf:1.6.6-dev 
+      udr: 5gc-udr:2.0.2-dev
+      udm: 5gc-udm:2.0.2-dev
+      webui: 5gc-webui:1.8.9-dev
+      #sctplb: sctplb:1.6.6-dev
+      #upfadapter: upfadapter:2.0.6-dev
+    pullPolicy: IfNotPresent
 
   kafka:
-    deploy: true
+    deploy: false
 
   mongodb:
+    deploy: true
     usePassword: false
     persistence:
       enabled: false
     architecture: replicaset
-    replicaCount: 2
-
-  resources:
-    enabled: false
+    replicaCount: 1
 
   config:
-    logger:
-      Util:
-        debugLevel: warn
-    #   # network function
-    #   AMF:
-    #     debugLevel: trace
-    #   SMF:
-    #     debugLevel: trace
-
     mongodb:
       name: aether
       url: mongodb://mongodb-arbiter-headless # Enable if cluster deployment required
       authKeysDbName: authentication
       authUrl: mongodb://mongodb-arbiter-headless
 
-    managedByConfigPod:
-      enabled: true
-      syncUrl: http://sdcore-adapter-v2-1.aether-roc.svc:8080/synchronize
-
-    sctplb:
-      deploy: true # If enabled then deploy sctp pod
-      ngapp:
-        externalIp: {{ core.amf.ip }}
-        port: 38412
-
-    upfadapter:
-      deploy: false # If enabled then deploy upf adapter pod
-
-    metricfunc:
-      deploy: true
-
-    # Change AMF config here if rquired
-    # Most of the AMF config comes from Slice APIs but some of the config is
-    # directly provided through Helm Charts
-    amf:
-      cfgFiles:
-        amfcfg.yaml:
-          configuration:
-            enableDBStore: true # Store AMF subscribers in the datastore
-            networkFeatureSupport5GS: # 5gs Network Feature Support IE, refer to TS 24.501 sec. 9.11.3.5
-              imsVoPS: 1 # IMS voice over PS session indicator (uinteger, range: 0~1)
-            security:
-              integrityOrder:
-                 - NIA3
-                 - NIA2
-            #     - NIA0
-              cipheringOrder:
-                 - NEA3
-                 - NEA2
-            #     - NEA0
-
-    # SMF config override. Refer to Helm Charts values for more options
-    smf:
-      cfgFiles:
-        smfcfg.yaml:
-          configuration:
-            enableDBStore: true  # Store SMF subscribers in the datastore
-            # staticIpInfo:
-            #   - dnn: internet
-            #     imsiIpInfo:
-            #       imsi-208930100007510: "172.250.0.100"
-            #       imsi-208930100007511: "172.250.0.101"
-            #       imsi-208930100007512: "172.250.0.102"
-            #       imsi-208930100007513: "172.250.0.103"
-            #       imsi-208930100007514: "172.250.0.104"
-
-    #pcf:
-    #  cfgFiles:
-    #    pcfcfg.yaml:
-    #      configuration:
-
-    nrf:
-      cfgFiles:
-        nrfcfg.yaml:
-          configuration:
-            mongoDBStreamEnable: false    # enable/disable MongoDB stream in NRF
-            nfProfileExpiryEnable: true   # If enabled, remove NF profile if no keepalive received
-            nfKeepAliveTime: 60           # default timeout for NF profiles
-
     webui:
+      serviceType: NodePort
+      urlportConfigs:
+        port: 5001
+        nodePort: 30003
+
+      ingress:
+        enabled: false
+        hostname: aether.local
+        path: /
+        pathType: Prefix
+        # extraHosts:
+          # - host: aether.local
+          #   path: /
       cfgFiles:
         webuicfg.yaml:
+          info:
+            version: 1.0.0
+            description: WebUI initial local configuration
           configuration:
+            enableAuthentication: false
+            spec-compliant-sdf: false
+            secure-grpc-server: false  # if 'true', you must set the path to where the credentials (pem and key) are located
+            webui-tls:
+              # pem: "/var/run/certs/tls.crt"
+              # key: "/var/run/certs/tls.key"
+            nfconfig-tls:
+              # pem: "/var/run/certs/tls.crt"
+              # key: "/var/run/certs/tls.key"
             managedByConfigPod:
-              enabled: {{ not core.standalone }}
+              enabled: false
+              syncUrl: http://roc-sdcore-adapter-v2-1.aether-roc.svc:8080/synchronize
+    
+    amf:
+      serviceType: NodePort
+      prometheus:
+        nodePort: 30084
+      sctp_grpc:
+        port: 9000
+        nodePort: 30088
+      sbi:
+        port: 29518
+        nodePort: 30087
+      ngapp:
+        port: 38412
+        nodePort: 30071
+
+      cfgFiles:
+        amfcfg.yaml:
+          manualConfigs: 
+            enabled: true
+            nfs: 
+              UDM:
+                # UDM 1
+                - nfType: "UDM"
+                  nfStatus: "REGISTERED"
+                  udmInfo:
+                    supiRanges:
+                      - start: "208930100007487"
+                        end: "208930100007495"
+                  nfServices:
+                    - serviceName: "nudm-sdm"
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: udm.aether-5gc.cluster.local
+
+                    - serviceName: "nudm-uecm"
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: udm.aether-5gc.cluster.local
+
+                    - serviceName: "nudm-ueau"
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: udm.aether-5gc.cluster.local
+
+                    - serviceName: "nudm-ee"
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: udm.aether-5gc.cluster.local
+
+                    - serviceName: "nudm-pp"
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: udm.aether-5gc.cluster.local
+
+              SMF:
+                - nfType: "SMF"
+                  nfStatus: "REGISTERED"
+                  nfServices:
+                  - serviceName: "nsmf-event-exposure"
+                    nfServiceStatus: REGISTERED
+                    scheme: http
+                    fqdn: smf.aether-5gc.cluster.local
+
+                  - serviceName: "nsmf-pdusession"
+                    nfServiceStatus: REGISTERED
+                    scheme: http
+                    fqdn: smf.aether-5gc.cluster.local
+
+              AUSF:
+                - nfType: "AUSF"
+                  nfStatus: "REGISTERED"
+                  ausfInfo:
+                    supiRanges:
+                      - start: "208930100007487"
+                        end: "208930100007495"
+                  nfServices:
+                    - serviceName: "nausf-auth"
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: ausf.aether-5gc.cluster.local
+
+              PCF:
+                - nfType: "PCF"
+                  nfStatus: "REGISTERED"
+                  pcfInfo:
+                    supiRanges:
+                      - start: "208930100007487"
+                        end: "208930100007495"
+                  nfServices:
+                    - serviceName: "npcf-am-policy-control"
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: pcf.aether-5gc.cluster.local
+
+                    - serviceName: npcf-smpolicycontrol
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: pcf.aether-5gc.cluster.local
+
+                    - serviceName: npcf-bdtpolicycontrol
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: pcf.aether-5gc.cluster.local
+
+                    - serviceName: npcf-policyauthorization
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: pcf.aether-5gc.cluster.local
+
+                    - serviceName: npcf-eventexposure
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: pcf.aether-5gc.cluster.local
+
+                    - serviceName: npcf-ue-policy-control
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: pcf.aether-5gc.cluster.local UDR
+
+                - nfType: "UDR"
+                  nfStatus: "REGISTERED"
+                  udrInfo:
+                    supiRanges:
+                      - start: "208930100007487"
+                        end: "208930100007495"
+                  nfServices:
+                    - serviceName: "nudr-dr"
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: udr.aether-5gc.cluster.local
+                      interPlmnFqdn: udr.aether-5gc.cluster.local
+
+              NSSF:
+                - nfType: "NSSF"
+                  nfStatus: "REGISTERED"
+                  nssfInfo:
+                    supiRanges:
+                      - start:
+                        end:
+                  nfServices:
+                    - serviceName: nnssf-nsselection
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: nssf.aether-5gc.cluster.local
+
+                    - serviceName: nnssf-nssai-exposure
+                      nfServiceStatus: REGISTERED
+                      scheme: http
+                      fqdn: nssf.aether-5gc.cluster.local
+
+    # udm:
+    #   cfgFiles:
+    #     udmcfg.yaml:
+          # manualConfigs:
+          #   enabled: true
+          #   nfs: 
+          #     UDM:
+          #     SMF:
+          #     AUSF:
+          #     PCF:
+          #     UDR:
+          #     NSSF:
+
+    # udr:
+    #   cfgFiles:
+    #     udrcfg.yaml:
+          # manualConfigs:
+          #   enabled: true
+          #   nfs: 
+          #     UDM:
+          #     SMF:
+          #     AUSF:
+          #     PCF:
+          #     UDR:
+          #     NSSF:
+
+    # ausf:
+    #   cfgFiles:
+    #     ausfcfg.yaml:
+          # manualConfigs:
+          #   enabled: true
+          #   nfs: 
+          #     UDM:
+          #     SMF:
+          #     AUSF:
+          #     PCF:
+          #     UDR:
+          #     NSSF:
+
+    # pcf:
+    #   cfgFiles:
+    #     pcfcfg.yaml:
+          # manualConfigs:
+          #   enabled: true
+          #   nfs: 
+          #     UDM:
+          #     SMF:
+          #     AUSF:
+          #     PCF:
+          #     UDR:
+          #     NSSF:
+
+    # nssf:
+    #   cfgFiles:
+    #     nssfcfg.yaml:
+          # manualConfigs:
+          #   enabled: true
+          #   nfs: 
+          #     UDM:
+          #     SMF:
+          #     AUSF:
+          #     PCF:
+          #     UDR:
+          #     NSSF:
+
+    upfadapter:
+      deploy: false
 
 # Override values for omec-sub-provision (subscriber) Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml
@@ -127,9 +305,9 @@ omec-control-plane:
 omec-sub-provision:
   enable: true
   images:
-    repository: "registry.aetherproject.org/proxy/"
-    #tags:
-    #  simapp: #add simapp override image
+    repository: ""
+    tags:
+     simapp: simapp:1.6.5
 
   config:
     simapp:
@@ -175,97 +353,6 @@ omec-sub-provision:
                 - "208930100007493"
                 - "208930100007494"
                 - "208930100007495"
-                - "208930100007496"
-                - "208930100007497"
-                - "208930100007498"
-                - "208930100007499"
-                - "208930100007500"
-                - "208930100007501"
-                - "208930100007502"
-                - "208930100007503"
-                - "208930100007504"
-                - "208930100007505"
-                - "208930100007506"
-                - "208930100007507"
-                - "208930100007508"
-                - "208930100007509"
-                - "208930100007510"
-                - "208930100007511"
-                - "208930100007512"
-                - "208930100007513"
-                - "208930100007514"
-                - "208930100007515"
-                - "208930100007516"
-                - "208930100007517"
-                - "208930100007518"
-                - "208930100007519"
-                - "208930100007520"
-                - "208930100007521"
-                - "208930100007522"
-                - "208930100007523"
-                - "208930100007524"
-                - "208930100007525"
-                - "208930100007526"
-                - "208930100007527"
-                - "208930100007528"
-                - "208930100007529"
-                - "208930100007530"
-                - "208930100007531"
-                - "208930100007532"
-                - "208930100007533"
-                - "208930100007534"
-                - "208930100007535"
-                - "208930100007536"
-                - "208930100007537"
-                - "208930100007538"
-                - "208930100007539"
-                - "208930100007540"
-                - "208930100007541"
-                - "208930100007542"
-                - "208930100007543"
-                - "208930100007544"
-                - "208930100007545"
-                - "208930100007546"
-                - "208930100007547"
-                - "208930100007548"
-                - "208930100007549"
-                - "208930100007550"
-                - "208930100007551"
-                - "208930100007552"
-                - "208930100007553"
-                - "208930100007554"
-                - "208930100007555"
-                - "208930100007556"
-                - "208930100007557"
-                - "208930100007558"
-                - "208930100007559"
-                - "208930100007560"
-                - "208930100007561"
-                - "208930100007562"
-                - "208930100007563"
-                - "208930100007564"
-                - "208930100007565"
-                - "208930100007566"
-                - "208930100007567"
-                - "208930100007568"
-                - "208930100007569"
-                - "208930100007570"
-                - "208930100007571"
-                - "208930100007572"
-                - "208930100007573"
-                - "208930100007574"
-                - "208930100007575"
-                - "208930100007576"
-                - "208930100007577"
-                - "208930100007578"
-                - "208930100007579"
-                - "208930100007580"
-                - "208930100007581"
-                - "208930100007582"
-                - "208930100007583"
-                - "208930100007584"
-                - "208930100007585"
-                - "208930100007586"
               ip-domain-name: "pool1"
               ip-domain-expanded:
                 dnn: internet
