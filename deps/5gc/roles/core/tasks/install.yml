@@ -45,7 +45,7 @@
     var: "chart_ref_sd_core"
   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
 
-- name: copy local_charts "{{ chart_ref_sd_core }}" to /tmp/sdcore-helm-charts
+- name: copy local_charts {{ chart_ref_sd_core }} to /tmp/sdcore-helm-charts
   synchronize:
     src: "{{ chart_ref_sd_core }}/"
     dest: /tmp/sdcore-helm-charts
@@ -55,7 +55,7 @@
   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
 
 - set_fact:
-    chart_ref_sd_core: "/tmp/sdcore-helm-charts/{{ core.helm.chart_ref | regex_replace('^.*/(.*)$', '\\1') }}"
+    chart_ref_sd_core: "/tmp/sdcore-helm-charts/{{ core.helm.chart_ref }}"
   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
 
 - debug:
@@ -65,7 +65,7 @@
 - name: update aether 5gc-cp helm dependencies
   shell: |
     helm dep up /tmp/sdcore-helm-charts/5g-control-plane
-  when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
+  when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts == false
 
 - name: update aether 5gc helm dependencies
   shell: |
