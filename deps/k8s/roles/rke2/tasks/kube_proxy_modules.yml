@@ -12,6 +12,7 @@
     - nftables
     - libzstd1
     - ipset
+    - xz-utils
     state: present
     update_cache: yes
 
