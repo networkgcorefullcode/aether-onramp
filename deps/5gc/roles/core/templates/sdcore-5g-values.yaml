@@ -343,7 +343,7 @@ omec-sub-provision:
 
             # Configure Device Groups (ignored if provision-network-slice is disabled)
             device-groups:
-            - name:  "5g-gnbsim-user-group1"
+            - name:  "test5g-gnbsim-user-group1"
               imsis:
                 - "208930100007487"
                 - "208930100007488"
