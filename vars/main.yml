@@ -35,7 +35,7 @@ core:
 
 ueransim:
   gnb:
-    ip: "192.168.12.13"
+    ip: "192.168.12.16"
   servers:
     0:
       gnb: "deps/ueransim/config/custom-gnb.yaml"
