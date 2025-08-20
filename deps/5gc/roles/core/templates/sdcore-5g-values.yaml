@@ -98,138 +98,139 @@ omec-control-plane:
 
       cfgFiles:
         amfcfg.yaml:
-          manualConfigs: 
-            enabled: true
-            nfs: 
-              UDM:
-                # UDM 1
-                - nfType: "UDM"
-                  nfStatus: "REGISTERED"
-                  udmInfo:
-                    supiRanges:
-                      - start: "208930100007487"
-                        end: "208930100007495"
-                  nfServices:
-                    - serviceName: "nudm-sdm"
+          configuration:
+            manualConfigs: 
+              enabled: true
+              nfs: 
+                UDM:
+                  # UDM 1
+                  - nfType: "UDM"
+                    nfStatus: "REGISTERED"
+                    udmInfo:
+                      supiRanges:
+                        - start: "208930100007487"
+                          end: "208930100007495"
+                    nfServices:
+                      - serviceName: "nudm-sdm"
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: udm.aether-5gc.cluster.local
+
+                      - serviceName: "nudm-uecm"
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: udm.aether-5gc.cluster.local
+
+                      - serviceName: "nudm-ueau"
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: udm.aether-5gc.cluster.local
+
+                      - serviceName: "nudm-ee"
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: udm.aether-5gc.cluster.local
+
+                      - serviceName: "nudm-pp"
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: udm.aether-5gc.cluster.local
+
+                SMF:
+                  - nfType: "SMF"
+                    nfStatus: "REGISTERED"
+                    nfServices:
+                    - serviceName: "nsmf-event-exposure"
                       nfServiceStatus: REGISTERED
                       scheme: http
-                      fqdn: udm.aether-5gc.cluster.local
+                      fqdn: smf.aether-5gc.cluster.local
 
-                    - serviceName: "nudm-uecm"
+                    - serviceName: "nsmf-pdusession"
                       nfServiceStatus: REGISTERED
                       scheme: http
-                      fqdn: udm.aether-5gc.cluster.local
+                      fqdn: smf.aether-5gc.cluster.local
 
-                    - serviceName: "nudm-ueau"
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: udm.aether-5gc.cluster.local
+                AUSF:
+                  - nfType: "AUSF"
+                    nfStatus: "REGISTERED"
+                    ausfInfo:
+                      supiRanges:
+                        - start: "208930100007487"
+                          end: "208930100007495"
+                    nfServices:
+                      - serviceName: "nausf-auth"
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: ausf.aether-5gc.cluster.local
 
-                    - serviceName: "nudm-ee"
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: udm.aether-5gc.cluster.local
+                PCF:
+                  - nfType: "PCF"
+                    nfStatus: "REGISTERED"
+                    pcfInfo:
+                      supiRanges:
+                        - start: "208930100007487"
+                          end: "208930100007495"
+                    nfServices:
+                      - serviceName: "npcf-am-policy-control"
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: pcf.aether-5gc.cluster.local
 
-                    - serviceName: "nudm-pp"
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: udm.aether-5gc.cluster.local
+                      - serviceName: npcf-smpolicycontrol
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: pcf.aether-5gc.cluster.local
 
-              SMF:
-                - nfType: "SMF"
-                  nfStatus: "REGISTERED"
-                  nfServices:
-                  - serviceName: "nsmf-event-exposure"
-                    nfServiceStatus: REGISTERED
-                    scheme: http
-                    fqdn: smf.aether-5gc.cluster.local
+                      - serviceName: npcf-bdtpolicycontrol
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: pcf.aether-5gc.cluster.local
 
-                  - serviceName: "nsmf-pdusession"
-                    nfServiceStatus: REGISTERED
-                    scheme: http
-                    fqdn: smf.aether-5gc.cluster.local
+                      - serviceName: npcf-policyauthorization
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: pcf.aether-5gc.cluster.local
 
-              AUSF:
-                - nfType: "AUSF"
-                  nfStatus: "REGISTERED"
-                  ausfInfo:
-                    supiRanges:
-                      - start: "208930100007487"
-                        end: "208930100007495"
-                  nfServices:
-                    - serviceName: "nausf-auth"
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: ausf.aether-5gc.cluster.local
+                      - serviceName: npcf-eventexposure
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: pcf.aether-5gc.cluster.local
 
-              PCF:
-                - nfType: "PCF"
-                  nfStatus: "REGISTERED"
-                  pcfInfo:
-                    supiRanges:
-                      - start: "208930100007487"
-                        end: "208930100007495"
-                  nfServices:
-                    - serviceName: "npcf-am-policy-control"
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: pcf.aether-5gc.cluster.local
+                      - serviceName: npcf-ue-policy-control
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: pcf.aether-5gc.cluster.local UDR
 
-                    - serviceName: npcf-smpolicycontrol
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: pcf.aether-5gc.cluster.local
+                  - nfType: "UDR"
+                    nfStatus: "REGISTERED"
+                    udrInfo:
+                      supiRanges:
+                        - start: "208930100007487"
+                          end: "208930100007495"
+                    nfServices:
+                      - serviceName: "nudr-dr"
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: udr.aether-5gc.cluster.local
+                        interPlmnFqdn: udr.aether-5gc.cluster.local
 
-                    - serviceName: npcf-bdtpolicycontrol
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: pcf.aether-5gc.cluster.local
+                NSSF:
+                  - nfType: "NSSF"
+                    nfStatus: "REGISTERED"
+                    nssfInfo:
+                      supiRanges:
+                        - start:
+                          end:
+                    nfServices:
+                      - serviceName: nnssf-nsselection
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: nssf.aether-5gc.cluster.local
 
-                    - serviceName: npcf-policyauthorization
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: pcf.aether-5gc.cluster.local
-
-                    - serviceName: npcf-eventexposure
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: pcf.aether-5gc.cluster.local
-
-                    - serviceName: npcf-ue-policy-control
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: pcf.aether-5gc.cluster.local UDR
-
-                - nfType: "UDR"
-                  nfStatus: "REGISTERED"
-                  udrInfo:
-                    supiRanges:
-                      - start: "208930100007487"
-                        end: "208930100007495"
-                  nfServices:
-                    - serviceName: "nudr-dr"
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: udr.aether-5gc.cluster.local
-                      interPlmnFqdn: udr.aether-5gc.cluster.local
-
-              NSSF:
-                - nfType: "NSSF"
-                  nfStatus: "REGISTERED"
-                  nssfInfo:
-                    supiRanges:
-                      - start:
-                        end:
-                  nfServices:
-                    - serviceName: nnssf-nsselection
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: nssf.aether-5gc.cluster.local
-
-                    - serviceName: nnssf-nssai-exposure
-                      nfServiceStatus: REGISTERED
-                      scheme: http
-                      fqdn: nssf.aether-5gc.cluster.local
+                      - serviceName: nnssf-nssai-exposure
+                        nfServiceStatus: REGISTERED
+                        scheme: http
+                        fqdn: nssf.aether-5gc.cluster.local
 
     # udm:
     #   cfgFiles:
