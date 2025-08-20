@@ -47,7 +47,7 @@ configuration:
       defaultAmf:
         hostName: amf # Host name of AMF
         ipAddr: "{{ amf_ip }}" # 172.16.220.36 # AMF IP address
-        port: 38412 # AMF port
+        port: 30071 # AMF port
 
   customProfiles:
     customProfiles1:
