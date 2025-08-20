@@ -305,9 +305,9 @@ omec-control-plane:
 omec-sub-provision:
   enable: true
   images:
-    repository: ""
-    tags:
-     simapp: simapp:1.6.5
+    repository: "registry.aetherproject.org/proxy/"
+    #tags:
+    #  simapp: #add simapp override image
 
   config:
     simapp:
