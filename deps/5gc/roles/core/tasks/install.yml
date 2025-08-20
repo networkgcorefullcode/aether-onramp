@@ -70,6 +70,7 @@
 - name: update aether 5gc helm dependencies
   shell: |
     helm dep up /tmp/sdcore-helm-charts/
+    helm dep up /tmp/sdcore-helm-charts/charts/5g-control-plane
   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
 
 # TODO: add systems check to avoid issues (e.g., mongodb needing avx support)
@@ -81,7 +82,7 @@
         name: sd-core
         release_namespace: aether-5gc
         create_namespace: true
-        chart_ref: "{{ core.helm.chart_ref if core.helm.local_charts == false else '/tmp/sdcore-helm-charts' }}"
+        chart_ref: "/tmp/sdcore-helm-charts"
         chart_version: "{{ core.helm.chart_version }}"
         values_files:
           - /tmp/sdcore-5g-values.yaml
