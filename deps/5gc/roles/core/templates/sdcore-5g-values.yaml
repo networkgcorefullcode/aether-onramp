@@ -114,27 +114,27 @@ omec-control-plane:
                       - serviceName: "nudm-sdm"
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: udm.aether-5gc.cluster.local
+                        fqdn: http://udm.aether-5gc.svc.cluster.local
 
                       - serviceName: "nudm-uecm"
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: udm.aether-5gc.cluster.local
+                        fqdn: http://udm.aether-5gc.svc.cluster.local
 
                       - serviceName: "nudm-ueau"
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: udm.aether-5gc.cluster.local
+                        fqdn: http://udm.aether-5gc.svc.cluster.local
 
                       - serviceName: "nudm-ee"
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: udm.aether-5gc.cluster.local
+                        fqdn: http://udm.aether-5gc.svc.cluster.local
 
                       - serviceName: "nudm-pp"
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: udm.aether-5gc.cluster.local
+                        fqdn: http://udm.aether-5gc.svc.cluster.local
 
                 SMF:
                   - nfType: "SMF"
@@ -143,12 +143,12 @@ omec-control-plane:
                     - serviceName: "nsmf-event-exposure"
                       nfServiceStatus: REGISTERED
                       scheme: http
-                      fqdn: smf.aether-5gc.cluster.local
+                      fqdn: http://smf.aether-5gc.svc.cluster.local
 
                     - serviceName: "nsmf-pdusession"
                       nfServiceStatus: REGISTERED
                       scheme: http
-                      fqdn: smf.aether-5gc.cluster.local
+                      fqdn: http://smf.aether-5gc.svc.cluster.local
 
                 AUSF:
                   - nfType: "AUSF"
@@ -161,7 +161,7 @@ omec-control-plane:
                       - serviceName: "nausf-auth"
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: ausf.aether-5gc.cluster.local
+                        fqdn: http://ausf.aether-5gc.svc.cluster.local
 
                 PCF:
                   - nfType: "PCF"
@@ -174,32 +174,32 @@ omec-control-plane:
                       - serviceName: "npcf-am-policy-control"
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: pcf.aether-5gc.cluster.local
+                        fqdn: http://pcf.aether-5gc.svc.cluster.local
 
                       - serviceName: npcf-smpolicycontrol
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: pcf.aether-5gc.cluster.local
+                        fqdn: http://pcf.aether-5gc.svc.cluster.local
 
                       - serviceName: npcf-bdtpolicycontrol
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: pcf.aether-5gc.cluster.local
+                        fqdn: http://pcf.aether-5gc.svc.cluster.local
 
                       - serviceName: npcf-policyauthorization
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: pcf.aether-5gc.cluster.local
+                        fqdn: http://pcf.aether-5gc.svc.cluster.local
 
                       - serviceName: npcf-eventexposure
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: pcf.aether-5gc.cluster.local
+                        fqdn: http://pcf.aether-5gc.svc.cluster.local
 
                       - serviceName: npcf-ue-policy-control
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: pcf.aether-5gc.cluster.local UDR
+                        fqdn: http://pcf.aether-5gc.svc.cluster.local UDR
 
                   - nfType: "UDR"
                     nfStatus: "REGISTERED"
@@ -211,8 +211,8 @@ omec-control-plane:
                       - serviceName: "nudr-dr"
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: udr.aether-5gc.cluster.local
-                        interPlmnFqdn: udr.aether-5gc.cluster.local
+                        fqdn: http://udr.aether-5gc.svc.cluster.local
+                        interPlmnFqdn: http://udr.aether-5gc.svc.cluster.local
 
                 NSSF:
                   - nfType: "NSSF"
@@ -225,12 +225,12 @@ omec-control-plane:
                       - serviceName: nnssf-nsselection
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: nssf.aether-5gc.cluster.local
+                        fqdn: http://nssf.aether-5gc.svc.cluster.local
 
                       - serviceName: nnssf-nssai-exposure
                         nfServiceStatus: REGISTERED
                         scheme: http
-                        fqdn: nssf.aether-5gc.cluster.local
+                        fqdn: http://nssf.aether-5gc.svc.cluster.local
 
     # udm:
     #   cfgFiles:
@@ -319,7 +319,7 @@ omec-sub-provision:
             sub-provision-endpt:
               addr: webui  # subscriber configuation endpoint.
             # sub-proxy-endpt: # used if subscriber proxy is enabled in the ROC.
-            #   addr: subscriber-proxy.aether-roc.svc.cluster.local
+            #   addr: subscriber-proxy.aether-roc.svc.svc.cluster.local
             #   port: 5000
 
             # Configure Subscriber IMSIs and their security details.
