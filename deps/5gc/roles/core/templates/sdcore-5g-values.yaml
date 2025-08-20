@@ -423,6 +423,7 @@ omec-user-plane:
     #  pfcpiface: <pfcp image tag>
   config:
     upf:
+      privileged: true
       name: "oaisim"
       sriov:
         enabled: false    # SRIOV is disabled by default
