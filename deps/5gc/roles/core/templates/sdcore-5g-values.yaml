@@ -312,9 +312,9 @@ omec-control-plane:
               registerIPv4: smf # IP used to register to NRF
               bindingIPv4: 0.0.0.0  # IP used to bind the service
               port: 29502 # Port used to bind the service
-              tls: # the local path of TLS key
-                key: /var/run/certs/smf.key # SMF TLS Private key
-                pem: /var/run/certs/smf.crt # SMF TLS Certificate
+              # tls: # the local path of TLS key
+              #   key: /var/run/certs/smf.key # SMF TLS Private key
+              #   pem: /var/run/certs/smf.crt # SMF TLS Certificate
             nrfUri: http://nrf:29510 # a valid URI of NRF
             # staticIpInfo:
             #   - dnn: internet
