@@ -15,4 +15,4 @@ cat > all-helm-output.yaml
 kustomize build .
 
 # Limpiar el archivo temporal
-rm all-helm-output.yaml
+#rm all-helm-output.yaml
