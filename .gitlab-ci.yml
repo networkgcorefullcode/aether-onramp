@@ -6,7 +6,9 @@ stages:
 # Lint básico de YAMLs con yamllint
 lint-yaml:
   stage: lint
-  image: cytopia/yamllint:alpine
+  image: 
+    name: cytopia/yamllint:alpine
+    entrypoint: [""]
   tags:
     - aether-runner
   script:
@@ -15,7 +17,7 @@ lint-yaml:
     - ls -la
     - echo "Mostrando .yamllint:"
     - cat .yamllint
-    - yamllint deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+    - yamllint -c .yamllint deps/5gc/roles/core/templates/sdcore-5g-values.yaml
 
   rules:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
