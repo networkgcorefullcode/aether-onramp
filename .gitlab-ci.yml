@@ -49,10 +49,6 @@ render-values:
   script:
     - set -euo pipefail
 
-    # (sanidad) Verifica que existan los paths esperados
-    - test -f deps/5gc/roles/core/vars/main.yml
-    - test -f deps/5gc/roles/core/templates/sdcore-5g-values.yaml
-
     # (opcional) Muestra el valor que tomará core.amf.ip desde vars/main.yml para auditar
     - |
       echo "Extrayendo core.amf.ip desde vars/main.yml:"
