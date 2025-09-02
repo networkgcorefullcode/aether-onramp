@@ -76,8 +76,8 @@ render-values:
     # 4. Renderizar la plantilla Helm
     - |
       ansible localhost -m ansible.builtin.template \
-        -a "src=./deps/5gc/roles/core/templates/sdcore-5g-values.yaml dest=sdcore-5g-values.yaml" \
-        -e @vars/main.yaml
+        -a "src=deps/5gc/roles/core/templates/sdcore-5g-values.yaml dest=sdcore-5g-values.yaml" \
+        -e @vars/main.yml
 
     # 5. Revisar output
     - cat sdcore-5g-values.yaml
