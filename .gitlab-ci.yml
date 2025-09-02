@@ -46,26 +46,36 @@ render-values:
   before_script:
     # Instalar Ansible en el contenedor
     - pip install --quiet "ansible<11"
-  script:
     - set -euo pipefail
+  script:
+    # 1. Mostrar de dónde vamos a leer
+    - echo "Extrayendo core.amf.ip desde vars/main.yaml:"
 
-    # (opcional) Muestra el valor que tomará core.amf.ip desde vars/main.yml para auditar
+    # 2. Ejecutar playbook mínimo para capturar la IP
     - |
-      echo "Extrayendo core.amf.ip desde vars/main.yml:"
-      ansible localhost -c local -m ansible.builtin.debug \
+      ansible localhost -m ansible.builtin.debug \
         -a "msg={{ core.amf.ip }}" \
-        -e @vars/main.yml
+        -e @vars/main.yaml \
+        | tee /tmp/amf_ip.out
+    - CORE_AMF_IP=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /tmp/amf_ip.out)
+    - echo "CORE_AMF_IP=$CORE_AMF_IP"
 
-    # Renderiza el template Jinja con las variables de Ansible
-    # Nota: 'template' trata 'src' como Jinja2 (no es obligatorio .j2)
+    # 3. Generar JSON de variables
     - |
-      ansible localhost -c local -m ansible.builtin.template \
-        -a "src=deps/5gc/roles/core/templates/sdcore-5g-values.yaml dest=/tmp/sdcore-5g-values.yaml" \
-        -e @vars/main.yml
+      ansible localhost -m ansible.builtin.debug \
+        -a "msg={{ core | to_json }}" \
+        -e @vars/main.yaml \
+        | grep msg \
+        | sed 's/^.*msg=//' > extra_vars.json
 
-    # (opcional) Revisa una parte del output renderizado
-    - echo "Primeras líneas de /tmp/sdcore-5g-values.yaml:"
-    - sed -n '1,80p' /tmp/sdcore-5g-values.yaml
+    # 4. Renderizar la plantilla Helm
+    - |
+      ansible localhost -m ansible.builtin.template \
+        -a "src=deps/5gc/roles/core/templates/sdcore-5g-values.yaml dest=sdcore-5g-values.yaml" \
+        -e @extra_vars.json
+
+    # 5. Revisar output
+    - cat sdcore-5g-values.yaml
   artifacts:
     paths:
       - /tmp/sdcore-5g-values.yaml
