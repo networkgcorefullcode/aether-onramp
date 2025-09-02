@@ -46,9 +46,9 @@ helm-dry-run:
     - helm repo add aether https://charts.aetherproject.org
     - helm repo update
     # Linter contra chart remoto
-    - helm lint ether/sd-core
+    - helm lint aether/sd-core
     # Render de manifests para verificar (usando tu values local)
-    - helm template ether/sd-core -f charts/5g-control-plane/values.yaml >/dev/null
+    - helm template aether/sd-core -f charts/5g-control-plane/values.yaml >/dev/null
   rules:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   - if: $CI_PIPELINE_SOURCE == "push"
