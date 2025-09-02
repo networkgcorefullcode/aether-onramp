@@ -7,6 +7,8 @@ stages:
 lint-yaml:
   stage: lint
   image: cytopia/yamllint:latest
+  tags:
+    - aether-runner
   script:
     - yamllint -c .yamllint deps/5gc/roles/core/templates/sdcore-5g-values.yaml
 
@@ -19,6 +21,8 @@ lint-yaml:
 validate-values:
   stage: validate
   image: mikefarah/yq:4.44.2
+  tags:
+    - aether-runner
   script:
     - echo "Validando sintaxis de values.yaml"
     - yq e . deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
@@ -29,6 +33,8 @@ validate-values:
 # Helm template dry-run para validar que los manifests se generen correctamente
 helm-dry-run:
   stage: dry-run
+  tags:
+    - aether-runner
   image:
     name: alpine/helm:3.14.4
     entrypoint: [""]
