@@ -194,7 +194,7 @@ omec-control-plane:
           #   kafkaInfo:    # Información de Kafka para eventos y métricas
           #     enableKafka: true
           #     brokerUri: "kafka"
-          #     brokerPort: 9092 
+          #     brokerPort: 9092
           #     topicName: "sdcore-data-source-amf"  # Topic donde publica AMF
           # # the kind of log output
           #   # debugLevel: how detailed to output, value: trace, debug, info, warn, error, fatal, panic
@@ -218,7 +218,7 @@ omec-control-plane:
       cfgFiles:
         ausfcfg.yaml:
           configuration:
-            enableDBStore: true 
+            enableDBStore: true
             groupId: ausfGroup001
             sbi:
               bindingIPv4: 0.0.0.0
