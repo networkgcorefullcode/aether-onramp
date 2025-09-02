@@ -11,8 +11,9 @@ lint-yaml:
     - yamllint -c .yamllint deps/5gc/roles/core/templates/sdcore-5g-values.yaml
 
   rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_PIPELINE_SOURCE == "push"
+    when: always
 
 # Validar sintaxis con yq
 validate-values:
@@ -22,8 +23,9 @@ validate-values:
     - echo "Validando sintaxis de values.yaml"
     - yq e . deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
   rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_PIPELINE_SOURCE == "push"
+    when: always
 # Helm template dry-run para validar que los manifests se generen correctamente
 helm-dry-run:
   stage: dry-run
@@ -39,8 +41,9 @@ helm-dry-run:
     # Render de manifests para verificar (usando tu values local)
     - helm template ether/sd-core -f charts/5g-control-plane/values.yaml >/dev/null
   rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_PIPELINE_SOURCE == "push"
+    when: always
 
 
 
