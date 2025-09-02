@@ -55,16 +55,16 @@ render-values:
     - |
       ansible localhost -m ansible.builtin.debug \
         -a "msg={{ core.amf.ip }}" \
-        -e @vars/main.yaml \
-        | tee /tmp/amf_ip.out
-    - CORE_AMF_IP=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /tmp/amf_ip.out)
+        -e @./vars/main.yaml \
+        | tee amf_ip.out
+    - CORE_AMF_IP=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' amf_ip.out)
     - echo "CORE_AMF_IP=$CORE_AMF_IP"
 
     # 3. Generar JSON de variables
     - |
       ansible localhost -m ansible.builtin.debug \
         -a "msg={{ core | to_json }}" \
-        -e @vars/main.yaml \
+        -e @./vars/main.yaml \
         | grep msg \
         | sed 's/^.*msg=//' > extra_vars.json
 
@@ -78,7 +78,7 @@ render-values:
     - cat sdcore-5g-values.yaml
   artifacts:
     paths:
-      - /tmp/sdcore-5g-values.yaml
+      - sdcore-5g-values.yaml
     when: always
 
   rules:
