@@ -37,87 +37,89 @@ validate-values:
   - if: $CI_PIPELINE_SOURCE == "push"
     when: always
 
-# Job 1: Renderizar la plantilla de Helm values
-render-values:
-  stage: dry-run
-  tags:
-    - aether-runner
-  image: python:3.12-slim
-  before_script:
-    # Instalar Ansible en el contenedor
-    - pip install --quiet "ansible<11"
-    - set -euo pipefail
-  script:
-    #debug
-    - echo "Archivos en el workspace:"
-    - ls -R .
+
+## trabajo en estos jobs detenido porque el Helm values depende de muchas variables de ansible no solo core.amf.ip
+# # Job 1: Renderizar la plantilla de Helm values
+# render-values:
+#   stage: dry-run
+#   tags:
+#     - aether-runner
+#   image: python:3.12-slim
+#   before_script:
+#     # Instalar Ansible en el contenedor
+#     - pip install --quiet "ansible<11"
+#     - set -euo pipefail
+#   script:
+#     #debug
+#     - echo "Archivos en el workspace:"
+#     - ls -R .
 
 
-    # 1. Mostrar de dónde vamos a leer
-    - echo "Extrayendo core.amf.ip desde vars/main.yml:"
+#     # 1. Mostrar de dónde vamos a leer
+#     - echo "Extrayendo core.amf.ip desde vars/main.yml:"
 
-    # 2. Ejecutar playbook mínimo para capturar la IP
-    - |
-      ansible localhost -m ansible.builtin.debug \
-        -a "msg={{ core.amf.ip }}" \
-        -e @./vars/main.yml \
-        | tee amf_ip.out
-    - CORE_AMF_IP=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' amf_ip.out)
-    - echo "CORE_AMF_IP=$CORE_AMF_IP"
+#     # 2. Ejecutar playbook mínimo para capturar la IP
+#     - |
+#       ansible localhost -m ansible.builtin.debug \
+#         -a "msg={{ core.amf.ip }}" \
+#         -e @./vars/main.yml \
+#         | tee amf_ip.out
+#     - CORE_AMF_IP=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' amf_ip.out)
+#     - echo "CORE_AMF_IP=$CORE_AMF_IP"
 
-    # 3. Generar JSON de variables
-    - |
-      ansible localhost -m ansible.builtin.debug \
-        -a "msg={{ core | to_json }}" \
-        -e @./vars/main.yml \
-        | grep msg \
-        | sed 's/^.*msg=//' > extra_vars.json
+#     # 3. Generar JSON de variables
+#     - |
+#       ansible localhost -m ansible.builtin.debug \
+#         -a "msg={{ core | to_json }}" \
+#         -e @./vars/main.yml \
+#         | grep msg \
+#         | sed 's/^.*msg=//' > extra_vars.json
 
-    # 4. Renderizar la plantilla Helm
-    - |
-      ansible localhost -m ansible.builtin.template \
-        -a "src=deps/5gc/roles/core/templates/sdcore-5g-values.yaml dest=sdcore-5g-values.yaml" \
-        -e @vars/main.yml
+#     # 4. Renderizar la plantilla Helm
+#     - |
+#       ansible localhost -m ansible.builtin.template \
+#         -a "src=deps/5gc/roles/core/templates/sdcore-5g-values.yaml dest=sdcore-5g-values.yaml" \
+#         -e @vars/main.yml
 
-    # 5. Revisar output
-    - cat sdcore-5g-values.yaml
-  artifacts:
-    paths:
-      - sdcore-5g-values.yaml
-    when: always
+#     # 5. Revisar output
+#     - cat sdcore-5g-values.yaml
+#   artifacts:
+#     paths:
+#       - sdcore-5g-values.yaml
+#     when: always
 
-  rules:
-  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  - if: $CI_PIPELINE_SOURCE == "push"
-    when: always
+#   rules:
+#   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#   - if: $CI_PIPELINE_SOURCE == "push"
+#     when: always
 
 
-# Job 2: Helm template dry-run para validar que los manifests se generen correctamente
-helm-dry-run:
-  stage: dry-run
-  tags:
-    - aether-runner
-  image:
-    name: alpine/helm:3.14.4
-    entrypoint: [""]
-  needs:
-    - job: render-values   # garantiza que se ejecute solo si render-values termina OK
-      artifacts: true      # obtiene artifacts del job render-values
-  script:
-    # - helm repo add aether https://charts.aetherproject.io/
-    - helm repo add aether https://charts.aetherproject.org
-    - helm repo update
+# # Job 2: Helm template dry-run para validar que los manifests se generen correctamente
+# helm-dry-run:
+#   stage: dry-run
+#   tags:
+#     - aether-runner
+#   image:
+#     name: alpine/helm:3.14.4
+#     entrypoint: [""]
+#   needs:
+#     - job: render-values   # garantiza que se ejecute solo si render-values termina OK
+#       artifacts: true      # obtiene artifacts del job render-values
+#   script:
+#     # - helm repo add aether https://charts.aetherproject.io/
+#     - helm repo add aether https://charts.aetherproject.org
+#     - helm repo update
 
-    # Linter contra chart remoto
-    - helm lint aether/sd-core -f deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+#     # Linter contra chart remoto
+#     - helm lint aether/sd-core -f deps/5gc/roles/core/templates/sdcore-5g-values.yaml
 
-    # Render de manifests para verificar que se generen correctamente (usando el values local)
-    - helm template aether/sd-core --version 2.2.4 -f deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
+#     # Render de manifests para verificar que se generen correctamente (usando el values local)
+#     - helm template aether/sd-core --version 2.2.4 -f deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
 
-  rules:
-  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  - if: $CI_PIPELINE_SOURCE == "push"
-    when: always
+#   rules:
+#   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#   - if: $CI_PIPELINE_SOURCE == "push"
+#     when: always
 
 
 
