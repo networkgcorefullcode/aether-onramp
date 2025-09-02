@@ -12,11 +12,6 @@ lint-yaml:
   tags:
     - aether-runner
   script:
-    - set -x
-    - pwd
-    - ls -la
-    - echo "Mostrando .yamllint:"
-    - cat .yamllint
     - yamllint -c .yamllint deps/5gc/roles/core/templates/sdcore-5g-values.yaml
 
   rules:
