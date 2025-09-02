@@ -6,12 +6,14 @@ stages:
 # Lint básico de YAMLs con yamllint
 lint-yaml:
   stage: lint
-  image: cytopia/yamllint:latest
+  image: cytopia/yamllint:alpine
   tags:
     - aether-runner
   script:
+    - set -x
     - pwd
     - ls -la
+    - echo "Mostrando .yamllint:"
     - cat .yamllint
     - yamllint deps/5gc/roles/core/templates/sdcore-5g-values.yaml
 
