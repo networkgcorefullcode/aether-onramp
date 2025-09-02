@@ -54,7 +54,7 @@ render-values:
       echo "Extrayendo core.amf.ip desde vars/main.yml:"
       ansible localhost -c local -m ansible.builtin.debug \
         -a "msg={{ core.amf.ip }}" \
-        -e @deps/5gc/roles/core/vars/main.yml
+        -e @vars/main.yml
 
     # Renderiza el template Jinja con las variables de Ansible
     # Nota: 'template' trata 'src' como Jinja2 (no es obligatorio .j2)
