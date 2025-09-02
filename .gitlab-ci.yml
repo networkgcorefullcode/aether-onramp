@@ -6,7 +6,7 @@ stages:
 # Lint básico de YAMLs con yamllint
 lint-yaml:
   stage: lint
-  image: 
+  image:
     name: cytopia/yamllint:alpine
     entrypoint: [""]
   tags:
@@ -36,7 +36,38 @@ validate-values:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   - if: $CI_PIPELINE_SOURCE == "push"
     when: always
-# Helm template dry-run para validar que los manifests se generen correctamente
+
+# Job 1: Renderizar la plantilla de Helm values
+render-values:
+  stage: dry-run
+  tags:
+    - aether-runner
+  image:
+    name: williamyeh/ansible:alpine3
+    entrypoint: [""]
+  script:
+    # 1. Leer la IP de AMF desde el archivo principal de variables de Ansible
+    - CORE_AMF_IP=$(ansible localhost -c local -m ansible.builtin.debug \
+        -a "msg={{ core.amf.ip }}" \
+        -e "@deps/5gc/roles/core/vars/main.yml" \
+        | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
+    - echo "CORE_AMF_IP=$CORE_AMF_IP"
+
+    # 2. Generar JSON para Ansible template
+    - printf '%s' "{\"core\":{\"amf\":{\"ip\":\"%s\"}}}" "$CORE_AMF_IP" > /tmp/extra_vars.json
+
+    # 3. Renderizar la plantilla
+    - ansible localhost -c local -m ansible.builtin.template \
+        -a "src=deps/5gc/roles/core/templates/sdcore-5g-values.yaml dest=/tmp/sdcore-5g-values.yaml" \
+        -e "@/tmp/extra_vars.json"
+
+    # 4. Guardar el resultado como artifact para el siguiente job
+  artifacts:
+    paths:
+      - /tmp/sdcore-5g-values.yaml
+
+
+# Job 2: Helm template dry-run para validar que los manifests se generen correctamente
 helm-dry-run:
   stage: dry-run
   tags:
@@ -44,14 +75,16 @@ helm-dry-run:
   image:
     name: alpine/helm:3.14.4
     entrypoint: [""]
+  dependencies:
+    - render-values
   script:
     # - helm repo add aether https://charts.aetherproject.io/
     - helm repo add aether https://charts.aetherproject.org
     - helm repo update
 
     # Linter contra chart remoto
-    - helm lint aether/sd-core -f deps/5gc/roles/core/templates/sdcore-5g-values.yaml    
-    
+    - helm lint aether/sd-core -f deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+
     # Render de manifests para verificar que se generen correctamente (usando el values local)
     - helm template aether/sd-core --version 2.2.4 -f deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
 
