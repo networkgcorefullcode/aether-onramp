@@ -48,6 +48,11 @@ render-values:
     - pip install --quiet "ansible<11"
     - set -euo pipefail
   script:
+    #debug
+    - echo "Archivos en el workspace:"
+    - ls -R .
+
+
     # 1. Mostrar de dónde vamos a leer
     - echo "Extrayendo core.amf.ip desde vars/main.yaml:"
 
