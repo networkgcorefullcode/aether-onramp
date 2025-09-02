@@ -22,12 +22,16 @@ lint-yaml:
 # Validar sintaxis con yq
 validate-values:
   stage: validate
-  image: mikefarah/yq:4.44.2
+  image: alpine:3.19
   tags:
     - aether-runner
+  before_script:
+    - apk add --no-cache git bash wget
+    - wget -qO /usr/local/bin/yq-go https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+    - chmod +x /usr/local/bin/yq-go
   script:
     - echo "Validando sintaxis de values.yaml"
-    - yq e . deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
+    - yq-go e . deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
   rules:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   - if: $CI_PIPELINE_SOURCE == "push"
