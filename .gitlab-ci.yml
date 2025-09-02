@@ -43,25 +43,38 @@ render-values:
   tags:
     - aether-runner
   image:
-    name: williamyeh/ansible:alpine3
+    name: python:3.12  # Contenedor con Python y pip para instalar Ansible
     entrypoint: [""]
+  before_script:
+     # Instala Ansible en el contenedor
+    - pip install --quiet ansible
   script:
-    # 1. Leer la IP de AMF desde el archivo principal de variables de Ansible
-    - CORE_AMF_IP=$(ansible localhost -c local -m ansible.builtin.debug \
-        -a "msg={{ core.amf.ip }}" \
-        -e "@deps/5gc/roles/core/vars/main.yml" \
-        | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
+    # 1. Crear un playbook temporal para obtener core.amf.ip
+    - |
+      cat > get_amf_ip.yml <<EOF
+      - hosts: localhost
+        gather_facts: false
+        vars_files:
+          - vars/main.yml
+        tasks:
+          - ansible.builtin.debug:
+              msg: "{{ core.amf.ip }}"
+      EOF
+
+    # 2. Ejecutar el playbook y capturar el valor IP en una variable de shell
+    - CORE_AMF_IP=$(ansible-playbook get_amf_ip.yml -c local | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
     - echo "CORE_AMF_IP=$CORE_AMF_IP"
 
-    # 2. Generar JSON para Ansible template
+    # 3. Crear archivo JSON con la variable para el template de Ansible
     - printf '%s' "{\"core\":{\"amf\":{\"ip\":\"%s\"}}}" "$CORE_AMF_IP" > /tmp/extra_vars.json
 
-    # 3. Renderizar la plantilla
+    # 4. Renderizar la plantilla Helm values usando Ansible template
     - ansible localhost -c local -m ansible.builtin.template \
         -a "src=deps/5gc/roles/core/templates/sdcore-5g-values.yaml dest=/tmp/sdcore-5g-values.yaml" \
         -e "@/tmp/extra_vars.json"
 
-    # 4. Guardar el resultado como artifact para el siguiente job
+    # 5. Revisar output (opcional)
+    - cat /tmp/sdcore-5g-values.yaml
   artifacts:
     paths:
       - /tmp/sdcore-5g-values.yaml
@@ -75,8 +88,9 @@ helm-dry-run:
   image:
     name: alpine/helm:3.14.4
     entrypoint: [""]
-  dependencies:
-    - render-values
+  needs:
+    - job: render-values   # garantiza que se ejecute solo si render-values termina OK
+      artifacts: true      # obtiene artifacts del job render-values
   script:
     # - helm repo add aether https://charts.aetherproject.io/
     - helm repo add aether https://charts.aetherproject.org
