@@ -10,6 +10,7 @@ lint-yaml:
   tags:
     - aether-runner
   script:
+    - pwd
     - yamllint -c .yamllint deps/5gc/roles/core/templates/sdcore-5g-values.yaml
 
   rules:
