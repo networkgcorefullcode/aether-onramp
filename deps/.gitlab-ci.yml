@@ -1,0 +1,44 @@
+stages:
+  - lint
+  - validate
+  - dry-run
+
+# Lint básico de YAMLs con yamllint
+lint-yaml:
+  stage: lint
+  image: cytopia/yamllint:latest
+  script:
+    - yamllint -d "{extends: relaxed, rules: {line-length: disable}}" deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Validar sintaxis con yq
+validate-values:
+  stage: validate
+  image: mikefarah/yq:4.44.2
+  script:
+    - echo "Validando sintaxis de values.yaml"
+    - yq e . deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Helm template dry-run para validar que los manifests se generen correctamente
+helm-dry-run:
+  stage: dry-run
+  image:
+    name: alpine/helm:3.14.4
+    entrypoint: [""]
+  script:
+    # - helm repo add aether https://charts.aetherproject.io/
+    - helm repo add aether https://charts.aetherproject.org
+    - helm repo update
+    # Linter contra chart remoto
+    - helm lint ether/sd-core
+    # Render de manifests para verificar (usando tu values local)
+    - helm template ether/sd-core -f charts/5g-control-plane/values.yaml >/dev/null
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+
+
