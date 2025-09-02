@@ -11,7 +11,9 @@ lint-yaml:
     - aether-runner
   script:
     - pwd
-    - yamllint -c .yamllint deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+    - ls -la
+    - cat .yamllint
+    - yamllint deps/5gc/roles/core/templates/sdcore-5g-values.yaml
 
   rules:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
