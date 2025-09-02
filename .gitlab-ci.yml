@@ -8,7 +8,7 @@ lint-yaml:
   stage: lint
   image: cytopia/yamllint:latest
   script:
-    - yamllint -d "{extends: relaxed, rules: {line-length: disable}}" deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+    - yamllint -c .yamllint deps/5gc/roles/core/templates/sdcore-5g-values.yaml
 
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
