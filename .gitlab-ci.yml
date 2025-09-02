@@ -42,53 +42,43 @@ render-values:
   stage: dry-run
   tags:
     - aether-runner
-  image:
-    name: python:3.12  # Contenedor con Python y pip para instalar Ansible
-    entrypoint: [""]
+  image: python:3.12-slim
   before_script:
-     # Instala Ansible en el contenedor
-    - pip install --quiet ansible
+    # Instalar Ansible en el contenedor
+    - pip install --quiet "ansible<11"
   script:
-    # 1. Crear un playbook temporal para obtener core.amf.ip
+    - set -euo pipefail
+
+    # (sanidad) Verifica que existan los paths esperados
+    - test -f deps/5gc/roles/core/vars/main.yml
+    - test -f deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+
+    # (opcional) Muestra el valor que tomará core.amf.ip desde vars/main.yml para auditar
     - |
-      cat > get_amf_ip.yml <<EOF
-      - hosts: localhost
-        gather_facts: false
-        vars_files:
-          - vars/main.yml
-        tasks:
-          - ansible.builtin.debug:
-              msg: "{{ core.amf.ip }}"
-      EOF
+      echo "Extrayendo core.amf.ip desde vars/main.yml:"
+      ansible localhost -c local -m ansible.builtin.debug \
+        -a "msg={{ core.amf.ip }}" \
+        -e @deps/5gc/roles/core/vars/main.yml
 
-    # 2. Ejecutar el playbook y capturar el valor IP en una variable de shell
-    - CORE_AMF_IP=$(ansible-playbook get_amf_ip.yml -c local | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
-    - echo "CORE_AMF_IP=$CORE_AMF_IP"
-
-    # 3. Crear playbook temporal que renderiza la plantilla
+    # Renderiza el template Jinja con las variables de Ansible
+    # Nota: 'template' trata 'src' como Jinja2 (no es obligatorio .j2)
     - |
-      cat > render_values.yml <<EOF
-      - hosts: localhost
-        gather_facts: false
-        tasks:
-          - name: Render Helm values
-            ansible.builtin.template:
-              src: deps/5gc/roles/core/templates/sdcore-5g-values.yaml
-              dest: /tmp/sdcore-5g-values.yaml
-            vars:
-              core: "{{ lookup('file', '/tmp/extra_vars.json') | from_json).core }}"
-      EOF
+      ansible localhost -c local -m ansible.builtin.template \
+        -a "src=deps/5gc/roles/core/templates/sdcore-5g-values.yaml dest=/tmp/sdcore-5g-values.yaml" \
+        -e @vars/main.yml
 
-    - cat /tmp/extra_vars.json
-
-    # 4. Ejecutar el playbook
-    - ansible-playbook render_values.yml -c local
-
-    # 5. Revisar output (opcional)
-    - cat /tmp/sdcore-5g-values.yaml
+    # (opcional) Revisa una parte del output renderizado
+    - echo "Primeras líneas de /tmp/sdcore-5g-values.yaml:"
+    - sed -n '1,80p' /tmp/sdcore-5g-values.yaml
   artifacts:
     paths:
       - /tmp/sdcore-5g-values.yaml
+    when: always
+
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_PIPELINE_SOURCE == "push"
+    when: always
 
 
 # Job 2: Helm template dry-run para validar que los manifests se generen correctamente
