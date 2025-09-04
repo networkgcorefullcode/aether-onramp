@@ -56,7 +56,7 @@ helm-dry-run-on-mr:
       --inventory localhost, \
       --connection local \
       --tags "gitops_render_values" \
-      --extra-vars "output_path=temp_values_for_validation.yaml" 
+      --extra-vars "output_path=temp_values_for_validation.yaml"
 
     # 2. Añadir repos de Helm y validar
     - echo "Validando con Helm..."
