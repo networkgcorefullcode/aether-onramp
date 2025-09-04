@@ -55,6 +55,7 @@ helm-dry-run-on-mr:
       ansible-playbook deps/5gc/core.yml \
       --inventory localhost, \
       --connection local \
+      -e @vars/main.yml \
       --tags "gitops_render_values" \
       --extra-vars "output_path=temp_values_for_validation.yaml"
 
@@ -101,6 +102,7 @@ render-and-commit-gitops-values:
       ansible-playbook deps/5gc/core.yml \
       --inventory localhost, \
       --connection local \
+      -e @vars/main.yml \
       --tags "gitops_render_values" \
       --extra-vars "output_path=${OUTPUT_FILE}"
 
