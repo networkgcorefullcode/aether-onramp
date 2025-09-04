@@ -46,12 +46,12 @@ helm-dry-run-on-mr:
   image: python:3.12-slim # Necesitamos Ansible para renderizar y Helm para validar
   before_script:
     - pip install --quiet "ansible<11"
-    - apt-get update && apt-get install -y curl
+    - apt-get update && apt-get install -y curl git
     - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
   script:
     # 1. Renderizar la plantilla de Helm values en un archivo temporal
     - echo "Renderizando plantilla para validación..."
-    - >
+    - |
       ansible-playbook deps/5gc/core.yml \
       --inventory localhost, \
       --connection local \
@@ -97,7 +97,7 @@ render-and-commit-gitops-values:
 
     # --- 3. Ejecutar Ansible para renderizar la plantilla ---
     # Usamos el mismo comando que en el dry-run, pero ahora guardamos en la ruta permanente
-    - >
+    - |
       ansible-playbook deps/5gc/core.yml \
       --inventory localhost, \
       --connection local \
