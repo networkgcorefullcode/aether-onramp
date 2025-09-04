@@ -52,7 +52,7 @@ helm-dry-run-on-mr:
     # 1. Renderizar la plantilla de Helm values en un archivo temporal
     - echo "Renderizando plantilla para validación..."
     - >
-      ansible-playbook deps/5gc/roles/core/tasks/main.yml
+      ansible-playbook deps/5gc/roles/core/tasks/render.yml
       --inventory localhost,
       --connection local
       --tags "gitops_render_values"
@@ -98,7 +98,7 @@ render-and-commit-gitops-values:
     # --- 3. Ejecutar Ansible para renderizar la plantilla ---
     # Usamos el mismo comando que en el dry-run, pero ahora guardamos en la ruta permanente
     - >
-      ansible-playbook deps/5gc/roles/core/tasks/main.yml
+      ansible-playbook deps/5gc/roles/core/tasks/render.yml
       --inventory localhost,
       --connection local
       --tags "gitops_render_values"
