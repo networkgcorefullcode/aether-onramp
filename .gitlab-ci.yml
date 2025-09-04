@@ -52,11 +52,11 @@ helm-dry-run-on-mr:
     # 1. Renderizar la plantilla de Helm values en un archivo temporal
     - echo "Renderizando plantilla para validación..."
     - >
-      ansible-playbook deps/5gc/roles/core/tasks/render.yml
-      --inventory localhost,
-      --connection local
-      --tags "gitops_render_values"
-      --extra-vars "output_path=temp_values_for_validation.yaml"
+      ansible-playbook deps/5gc/core.yml \
+      --inventory localhost, \
+      --connection local \
+      --tags "gitops_render_values" \
+      --extra-vars "output_path=temp_values_for_validation.yaml" 
 
     # 2. Añadir repos de Helm y validar
     - echo "Validando con Helm..."
@@ -98,10 +98,10 @@ render-and-commit-gitops-values:
     # --- 3. Ejecutar Ansible para renderizar la plantilla ---
     # Usamos el mismo comando que en el dry-run, pero ahora guardamos en la ruta permanente
     - >
-      ansible-playbook deps/5gc/roles/core/tasks/render.yml
-      --inventory localhost,
-      --connection local
-      --tags "gitops_render_values"
+      ansible-playbook deps/5gc/core.yml \
+      --inventory localhost, \
+      --connection local \
+      --tags "gitops_render_values" \
       --extra-vars "output_path=${OUTPUT_FILE}"
 
     # --- 4. Commitear y pushear los cambios si los hay ---
