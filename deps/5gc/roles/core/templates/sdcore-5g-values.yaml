@@ -762,7 +762,7 @@ omec-user-plane:
       hugepage:
         enabled: false    # Should be enabled if DPDK is enabled
       routes:
-        - to: {{ ansible_default_ipv4.address }}
+        - to: {{ core.amf.ip }}
           via: 169.254.1.1
       enb:
         subnet: {{ ran_subnet }} # Subnet for the gNB network
