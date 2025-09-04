@@ -1,11 +1,13 @@
-# task to render the Helm values file for 5G Core
+# Este archivo contiene la lógica específica para el renderizado de GitOps
+# Es importado por main.yml
+
 - name: "GitOps | Render 5G Core Helm values file"
-  tags:
-    - never                 # Para que esta tarea nunca se ejecute por defecto
-    - gitops_render_values  # Un tag específico para que el pipeline de CI la llame
-  template:
+  ansible.builtin.template:
     src: "sdcore-5g-values.yaml"
     dest: "{{ output_path }}"
   when: output_path is defined
   delegate_to: localhost
   run_once: true
+  tags:
+    - never
+    - gitops_render_values

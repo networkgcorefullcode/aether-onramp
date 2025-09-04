@@ -8,3 +8,8 @@
   import_tasks: roles/core/tasks/uninstall.yml
   tags: uninstall
 
+- name: render Helm values for 5gc/core
+  ansible.builtin.import_tasks: render.yml
+  tags:
+    - never
+    - gitops_render_values
