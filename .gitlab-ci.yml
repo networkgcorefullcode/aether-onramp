@@ -20,7 +20,7 @@ lint-yaml:
     when: always
 
 # Validar sintaxis con yq
-validate-values:
+validate-values-syntax:
   stage: validate
   image: alpine:3.19
   tags:
@@ -38,88 +38,88 @@ validate-values:
     when: always
 
 
-## trabajo en estos jobs detenido porque el Helm values depende de muchas variables de ansible no solo core.amf.ip
-# # Job 1: Renderizar la plantilla de Helm values
-# render-values:
-#   stage: dry-run
-#   tags:
-#     - aether-runner
-#   image: python:3.12-slim
-#   before_script:
-#     # Instalar Ansible en el contenedor
-#     - pip install --quiet "ansible<11"
-#     - set -euo pipefail
-#   script:
-#     #debug
-#     - echo "Archivos en el workspace:"
-#     - ls -R .
+helm-dry-run-on-mr:
+  stage: dry-run
+  tags:
+    - aether-runner
+  image: python:3.12-slim # Necesitamos Ansible para renderizar y Helm para validar
+  before_script:
+    - pip install --quiet "ansible<11"
+    - apt-get update && apt-get install -y curl
+    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  script:
+    # 1. Renderizar la plantilla de Helm values en un archivo temporal
+    - echo "Renderizando plantilla para validación..."
+    - >
+      ansible-playbook deps/5gc/roles/core/tasks/main.yml
+      --inventory localhost,
+      --connection local
+      --tags "gitops_render_values"
+      --extra-vars "output_path=temp_values_for_validation.yaml"
+
+    # 2. Añadir repos de Helm y validar
+    - echo "Validando con Helm..."
+    - helm repo add aether https://charts.aetherproject.org
+    - helm repo update
+
+    # 3. Linter y template. Helm usará el values TEMPORAL RENDERIZADO.
+    - helm lint aether/sd-core --values temp_values_for_validation.yaml
+    - helm template sd-core aether/sd-core --version 2.2.4 --values temp_values_for_validation.yaml > /dev/null
+
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: always
 
 
-#     # 1. Mostrar de dónde vamos a leer
-#     - echo "Extrayendo core.amf.ip desde vars/main.yml:"
+render-and-commit-gitops-values:
+  stage: render-and-commit
+  tags:
+    - aether-runner
+  image: python:3.12-slim
+  before_script:
+    - pip install --quiet "ansible<11"
 
-#     # 2. Ejecutar playbook mínimo para capturar la IP
-#     - |
-#       ansible localhost -m ansible.builtin.debug \
-#         -a "msg={{ core.amf.ip }}" \
-#         -e @./vars/main.yml \
-#         | tee amf_ip.out
-#     - CORE_AMF_IP=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' amf_ip.out)
-#     - echo "CORE_AMF_IP=$CORE_AMF_IP"
+  script:
+    # --- 1. Configuración de Git ---
+    - echo "Configuring Git user..."
+    - git config --global user.email "ci-bot@aether.local"
+    - git config --global user.name "CI Bot"
+    # Usamos CI_JOB_TOKEN para autenticarnos y poder hacer push
+    - git remote set-url origin "https://$TOKEN_USER:$ONRAMP_TOKEN@$GITLAB_SERVER_URL/5g/aether.git"
 
-#     # 3. Generar JSON de variables
-#     - |
-#       ansible localhost -m ansible.builtin.debug \
-#         -a "msg={{ core | to_json }}" \
-#         -e @./vars/main.yml \
-#         | grep msg \
-#         | sed 's/^.*msg=//' > extra_vars.json
+    # --- 2. Preparar variables y rutas ---
+    - ENV_DIR="environments/${CI_COMMIT_BRANCH}"
+    - OUTPUT_FILE="${ENV_DIR}/5g-core-values.yaml"
+    - echo "Rendering values for branch '${CI_COMMIT_BRANCH}' into '${OUTPUT_FILE}'"
+    - mkdir -p ${ENV_DIR}
 
-#     # 4. Renderizar la plantilla Helm
-#     - |
-#       ansible localhost -m ansible.builtin.template \
-#         -a "src=deps/5gc/roles/core/templates/sdcore-5g-values.yaml dest=sdcore-5g-values.yaml" \
-#         -e @vars/main.yml
+    # --- 3. Ejecutar Ansible para renderizar la plantilla ---
+    # Usamos el mismo comando que en el dry-run, pero ahora guardamos en la ruta permanente
+    - >
+      ansible-playbook deps/5gc/roles/core/tasks/main.yml
+      --inventory localhost,
+      --connection local
+      --tags "gitops_render_values"
+      --extra-vars "output_path=${OUTPUT_FILE}"
 
-#     # 5. Revisar output
-#     - cat sdcore-5g-values.yaml
-#   artifacts:
-#     paths:
-#       - sdcore-5g-values.yaml
-#     when: always
+    # --- 4. Commitear y pushear los cambios si los hay ---
+    - echo "Checking for changes in the rendered file..."
+    - git add ${OUTPUT_FILE}
+    - |
+      if git diff --staged --quiet; then
+        echo "No changes detected in Helm values. Nothing to commit."
+      else
+        echo "Helm values changed. Committing and pushing back to '${CI_COMMIT_BRANCH}'..."
+        # El [skip ci] es VITAL para evitar que este push dispare otro pipeline.
+        git commit -m "chore(ci): Render Helm values for ${CI_COMMIT_BRANCH} [skip ci]"
+        git push origin HEAD:${CI_COMMIT_BRANCH}
+      fi
 
-#   rules:
-#   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#   - if: $CI_PIPELINE_SOURCE == "push"
-#     when: always
-
-
-# # Job 2: Helm template dry-run para validar que los manifests se generen correctamente
-# helm-dry-run:
-#   stage: dry-run
-#   tags:
-#     - aether-runner
-#   image:
-#     name: alpine/helm:3.14.4
-#     entrypoint: [""]
-#   needs:
-#     - job: render-values   # garantiza que se ejecute solo si render-values termina OK
-#       artifacts: true      # obtiene artifacts del job render-values
-#   script:
-#     # - helm repo add aether https://charts.aetherproject.io/
-#     - helm repo add aether https://charts.aetherproject.org
-#     - helm repo update
-
-#     # Linter contra chart remoto
-#     - helm lint aether/sd-core -f deps/5gc/roles/core/templates/sdcore-5g-values.yaml
-
-#     # Render de manifests para verificar que se generen correctamente (usando el values local)
-#     - helm template aether/sd-core --version 2.2.4 -f deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
-
-#   rules:
-#   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#   - if: $CI_PIPELINE_SOURCE == "push"
-#     when: always
-
+  rules:
+    # Esta regla es la clave: el job SÓLO se ejecuta en un push (como un merge)
+    # a las ramas de entorno, y NO en los MRs.
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+#    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
 
 
