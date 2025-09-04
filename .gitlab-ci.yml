@@ -2,6 +2,7 @@ stages:
   - lint
   - validate
   - dry-run
+  - render-and-commit
 
 # Lint básico de YAMLs con yamllint
 lint-yaml:
