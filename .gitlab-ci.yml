@@ -93,20 +93,20 @@ render-and-commit-gitops-values:
     - apt update && apt install git -y
 
   script:
-    # --- 1. Configuración de Git ---
+    # Configuración de Git 
     - echo "Configuring Git user..."
     - git config --global user.email "ci-bot@aether.local"
     - git config --global user.name "CI Bot"
     # Usamos CI_JOB_TOKEN para autenticarnos y poder hacer push
     - git remote set-url origin "https://$TOKEN_USER:$ONRAMP_TOKEN@$GITLAB_SERVER_URL/5g/aether.git"
 
-    # --- 2. Preparar variables y rutas ---
+    # Preparar variables y rutas 
     - ENV_DIR="{CI_PROJECT_DIR}/environments/${CI_COMMIT_BRANCH}"
     - OUTPUT_FILE="${ENV_DIR}/5g-core-values.yaml"
     - echo "Rendering values for branch '${CI_COMMIT_BRANCH}' into '${OUTPUT_FILE}'"
     - mkdir -p ${ENV_DIR}
 
-    # --- 3. Ejecutar Ansible para renderizar la plantilla ---
+    # Ejecutar Ansible para renderizar la plantilla
     # Usamos el mismo comando que en el dry-run, pero ahora guardamos en la ruta permanente
     - |
       ansible-playbook deps/5gc/core.yml \
@@ -116,7 +116,7 @@ render-and-commit-gitops-values:
       --tags "gitops_render_values" \
       --extra-vars "output_path=${OUTPUT_FILE}"
 
-    # --- 4. Commitear y pushear los cambios si los hay ---
+    # Commitear y pushear los cambios si los hay ---
     - echo "Checking for changes in the rendered file..."
     - git add ${OUTPUT_FILE}
     - |
