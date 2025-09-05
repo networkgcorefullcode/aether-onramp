@@ -49,7 +49,11 @@ helm-dry-run-on-mr:
     - apt-get update && apt-get install -y curl git
     - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
   script:
-    # 1. Renderizar la plantilla de Helm values en un archivo temporal
+    # Definir la ruta absoluta para el archivo temporal
+    #  $CI_PROJECT_DIR para garantizar que la ruta es inequívoca.
+    - TEMP_VALUES_PATH="${CI_PROJECT_DIR}/temp_values_for_validation.yaml"
+    - echo "Se generará el archivo de validación en:" ${TEMP_VALUES_PATH}
+    # Renderizar la plantilla de Helm values en un archivo temporal
     - echo "Renderizando plantilla para validación..."
     - |
       ansible-playbook deps/5gc/core.yml \
@@ -57,16 +61,16 @@ helm-dry-run-on-mr:
       --connection local \
       -e @vars/main.yml \
       --tags "gitops_render_values" \
-      --extra-vars "output_path=temp_values_for_validation.yaml"
+      --extra-vars "output_path=${TEMP_VALUES_PATH}"
 
-    # 2. Añadir repos de Helm y validar
+    # Añadir repos de Helm y validar
     - echo "Validando con Helm..."
     - helm repo add aether https://charts.aetherproject.org
     - helm repo update
 
-    # 3. Linter y template. Helm usará el values TEMPORAL RENDERIZADO.
-    - helm lint aether/sd-core --values temp_values_for_validation.yaml
-    - helm template sd-core aether/sd-core --version 2.2.4 --values temp_values_for_validation.yaml > /dev/null
+    # Linter y template. Helm usará el values TEMPORAL RENDERIZADO.
+    - helm lint aether/sd-core --values ${TEMP_VALUES_PATH}
+    - helm template sd-core aether/sd-core --version 2.2.4 --values ${TEMP_VALUES_PATH} > /dev/null
 
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
