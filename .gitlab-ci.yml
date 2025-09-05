@@ -90,6 +90,7 @@ render-and-commit-gitops-values:
   image: python:3.12-slim
   before_script:
     - pip install --quiet "ansible<11"
+    - apt update && apt install git
 
   script:
     # --- 1. Configuración de Git ---
