@@ -19,14 +19,10 @@ spec:
     # Sobrescribe DE DÓNDE sacar los values.yaml
     helm:
       valueFiles:
-      # Esto es una sintaxis especial de Argo CD: $<alias-del-proyecto>:<ruta>
-      - $onramp-private:environments/dev/5g-core-values.yaml
-
-  sources:
-    # Le decimos a Argo CD que, para la fuente con el alias 'onramp-private',
-    # debe usar la rama 'dev'.
-    - repoURL: $onramp-private
-      targetRevision: dev
+        # Aquí usamos una sintaxis especial y explícita para una fuente secundaria
+        - repo: $onramp-private # Usa el repo con el alias 'onramp-private'
+          path: environments/dev/5g-core-values.yaml # La ruta del archivo DENTRO de ese repo
+          revision: dev # La rama que debe usar de ESE repo
 
   destination:
     # Apunta al clúster donde está instalado Argo CD
