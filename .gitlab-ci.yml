@@ -101,7 +101,7 @@ render-and-commit-gitops-values:
     - git remote set-url origin "https://$TOKEN_USER:$ONRAMP_TOKEN@$GITLAB_SERVER_URL/5g/aether.git"
 
     # --- 2. Preparar variables y rutas ---
-    - ENV_DIR="environments/${CI_COMMIT_BRANCH}"
+    - ENV_DIR="{CI_PROJECT_DIR}/environments/${CI_COMMIT_BRANCH}"
     - OUTPUT_FILE="${ENV_DIR}/5g-core-values.yaml"
     - echo "Rendering values for branch '${CI_COMMIT_BRANCH}' into '${OUTPUT_FILE}'"
     - mkdir -p ${ENV_DIR}
