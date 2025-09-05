@@ -8,21 +8,25 @@ spec:
   project: default
 
   source:
-    #  APUNTA A LA URL PÚBLICA
-    repoURL: https://github.com/networkgcorefullcode/aether-onramp
-
-    # ESPECIFICA EL NOMBRE DEL CHART Y LA RUTA (Leído del repo público)
+    #  APUNTA A LA URL DEL CHART
+    repoURL: https://charts.aetherproject.org
+    # ESPECIFICA EL NOMBRE DEL CHART
     chart: 'sd-core'
    #path: some/path # por ahora no aplica
-
     # INDICA LA REVISIÓN (Commit SHA o rama, leído del repo público)
-    targetRevision: dev
+    targetRevision: 2.2.4
 
     # Sobrescribe DE DÓNDE sacar los values.yaml
     helm:
       valueFiles:
       # Esto es una sintaxis especial de Argo CD: $<alias-del-proyecto>:<ruta>
       - $onramp-private:environments/dev/5g-core-values.yaml
+
+  sources:
+    # Le decimos a Argo CD que, para la fuente con el alias 'onramp-private',
+    # debe usar la rama 'dev'.
+    - repoURL: $onramp-private
+      targetRevision: dev
 
   destination:
     # Apunta al clúster donde está instalado Argo CD
