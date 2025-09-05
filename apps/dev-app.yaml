@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: daether-5g-core-dev
+  namespace: argocd
+spec:
+  # El proyecto por defecto donde viven los recursos de la App
+  project: default
+
+  source:
+    # 1. APUNTA A LA URL PÚBLICA
+    repoURL: https://github.com/networkgcorefullcode/aether-onramp
+
+    # 2. ESPECIFICA EL NOMBRE DEL CHART Y LA RUTA (Leído del repo público)
+    chart: 'sd-core'
+   #path: some/path # por ahora no aplica
+
+    # 3. INDICA LA REVISIÓN (Commit SHA o rama, leído del repo público)
+    targetRevision: dev
+
+    # 4. ¡LA MAGIA! Sobrescribe DE DÓNDE sacar los values.yaml
+    helm:
+      valueFiles:
+      # Esto es una sintaxis especial de Argo CD: $<alias-del-proyecto>:<ruta>
+      - $onramp-private:environments/dev/5g-core-values.yaml
