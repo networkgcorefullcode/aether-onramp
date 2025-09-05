@@ -6,10 +6,10 @@ metadata:
 spec:
   project: default
   source:
-    # 1. Apunta a la URL del MIRROR PÚBLICO.
+    # Apunta a la URL del MIRROR PÚBLICO.
     repoURL: https://github.com/networkgcorefullcode/aether-onramp
 
-    # 2. Apunta a la rama y la carpeta donde viven los manifiestos de las apps.
+    #  Apunta a la rama y la carpeta donde viven los manifiestos de las apps.
     targetRevision: dev
     path: apps
 
