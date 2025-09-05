@@ -10,19 +10,30 @@ spec:
   source:
     #  APUNTA A LA URL DEL CHART
     repoURL: https://charts.aetherproject.org
-    # ESPECIFICA EL NOMBRE DEL CHART
-    chart: 'sd-core'
+    chart: 'sd-core' # Nombre del chart
    #path: some/path # por ahora no aplica
-    # INDICA LA REVISIÓN (Commit SHA o rama, leído del repo público)
-    targetRevision: 2.2.4
+    targetRevision: 2.2.4 # La versión del chart
 
     # Sobrescribe DE DÓNDE sacar los values.yaml
     helm:
       valueFiles:
-        # Aquí usamos una sintaxis especial y explícita para una fuente secundaria
-        - repo: $onramp-private # Usa el repo con el alias 'onramp-private'
-          path: environments/dev/5g-core-values.yaml # La ruta del archivo DENTRO de ese repo
-          revision: dev # La rama que debe usar de ESE repo
+        # Aquí usamos la sintaxis de cadena simple, pero referenciando un alias.
+        # El alias 'values-private' lo definiremos abajo en la sección 'sources'.
+        - $values-private/environments/dev/5g-core-values.yaml
+
+  # --- La sección 'sources' (plural) describe TODAS las fuentes ---
+  sources:
+    # FUENTE #1: El repositorio PRIVADO de valores
+    - repoURL: $onramp-private # Alias
+      # Le decimos a Argo CD que debe usar la rama 'dev' de este repositorio.
+      targetRevision: dev
+      # Le damos un alias INTERNO a esta fuente para usarlo en 'valueFiles'
+      ref: values-private
+
+    # FUENTE #2: (Opcional pero recomendado para claridad) El repositorio del Helm Chart
+    - repoURL: https://charts.aetherproject.org
+      chart: sd-core
+      targetRevision: 2.2.4
 
   destination:
     # Apunta al clúster donde está instalado Argo CD
@@ -30,3 +41,10 @@ spec:
 
     # El namespace donde se despliegan los recursos del 5G Core
     namespace: aether-5gc
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
