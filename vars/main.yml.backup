@@ -15,7 +15,7 @@ core:
   standalone: true			# set to false to place under control of ROC
   data_iface: eth0
   values_file: "deps/5gc/roles/core/templates/sdcore-5g-values.yaml"
-  ran_subnet: "192.168.8.0/21"		# set to empty string to get subnet from 'data_iface',the given value is for Lab Environment
+  ran_subnet: "172.20.0.0/16"		# set to empty string to get subnet from 'data_iface'
   helm:
     local_charts: false		# set chart_ref to local path name if true
     chart_ref:  aether/sd-core

@@ -1,5 +1,14 @@
 # Este archivo contiene la lógica específica para el renderizado de GitOps
 # Es importado por main.yml
+- name: "GitOps | Prepare derived network variables"
+  ansible.builtin.set_fact:
+    # Esta lógica es una copia de la que está en install.yml
+    ran_subnet: "{{ core.ran_subnet }}"
+    access_gw: "{{ core.upf.access_subnet[:-3] }}"
+    access_ip: "{{ core.upf.default_upf.ip.access + '/24' }}"
+    core_gw: "{{ core.upf.core_subnet[:-3] }}"
+    core_ip: "{{ core.upf.default_upf.ip.core + '/24' }}"
+  run_once: true
 
 - name: "GitOps | Render 5G Core Helm values file"
   ansible.builtin.template:
