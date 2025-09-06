@@ -7,38 +7,31 @@ spec:
   # El proyecto por defecto donde viven los recursos de la App
   project: default
 
-  source:
-    #  APUNTA A LA URL DEL CHART
-    repoURL: https://charts.aetherproject.org
-    chart: 'sd-core' # Nombre del chart
-   #path: some/path # por ahora no aplica
-    targetRevision: 2.2.4 # La versión del chart
-
-    # Sobrescribe DE DÓNDE sacar los values.yaml
-    helm:
-      valueFiles:
-        # Aquí usamos la sintaxis de cadena simple, pero referenciando un alias.
-        # El alias 'values-private' lo definiremos abajo en la sección 'sources'.
-        - $values-private/environments/dev/5g-core-values.yaml
-
-  # --- La sección 'sources' (plural) describe TODAS las fuentes ---
   sources:
-    # FUENTE #1: El repositorio PRIVADO de valores
-    - repoURL: $onramp-private # Alias
-      # Le decimos a Argo CD que debe usar la rama 'dev' de este repositorio.
+      # El repositorio público que contiene los VALUES.YAML
+    - repoURL: https://github.com/networkgcorefullcode/aether-onramp
+      # La rama que debe observar en el repo PÚBLICO
       targetRevision: dev
-      # Le damos un alias INTERNO a esta fuente para usarlo en 'valueFiles'
-      ref: values-private
+      # Nombre del Helm Chart
+      ref: values-public # alias para esta fuente
 
-    # FUENTE #2: (Opcional pero recomendado para claridad) El repositorio del Helm Chart
-    - repoURL: https://charts.aetherproject.org
+    # El repositorio de Helm que contiene el CHART
+    - repoURL: https://charts.sd-core.opennetworking.org
       chart: sd-core
       targetRevision: 2.2.4
+
+  source:
+    repoURL: https://charts.aetherproject.org
+    chart: sd-core
+    targetRevision: 2.2.4
+    helm:
+      valueFiles:
+        - $values-public/environments/dev/5g-core-values.yaml
+
 
   destination:
     # Apunta al clúster donde está instalado Argo CD
     server: 'https://kubernetes.default.svc'
-
     # El namespace donde se despliegan los recursos del 5G Core
     namespace: aether-5gc
 
