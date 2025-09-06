@@ -15,10 +15,10 @@ spec:
       targetRevision: 2.2.4
       helm:
       valueFiles:
-          - $values-from-git/environments/dev/5g-core-values.yaml
+          - $values-from-git/refs/heads/dev/environments/dev/5g-core-values.yaml
 
       # El repositorio público que contiene los VALUES.YAML
-    - repoURL: https://github.com/networkgcorefullcode/aether-onramp
+    - repoURL: https://raw.githubusercontent.com/networkgcorefullcode/aether-onramp
       # La rama que debe observar en el repo PÚBLICO
       targetRevision: dev
       ref: values-from-git
@@ -35,3 +35,5 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
+
