@@ -18,7 +18,7 @@ spec:
           - $values-from-git/environments/dev/5g-core-values.yaml
 
       # El repositorio público que contiene los VALUES.YAML
-    - repoURL: https://github.com/networkgcorefullcode/aether-onramp
+    - repoURL: https://github.com/networkgcorefullcode/aether-onramp.git
       # La rama que debe observar en el repo PÚBLICO
       targetRevision: dev
       ref: values-from-git
