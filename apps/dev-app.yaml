@@ -7,27 +7,22 @@ spec:
   # El proyecto por defecto donde viven los recursos de la App
   project: default
 
+# SECCIÓN 'source' PRINCIPAL
+  source:
+    # El repositorio de Helm que contiene el CHART
+    - repoURL: https://charts.aetherproject.org
+      chart: sd-core
+      targetRevision: 2.2.4
+      helm:
+      valueFiles:
+        - https://github.com/networkgcorefullcode/aether-onramp/environments/dev/5g-core-values.yaml
+
+# Sección source para definir la rama del archivo Helm Values
   sources:
       # El repositorio público que contiene los VALUES.YAML
     - repoURL: https://github.com/networkgcorefullcode/aether-onramp
       # La rama que debe observar en el repo PÚBLICO
       targetRevision: dev
-      # Nombre del Helm Chart
-      ref: values-public # alias para esta fuente
-
-    # El repositorio de Helm que contiene el CHART
-    - repoURL: https://charts.aetherproject.org
-      chart: sd-core
-      targetRevision: 2.2.4
-
-  source:
-    repoURL: https://charts.aetherproject.org
-    chart: sd-core
-    targetRevision: 2.2.4
-    helm:
-      valueFiles:
-        - $values-public/environments/dev/5g-core-values.yaml
-
 
   destination:
     # Apunta al clúster donde está instalado Argo CD
