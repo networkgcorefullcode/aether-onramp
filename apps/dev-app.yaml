@@ -16,7 +16,7 @@ spec:
       ref: values-public # alias para esta fuente
 
     # El repositorio de Helm que contiene el CHART
-    - repoURL: https://charts.sd-core.opennetworking.org
+    - repoURL: https://charts.aetherproject.org
       chart: sd-core
       targetRevision: 2.2.4
 
