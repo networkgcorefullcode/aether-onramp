@@ -23,7 +23,7 @@ omec-control-plane:
       smf: omecproject/5gc-smf:v1.2.1-new-dev
       udm: omecproject/5gc-udm:v1.2.1-new-dev
       udr: omecproject/5gc-udr:v1.2.1-new-dev
-      pcf: omecproject/5gc-pcf:1.6.6-dev
+      pcf: omecproject/5gc-pcf:v1.2.1-new-dev
       nrf: omecproject/5gc-nrf:v1.2.1-new-dev
       webui: omecproject/5gc-webui:v1.2.1-new-dev
       sctplb: omecproject/sctplb:v1.2.1-new-dev
