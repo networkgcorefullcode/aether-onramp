@@ -8,17 +8,15 @@ spec:
   project: default
 
 # SECCIÓN 'source' PRINCIPAL
-  source:
-    # El repositorio de Helm que contiene el CHART
-    repoURL: https://charts.aetherproject.org
-    chart: sd-core
-    targetRevision: 2.2.4
-    helm:
-    valueFiles:
-        - $values-from-git/environments/dev/5g-core-values.yaml
-
-# Sección source para definir la rama del archivo Helm Values
   sources:
+    # El repositorio de Helm que contiene el CHART
+    - chart: sd-core
+      repoURL: https://charts.aetherproject.org
+      targetRevision: 2.2.4
+      helm:
+      valueFiles:
+          - $values-from-git/environments/dev/5g-core-values.yaml
+
       # El repositorio público que contiene los VALUES.YAML
     - repoURL: https://github.com/networkgcorefullcode/aether-onramp
       # La rama que debe observar en el repo PÚBLICO
