@@ -313,8 +313,8 @@ omec-control-plane:
               bindingIPv4: 0.0.0.0  # IP used to bind the service
               port: 29502 # Port used to bind the service
               tls: # the local path of TLS key
-                key: /var/run/certs/smf.key # SMF TLS Private key
-                pem: /var/run/certs/smf.crt # SMF TLS Certificate
+                key: /var/run/certs/tls.key # SMF TLS Private key
+                pem: /var/run/certs/tls.crt # SMF TLS Certificate
             nrfUri: https://nrf:29510 # a valid URI of NRF
             # staticIpInfo:
             #   - dnn: internet
@@ -475,8 +475,8 @@ omec-control-plane:
               registerIPv4: pcf
               scheme: https
               tls: # the local path of TLS key
-                key: /var/run/certs/pcf.key # PCF TLS Private key
-                pem: /var/run/certs/pcf.crt # PCF TLS Certificate
+                key: /var/run/certs/tls.key # PCF TLS Private key
+                pem: /var/run/certs/tls.crt # PCF TLS Certificate
     #         serviceList:
     #         - serviceName: npcf-am-policy-control
     #         - serviceName: npcf-smpolicycontrol
