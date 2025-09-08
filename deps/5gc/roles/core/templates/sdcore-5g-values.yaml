@@ -18,7 +18,7 @@ omec-control-plane:
   images:
     repository: "192.168.12.15:8083/"
     tags:
-      amf: omecproject/5gc-amf:v1.2.1-new-dev
+      amf: lsls
       ausf: omecproject/5gc-ausf:v1.2.1-new-dev
       smf: omecproject/5gc-smf:v1.2.1-new-dev
       udm: omecproject/5gc-udm:v1.2.1-new-dev
@@ -80,7 +80,7 @@ omec-control-plane:
     # Change AMF config here if rquired
     # Most of the AMF config comes from Slice APIs but some of the config is
     # directly provided through Helm Charts
-    amf:
+    amf:lsls
       cfgFiles:
         amfcfg.yaml:
           configuration:

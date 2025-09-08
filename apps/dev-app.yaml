@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: aether-5g-core-dev
+  name: sd-core
   namespace: argocd
 spec:
   # El proyecto por defecto donde viven los recursos de la App
