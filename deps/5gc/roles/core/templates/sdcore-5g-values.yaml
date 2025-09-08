@@ -25,7 +25,7 @@ omec-control-plane:
       udr: omecproject/5gc-udr:v1.2.1-new-dev
       pcf: omecproject/5gc-pcf:v1.2.1-new-dev
       nrf: omecproject/5gc-nrf:v1.2.1-new-dev
-      webui: juanita
+      webui: lolo
       sctplb: omecproject/sctplb:v1.2.1-new-dev
       nssf: omecproject/5gc-nssf:v1.2.1-new-dev
       upfadapter: omecproject/upfadapter:v1.2.2-new-dev
@@ -516,7 +516,7 @@ omec-control-plane:
               - nnrf-disc # Nnrf_NFDiscovery service
             webuiUri: "http://webui:5001"
 
-    webui:juanita
+    webui:lolo
       cfgFiles:
         webuicfg.yaml:
           configuration:
