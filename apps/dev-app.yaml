@@ -23,11 +23,21 @@ spec:
       targetRevision: dev
       ref: values-from-git
 
-    # OVERLAY DE KUSTOMIZE PARA PARCHES
-    - repoURL: https://github.com/networkgcorefullcode/aether-onramp.git
-      targetRevision: dev
-      path: helm-patches/webui
-      kustomize: {}
+# Patch inline con kustomize
+  source:
+    kustomize:
+      patches:
+        - target:
+            kind: Service
+            name: webui
+          patch: |-
+            - op: add
+              path: /spec/ports/-
+              value:
+                name: http-nfconfig
+                port: 5001
+                protocol: TCP
+                targetPort: 5001
 
   destination:
     # Apunta al clúster donde está instalado Argo CD
