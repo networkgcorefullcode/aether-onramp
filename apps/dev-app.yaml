@@ -17,20 +17,8 @@ spec:
         valueFiles:
           - $values-from-git/environments/dev/5g-core-values.yaml
         postRenderer:
-          kustomize:
-            patches:
-              - target:
-                  kind: Service
-                  name: webui
-                  namespace: aether-5gc
-                patch: |-
-                  - op: add
-                    path: /spec/ports/-
-                    value:
-                      name: http-nfconfig
-                      port: 5001
-                      protocol: TCP
-                      targetPort: 5001
+          command: ["./helm-patches/webui/post-render.sh"]
+
 
       # El repositorio público que contiene los VALUES.YAML
     - repoURL: https://github.com/networkgcorefullcode/aether-onramp.git

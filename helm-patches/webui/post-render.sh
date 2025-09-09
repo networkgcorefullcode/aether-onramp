@@ -1,18 +1,15 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# Obtener el directorio donde reside este script
-# Esto nos permite usar rutas relativas de forma segura
+# Directorio donde está este script (y tu kustomization.yaml)
 SCRIPT_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
-
-# Navegar a ese directorio. Ahora todas las rutas relativas funcionarán como esperamos.
 cd "$SCRIPT_DIR"
 
-# Leer todo el YAML de Helm desde stdin y guardarlo en un archivo DENTRO de nuestro directorio.
+# Helm manda YAML por stdin → lo guardamos en un archivo temporal
 cat > all-helm-output.yaml
 
-# Ejecutar kustomize. Como ahora estamos en /tmp/helm-patches, la ruta relativa './webui' es correcta.
-kustomize build .
+# Ejecutar kustomize en este directorio
+kustomize build "$SCRIPT_DIR"
 
-# Limpiar el archivo temporal
-#rm all-helm-output.yaml
+# Limpieza opcional
+rm -f all-helm-output.yaml
