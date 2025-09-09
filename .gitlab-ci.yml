@@ -17,7 +17,7 @@ lint-yaml:
 
   rules:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  - if: $CI_PIPELINE_SOURCE == "push"
+  - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
     when: always
 
 # Validar sintaxis con yq
@@ -35,7 +35,7 @@ validate-values-syntax:
     - yq-go e . deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
   rules:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  - if: $CI_PIPELINE_SOURCE == "push"
+  - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
     when: always
 
 
@@ -79,7 +79,8 @@ helm-dry-run-on-mr:
 
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+
       when: always
 
 
