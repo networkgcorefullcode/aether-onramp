@@ -30,6 +30,7 @@ spec:
         - target:
             kind: Service
             name: webui
+            namespace: aether-5gc
           patch: |-
             - op: add
               path: /spec/ports/-
