@@ -71,11 +71,11 @@ helm-dry-run-on-mr:
     # Descargar y descomprimir el chart en el directorio local --
     # El flag --untar es crucial. Creará un directorio llamado 'sd-core' en el workspace.
     - echo "Descargando el chart 'aether/sd-core' localmente..."
-    - helm pull aether/sd-core --version 2.2.4 --untar
+    - helm pull aether/sd-core --version 3.0.0 --untar
 
     # Linter y template. Helm usará el values TEMPORAL RENDERIZADO.
     - helm lint ./sd-core --values ${TEMP_VALUES_PATH}
-    - helm template sd-core ./sd-core --version 2.2.4 --values ${TEMP_VALUES_PATH} > /dev/null
+    - helm template sd-core ./sd-core --version 3.0.0 --values ${TEMP_VALUES_PATH} > /dev/null
 
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
