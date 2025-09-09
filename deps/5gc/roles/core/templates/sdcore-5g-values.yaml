@@ -309,7 +309,6 @@ omec-control-plane:
                 pem: /var/run/certs/tls.crt # AUSF TLS Certificate
             serviceNameList:
               - nausf-auth
-            groupId: ausfGroup001
             nrfUri: "https://nrf:29510"
             webuiUri: "http://webui:5001" # URI del WebUI del AMF
           logger:
@@ -547,13 +546,7 @@ omec-control-plane:
             serviceNameList:
               - nnssf-nsselection
               - nnssf-nssaiavailability
-            nsiList:
-              - snssai:
-                  sst: 1
-                  sd: "010203"
-                nsiInformationList:
-                  - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
-                    nsiId: 22
+
 
 
     pcf:
