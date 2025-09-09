@@ -65,22 +65,99 @@ omec-control-plane:
       enabled: true
       syncUrl: http://sdcore-adapter-v2-1.aether-roc.svc:8080/synchronize
 
+    # sctplb:
+    #   deploy: true # If enabled then deploy sctp pod
+    #   ngapp:
+    #     externalIp: {{ core.amf.ip }}
+    #     port: 38412
+
     sctplb:
-      deploy: true # If enabled then deploy sctp pod
+      deploy: true
+      podAnnotations:
+        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+      serviceType: ClusterIP
+      sctp_grpc:
+        port: 9000
+        #nodePort: 30088
       ngapp:
         externalIp: {{ core.amf.ip }}
         port: 38412
+        #nodePort: 30071
+      cfgFiles:
+        sctplb.yaml:
+          info:
+            version: 1.0.0
+            description: SCTPLB initial local configuration
+          logger:
+            sctpLogs: info
+            dispatcherLogs: info
+            clientdiscLogs: info
+          configuration:
+            type: "grpc"
+            services:
+              - uri: "amf-headless"
+            ngapIpList:
+              - 0.0.0.0
 
     upfadapter:
       deploy: false # If enabled then deploy upf adapter pod
 
+    # metricfunc:
+    #   deploy: true
+
     metricfunc:
-      deploy: true
+      deploy: false
+      serviceType: ClusterIP
+      prometheus:
+        port: 9089
+      apiEndpoint:
+        port: 9301
+      cfgFiles:
+        metricscfg.yaml:
+          configuration:
+            controllerFlag: false
+            nfStreams:
+              - topic:
+                  topicGroup: analytics
+                  topicName: sdcore-data-source-amf
+                urls:
+                  - uri: "kafka-headless"
+                    port: 9092
+              - topic:
+                  topicGroup: analytics
+                  topicName: sdcore-data-source-smf
+                urls:
+                  - uri: "kafka-headless"
+                    port: 9092
+            prometheusServer:
+              addr: POD_IP
+              port: 9089
+            apiServer:
+              addr: POD_IP
+              port: 9301
+            debugProfileServer:
+              addr: POD_IP
+              port: 5001
+            userAppApiServer:
+              addr: "userAppapp"
+              port: 9301
+            rocEndPoint:
+              addr: "roc-aether-roc-gui-v2-1-external.aether-roc.svc"
+              port: 80
+            metricFuncEndPoint:
+              addr: "metricfunc.aether-5gc.svc"
+              port: 5001
+          info:
+            description: Metrics initial local configuration
+            version: 1.0.0
+          logger:
+            level: info
 
     # Change AMF config here if rquired
     # Most of the AMF config comes from Slice APIs but some of the config is
     # directly provided through Helm Charts
     amf:
+      deploy: true
       cfgFiles:
         amfcfg.yaml:
           configuration:
@@ -215,6 +292,8 @@ omec-control-plane:
 
 
     ausf:
+      deploy: true
+      serviceType: ClusterIP
       cfgFiles:
         ausfcfg.yaml:
           configuration:
@@ -230,6 +309,7 @@ omec-control-plane:
                 pem: /var/run/certs/tls.crt # AUSF TLS Certificate
             serviceNameList:
               - nausf-auth
+            groupId: ausfGroup001
             nrfUri: "https://nrf:29510"
             webuiUri: "http://webui:5001" # URI del WebUI del AMF
           logger:
@@ -239,6 +319,7 @@ omec-control-plane:
 
 
     udr:
+      deploy: true
       cfgFiles:
         udrcfg.yaml:
           configuration:
@@ -263,6 +344,7 @@ omec-control-plane:
 
 
     udm:
+      deploy: true
       cfgFiles:
         udmcfg.yaml:
           configuration:
@@ -303,6 +385,7 @@ omec-control-plane:
 
     # SMF config override. Refer to Helm Charts values for more options
     smf:
+      deploy: true
       cfgFiles:
         smfcfg.yaml:
           configuration:
@@ -439,10 +522,12 @@ omec-control-plane:
           #     ReportCaller: false
 
     nssf:
+      deploy: true
       cfgFiles:
         nssfcfg.yaml:
           configuration:
             nrfUri: http://nrfs:29510
+            webuiUri: http://webui:5001
             nsiList:
             - nsiInformationList:
               - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
@@ -459,8 +544,20 @@ omec-control-plane:
               tls:
                 key: /var/run/certs/tls.key
                 pem: /var/run/certs/tls.crt
+            serviceNameList:
+              - nnssf-nsselection
+              - nnssf-nssaiavailability
+            nsiList:
+              - snssai:
+                  sst: 1
+                  sd: "010203"
+                nsiInformationList:
+                  - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
+                    nsiId: 22
+
 
     pcf:
+      deploy: true
       cfgFiles:
         pcfcfg.yaml:
           configuration:
@@ -469,6 +566,7 @@ omec-control-plane:
             nrfCacheEvictionInterval: 900
             pcfName: PCF
             nrfUri: https://nrf:29510
+            webuiUri: http://webui:5001
             sbi:
               bindingIPv4: 0.0.0.0
               port: 29507
@@ -477,15 +575,15 @@ omec-control-plane:
               tls: # the local path of TLS key
                 key: /var/run/certs/tls.key # PCF TLS Private key
                 pem: /var/run/certs/tls.crt # PCF TLS Certificate
-    #         serviceList:
-    #         - serviceName: npcf-am-policy-control
-    #         - serviceName: npcf-smpolicycontrol
-    #           suppFeat: 3fff
-    #         - serviceName: npcf-bdtpolicycontrol
-    #         - serviceName: npcf-policyauthorization
-    #           suppFeat: 3
-    #         - serviceName: npcf-eventexposure
-    #         - serviceName: npcf-ue-policy-control
+            serviceList:
+            - serviceName: npcf-am-policy-control
+            - serviceName: npcf-smpolicycontrol
+              suppFeat: 3fff
+            - serviceName: npcf-bdtpolicycontrol
+            - serviceName: npcf-policyauthorization
+              suppFeat: 3
+            - serviceName: npcf-eventexposure
+            - serviceName: npcf-ue-policy-control
     #       info:
     #         description: PCF initial local configuration
     #         version: 1.0.0
@@ -495,6 +593,7 @@ omec-control-plane:
     #           ReportCaller: false
 
     nrf:
+      deploy: true
       cfgFiles:
         nrfcfg.yaml:
           configuration:
@@ -516,34 +615,42 @@ omec-control-plane:
               - nnrf-disc # Nnrf_NFDiscovery service
             webuiUri: "http://webui:5001"
 
-    webui:
-      cfgFiles:
-        webuicfg.yaml:
-          configuration:
-            managedByConfigPod:
-              enabled: {{ not core.standalone }}
-          #   mongodb:                    # Configuración de la base de datos MongoDB
-          #     name: "aether"              # (string) Nombre de la base de datos principal
-          #     url: "mongodb://mongodb-arbiter-headless" # (string) URL de conexión a MongoDB
-          #     authKeysDbName: "authdb"   # (string) Nombre de la base de datos de llaves de autenticación
-          #     authUrl: "mongodb://mongodb-arbiter-headless" # (string) URL de autenticación
-          #     webuiDbName: "webuiDB"       # (string, opcional) Nombre de la base de datos específica para WebUI
-          #     webuiDbUrl: "mongodb://mongodb-arbiter-headless" # (string, opcional) URL específica para la base de datos WebUI
-          #   # webui-tls:                  # Configuración TLS para el WebUI
-          #     # pem: "/var/run/certs/tls.crt" # (string) Ruta al archivo PEM del certificado TLS
-          #     # key: "/var/run/certs/tls.key" # (string) Ruta al archivo de clave privada TLS
-          #   # nfconfig-tls:               # Configuración TLS para la comunicación con NF Config
-          #     # pem: "/var/run/certs/tls.crt" # (string) Ruta al archivo PEM del certificado TLS de NF Config
-          #     # key: "/var/run/certs/tls.key" # (string) Ruta al archivo de clave privada TLS de NF Config
-
-          #   spec-compliant-sdf: false   # (bool) Cumplimiento estricto del SDF
-          #   enableAuthentication: false # (bool, opcional) Habilita autenticación en el WebUI
-          #   send-pebble-notifications: false # (bool, opcional) Habilita notificaciones Pebble
-
-          # logger:
-          #   WEBUI:
-          #     debugLevel: debug
-          #     ReportCaller: false
+  webui:
+    deploy: true
+    #podAnnotations:
+    serviceType: ClusterIP
+    # serviceAnnotations:
+    #   external-dns.alpha.kubernetes.io/hostname: "aether-config.tenant-site.company.com"
+    urlport:
+      port: 5000
+      # Provide nodePort when serviceType is NodePort
+      #nodePort: 35000
+    rest:
+      port: 5001
+      # Provide nodePort when serviceType is NodePort
+      # nodePort: 35001
+    ingress:
+      enabled: false
+      hostname: aether.local
+      path: /
+      pathType: Prefix
+      # extraHosts:
+        # - host: aether.local
+        #   path: /
+    cfgFiles:
+      webuicfg.yaml:
+        info:
+          version: 1.0.0
+          description: WebUI initial local configuration
+        configuration:
+          enableAuthentication: false
+          spec-compliant-sdf: false
+          # webui-tls:
+          #   pem: /var/run/certs/tls.crt
+          #   key: /var/run/certs/tls.key
+          # nfconfig-tls:
+          #   pem: /var/run/certs/tls.crt
+          #   key: /var/run/certs/tls.key
 
 # Override values for omec-sub-provision (subscriber) Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml

@@ -12,12 +12,12 @@ spec:
     # El repositorio de Helm que contiene el CHART
     - chart: sd-core
       repoURL: https://charts.aetherproject.org
-      targetRevision: 2.2.4
+      targetRevision: 3.0.0
       helm:
         valueFiles:
           - $values-from-git/environments/dev/5g-core-values.yaml
-        postRenderer:
-          command: ["./helm-patches/webui/post-render.sh"]
+        # postRenderer:
+        #   command: ["./helm-patches/webui/post-render.sh"]
 
 
       # El repositorio público que contiene los VALUES.YAML
