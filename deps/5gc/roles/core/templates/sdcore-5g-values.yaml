@@ -28,7 +28,7 @@ omec-control-plane:
       webui: omecproject/5gc-webui:1.9.0
       sctplb: omecproject/sctplb:v1.2.1-new-dev
       nssf: omecproject/5gc-nssf:v1.2.1-new-dev
-      upfadapter: omecproject/upfadapter:v1.2.2-new-dev
+      upfadapter: omecproject/5gc-upfadapter:2.0.6-gsi
     # refer to above Helm Chart to add other NF images
 
   kafka:
