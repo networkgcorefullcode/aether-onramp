@@ -1,13 +1,7 @@
-# helm-patches/webui/webui-svc-patch.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  # El nombre debe coincidir EXACTAMENTE con el nombre del service que Helm genera
-  # Puede que necesites hacer un `helm template` para ver el nombre real.
-  name: webui
-spec:
-  ports:
-  - name: http-nfconfig
+- op: add
+  path: /spec/ports/-
+  value:
+    name: http-nfconfig
     port: 5001
     protocol: TCP
     targetPort: 5001
