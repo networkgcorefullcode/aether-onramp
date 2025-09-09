@@ -17,6 +17,13 @@ spec:
         valueFiles:
           - $values-from-git/environments/dev/5g-core-values.yaml
 
+        # Esta sección le dice a Argo CD que ejecute un comando después de 'helm template'.
+        postRenderer:
+          # El comando que se ejecutará.
+          command: ["/bin/sh"]
+          # Los argumentos para el comando. En este caso, la ruta a tu script.
+          args: ["-c", "helm-patches/webui/post-render.sh"]
+
       # El repositorio público que contiene los VALUES.YAML
     - repoURL: https://github.com/networkgcorefullcode/aether-onramp.git
       # La rama que debe observar en el repo PÚBLICO
