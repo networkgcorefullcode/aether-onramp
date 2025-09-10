@@ -8,13 +8,13 @@ mirrors:
 configs:
   "192.168.12.15:8083":
     auth:
-      username: admin   # this is the registry username
-      password: Avangenio2023*   # this is the registry password
-    tls: 
+      username: user-1   # this is the registry username
+      password: user2023*   # this is the registry password
+    tls:
       insecure_skip_verify: true
   "docker.io":
     auth:
-      username: admin   # this is the registry username
-      password: Avangenio2023*   # this is the registry password
-    tls: 
+      username: user-1   # this is the registry username
+      password: user2023*   # this is the registry password
+    tls:
       insecure_skip_verify: true
