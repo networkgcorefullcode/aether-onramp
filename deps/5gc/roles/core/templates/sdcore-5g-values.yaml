@@ -27,7 +27,7 @@ omec-control-plane:
       nrf: omecproject/5gc-nrf:2.0.3-dev
       webui: omecproject/5gc-webui:1.9.0-dev
       sctplb: omecproject/sctplb:v1.2.1-new-dev
-      nssf: omecproject/5gc-nssf:v1.2.1-new-dev
+      nssf: omecproject/5gc-nssf:1.7.0-dev
       upfadapter: omecproject/upfadapter:v1.2.2-new-dev
     # refer to above Helm Chart to add other NF images
 
