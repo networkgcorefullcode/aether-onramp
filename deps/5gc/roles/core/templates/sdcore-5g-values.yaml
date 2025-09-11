@@ -174,7 +174,7 @@ omec-control-plane:
                  - NEA2
             #     - NEA0
             sbi: # Service-based interface information
-              scheme: http # the protocol for sbi (http or https)
+              scheme: https # the protocol for sbi (http or https)
               registerIPv4: amf # IP used to register to NRF
               bindingIPv4: 0.0.0.0  # IP used to bind the service
               port: 29518 # port used to bind the service
@@ -303,7 +303,7 @@ omec-control-plane:
               bindingIPv4: 0.0.0.0
               port: 29509
               registerIPv4: ausf
-              scheme: http
+              scheme: https
               tls: # the local path of TLS key
                 key: /var/run/certs/tls.key # AUSF TLS Private key
                 pem: /var/run/certs/tls.crt # AUSF TLS Certificate
@@ -324,7 +324,7 @@ omec-control-plane:
           configuration:
             enableDBStore: true
             sbi: # Service Based Interface
-              scheme: http
+              scheme: https
               registerIPv4: udr
               bindingIPv4: 0.0.0.0
               port: 29504
@@ -352,7 +352,7 @@ omec-control-plane:
               bindingIPv4: 0.0.0.0
               port: 29503
               registerIPv4: udm
-              scheme: http
+              scheme: https
               tls:
                 key: /var/run/certs/tls.key # UDM TLS Private key
                 pem: /var/run/certs/tls.crt # UDM TLS Certificate
@@ -390,7 +390,7 @@ omec-control-plane:
           configuration:
             enableDBStore: true  # Store SMF subscribers in the datastore
             sbi: # Service-based interface information
-              scheme: http # the protocol for sbi (http or https)
+              scheme: https # the protocol for sbi (http or https)
               registerIPv4: smf # IP used to register to NRF
               bindingIPv4: 0.0.0.0  # IP used to bind the service
               port: 29502 # Port used to bind the service
@@ -539,7 +539,7 @@ omec-control-plane:
               bindingIPv4: 0.0.0.0
               port: 29531
               registerIPv4: nssf
-              scheme: http
+              scheme: https
               tls:
                 key: /var/run/certs/tls.key
                 pem: /var/run/certs/tls.crt
@@ -564,7 +564,7 @@ omec-control-plane:
               bindingIPv4: 0.0.0.0
               port: 29507
               registerIPv4: pcf
-              scheme: http
+              scheme: https
               tls: # the local path of TLS key
                 key: /var/run/certs/tls.key # PCF TLS Private key
                 pem: /var/run/certs/tls.crt # PCF TLS Certificate
