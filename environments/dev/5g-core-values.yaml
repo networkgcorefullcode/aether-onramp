@@ -525,11 +525,11 @@ omec-control-plane:
       cfgFiles:
         nssfcfg.yaml:
           configuration:
-            nrfUri: http://nrfs:29510
+            nrfUri: https://nrfs:29510
             webuiUri: http://webui:5001
             nsiList:
             - nsiInformationList:
-              - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+              - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
                 nsiId: 22
               snssai:
                 sd: "010203"
