@@ -181,7 +181,7 @@ omec-control-plane:
               tls: # the local path of TLS key
                 key: /var/run/certs/tls.key # AMF TLS Private key
                 pem: /var/run/certs/tls.crt # AMF TLS Certificate
-            nrfUri: "https://nrf:29510" # a valid URI of NRF
+            nrfUri: "http://nrf:29510" # a valid URI of NRF
           #   amfName: AMF # the name of this AMF
           #   amfDBName: "amf_db"   # Nombre de la base de datos MongoDB para el AMF
           #   ngapIpList:  # the IP list of N2 interfaces on this AMF
@@ -309,7 +309,7 @@ omec-control-plane:
                 pem: /var/run/certs/tls.crt # AUSF TLS Certificate
             serviceNameList:
               - nausf-auth
-            nrfUri: "https://nrf:29510"
+            nrfUri: "http://nrf:29510"
             webuiUri: "http://webui:5001" # URI del WebUI del AMF
           logger:
             AUSF:
@@ -334,7 +334,7 @@ omec-control-plane:
             mongodb:
                name: "aether"                      # Nombre de la base de datos
                url: mongodb://mongodb-arbiter-headless  # URL de conexión con credenciales y host:puerto
-            nrfUri: "https://nrf:29510"
+            nrfUri: "http://nrf:29510"
             webuiUri: "http://webui:5001"
           logger:
             UDR:
@@ -356,7 +356,7 @@ omec-control-plane:
               tls:
                 key: /var/run/certs/tls.key # UDM TLS Private key
                 pem: /var/run/certs/tls.crt # UDM TLS Certificate
-            nrfUri: "https://nrf:29510"
+            nrfUri: "http://nrf:29510"
             plmnList:
             - plmnId:
                 mcc: "208"
@@ -397,7 +397,7 @@ omec-control-plane:
               tls: # the local path of TLS key
                 key: /var/run/certs/tls.key # SMF TLS Private key
                 pem: /var/run/certs/tls.crt # SMF TLS Certificate
-            nrfUri: https://nrf:29510 # a valid URI of NRF
+            nrfUri: http://nrf:29510 # a valid URI of NRF
             # staticIpInfo:
             #   - dnn: internet
             #     imsiIpInfo:
@@ -558,7 +558,7 @@ omec-control-plane:
             enableNrfCaching: true
             nrfCacheEvictionInterval: 900
             pcfName: PCF
-            nrfUri: https://nrf:29510
+            nrfUri: http://nrf:29510
             webuiUri: http://webui:5001
             sbi:
               bindingIPv4: 0.0.0.0
@@ -596,7 +596,7 @@ omec-control-plane:
             MongoDBName: aether # database name in MongoDB
             MongoDBUrl: "mongodb://mongodb-arbiter-headless" # a valid URL of the mongodb
             sbi: # Service-based interface information
-              scheme: https # the protocol for sbi (http or https)
+              scheme: http # the protocol for sbi (http or https)
               registerIPv4: nrf # IP used to serve NFs or register to another NRF
               bindingIPv4: 0.0.0.0  # IP used to bind the service
               port: 29510 # port used to bind the service
