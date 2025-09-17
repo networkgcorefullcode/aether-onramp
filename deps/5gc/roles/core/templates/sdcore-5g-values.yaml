@@ -621,7 +621,7 @@ omec-control-plane:
     rest:
       port: 5001
       # Provide nodePort when serviceType is NodePort
-       nodePort: 35001
+      nodePort: 35001
     ingress:
       enabled: false
       hostname: aether.local
