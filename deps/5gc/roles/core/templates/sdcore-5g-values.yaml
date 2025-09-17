@@ -611,17 +611,17 @@ omec-control-plane:
   webui:
     deploy: true
     #podAnnotations:
-    serviceType: ClusterIP
+    serviceType: NodePort
     # serviceAnnotations:
     #   external-dns.alpha.kubernetes.io/hostname: "aether-config.tenant-site.company.com"
     urlport:
       port: 5000
       # Provide nodePort when serviceType is NodePort
-      #nodePort: 35000
+      nodePort: 35000
     rest:
       port: 5001
       # Provide nodePort when serviceType is NodePort
-      # nodePort: 35001
+       nodePort: 35001
     ingress:
       enabled: false
       hostname: aether.local
