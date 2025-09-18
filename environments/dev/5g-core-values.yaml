@@ -551,18 +551,22 @@ omec-control-plane:
 
     pcf:
       deploy: true
+      serviceType: ClusterIP
+      sbi:
+        port: 29507
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30077
       cfgFiles:
         pcfcfg.yaml:
           configuration:
+            pcfName: PCF
             defaultBdtRefId: BdtPolicyId-
             enableNrfCaching: true
             nrfCacheEvictionInterval: 900
-            pcfName: PCF
             nrfUri: http://nrf:29510
             webuiUri: http://webui:5001
             sbi:
               bindingIPv4: 0.0.0.0
-              port: 29507
               registerIPv4: pcf
               scheme: http
               tls: # the local path of TLS key
