@@ -608,42 +608,42 @@ omec-control-plane:
               - nnrf-disc # Nnrf_NFDiscovery service
             webuiUri: "http://webui:5001"
 
-  webui:
-    deploy: true
-    #podAnnotations:
-    serviceType: NodePort
-    # serviceAnnotations:
-    #   external-dns.alpha.kubernetes.io/hostname: "aether-config.tenant-site.company.com"
-    urlport:
-      port: 5000
-      # Provide nodePort when serviceType is NodePort
-      nodePort: 35000
-    rest:
-      port: 5001
-      # Provide nodePort when serviceType is NodePort
-      nodePort: 35001
-    ingress:
-      enabled: false
-      hostname: aether.local
-      path: /
-      pathType: Prefix
-      # extraHosts:
-        # - host: aether.local
-        #   path: /
-    cfgFiles:
-      webuicfg.yaml:
-        info:
-          version: 1.0.0
-          description: WebUI initial local configuration
-        configuration:
-          enableAuthentication: false
-          spec-compliant-sdf: false
-          # webui-tls:
-          #   pem: /var/run/certs/tls.crt
-          #   key: /var/run/certs/tls.key
-          # nfconfig-tls:
-          #   pem: /var/run/certs/tls.crt
-          #   key: /var/run/certs/tls.key
+    webui:
+      deploy: true
+      #podAnnotations:
+      serviceType: NodePort
+      # serviceAnnotations:
+      #   external-dns.alpha.kubernetes.io/hostname: "aether-config.tenant-site.company.com"
+      urlport:
+        port: 5000
+        # Provide nodePort when serviceType is NodePort
+        nodePort: 35000
+      rest:
+        port: 5001
+        # Provide nodePort when serviceType is NodePort
+        nodePort: 35001
+      ingress:
+        enabled: false
+        hostname: aether.local
+        path: /
+        pathType: Prefix
+        # extraHosts:
+          # - host: aether.local
+          #   path: /
+      cfgFiles:
+        webuicfg.yaml:
+          info:
+            version: 1.0.0
+            description: WebUI initial local configuration
+          configuration:
+            enableAuthentication: false
+            spec-compliant-sdf: false
+            # webui-tls:
+            #   pem: /var/run/certs/tls.crt
+            #   key: /var/run/certs/tls.key
+            # nfconfig-tls:
+            #   pem: /var/run/certs/tls.crt
+            #   key: /var/run/certs/tls.key
 
 # Override values for omec-sub-provision (subscriber) Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml
