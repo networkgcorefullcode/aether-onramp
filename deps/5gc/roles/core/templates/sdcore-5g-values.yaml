@@ -563,7 +563,6 @@ omec-control-plane:
             defaultBdtRefId: BdtPolicyId-
             enableNrfCaching: true
             nrfCacheEvictionInterval: 900
-            pcfName: PCF
             nrfUri: http://nrf:29510
             webuiUri: http://webui:5001
             sbi:
