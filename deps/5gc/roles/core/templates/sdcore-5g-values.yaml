@@ -49,6 +49,17 @@ omec-control-plane:
       url: mongodb://mongodb-arbiter-headless # Enable if cluster deployment required
       authKeysDbName: authentication
       authUrl: mongodb://mongodb-arbiter-headless
+    
+    amf:
+      deploy: true
+      # serviceAnnotations:
+      #   external-dns.alpha.kubernetes.io/hostname: "aether-amf.tenant-site.company.com"
+      podAnnotations:
+        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+      serviceType: NodePort
+      ngapp:
+        #externalIp:
+        nodePort: 30071
 
     webui:
       serviceType: NodePort
