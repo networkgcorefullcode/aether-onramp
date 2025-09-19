@@ -563,7 +563,6 @@ config:
           version: 1.0.0
           description: SMF initial local configuration
         configuration:
-          smfDBName: sdcore_smf
           enableDBStore: false
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
