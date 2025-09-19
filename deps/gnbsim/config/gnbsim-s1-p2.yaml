@@ -10,7 +10,7 @@ info:
   description: GNBSIM initial local configuration
 
 configuration:
-  runConfigProfilesAtStart: false
+  runConfigProfilesAtStart: true
   singleInterface: false #default value
   execInParallel: false #run all profiles in parallel
   httpServer: # Serves APIs to create/control profiles on the go
@@ -102,7 +102,7 @@ configuration:
         mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
     - profileType: pdusessest # profile type
       profileName: profile2 # uniqely identifies a profile within application
-      enable: true # Set true to execute the profile, false otherwise.
+      enable: false # Set true to execute the profile, false otherwise.
       gnbName: gnb1 # gNB to be used for this profile
       startImsi: "208930100007491" # First IMSI. Subsequent values will be used if ueCount is more than 1
       ueCount: 3 # Number of UEs for for which the profile will be executed
