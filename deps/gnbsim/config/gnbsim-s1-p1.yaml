@@ -12,7 +12,7 @@ info:
 configuration:
   runConfigProfilesAtStart: true
   singleInterface: false #default value
-  execInParallel: true #run all profiles in parallel
+  execInParallel: false #run all profiles in parallel
   httpServer: # Serves APIs to create/control profiles on the go
     enable: false
     ipAddr: "{{ container_ip }}"
@@ -53,16 +53,16 @@ configuration:
     customProfiles1:
       profileType: custom # profile type
       profileName: custom1 # uniqely identifies  a profile within application
-      enable: false # Set true to execute the profile, false otherwise.
-      execInParallel: true #run all subscribers in parallel
+      enable: true # Set true to execute the profile, false otherwise.
+      execInParallel: false #run all subscribers in parallel
       stepTrigger: false #wait for trigger to move to next step
       gnbName: gnb1 # gNB to be used for this profile
-      startImsi: "208930100007487" # First IMSI. Subsequent values will be used if ueCount is more than 1
-      ueCount: 3 # Number of UEs for for which the profile will be executed
+      startImsi: "208930100007595" # First IMSI. Subsequent values will be used if ueCount is more than 1
+      ueCount: 1 # Number of UEs for for which the profile will be executed
       perUserTimeout: 10
       defaultAs: "{{ ping_target }}" #default icmp pkt destination
       opc: "981d464c7c52eb6e5036234984ad0bcf"
-      key: "5122250214c33e723a5dd523fc145fc0"
+      key: "0bbf8e5965eebdc0f2c69126bf252526"
       sequenceNumber: "16f3b3f70fc2"
       plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
         mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
@@ -102,7 +102,7 @@ configuration:
         mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
     - profileType: pdusessest # profile type
       profileName: profile2 # uniqely identifies a profile within application
-      enable: true # Set true to execute the profile, false otherwise.
+      enable: false # Set true to execute the profile, false otherwise.
       gnbName: gnb1 # gNB to be used for this profile
       startImsi: "208930100007487" # First IMSI. Subsequent values will be used if ueCount is more than 1
       ueCount: 3 # Number of UEs for for which the profile will be executed
