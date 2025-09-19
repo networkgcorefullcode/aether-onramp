@@ -220,6 +220,53 @@ omec-user-plane:
     #  bess: <bess image tag>
     #  pfcpiface: <pfcp image tag>
   config:
+    GIN:
+      mode: debug          # Possible options are: release, debug
+    logger:
+      # network function
+      # AMF:
+      #   debugLevel: info
+      SMF:
+        debugLevel: debug
+    #   UDR:
+    #     debugLevel: info
+    #   UDM:
+    #     debugLevel: info
+    #   NRF:
+    #     debugLevel: info
+    #   PCF:
+    #     debugLevel: info
+    #   AUSF:
+    #     debugLevel: info
+    #   N3IWF:
+    #     debugLevel: info
+    # # library
+    #   NAS:
+    #     debugLevel: info
+    #   FSM:
+    #     debugLevel: info
+    #   NGAP:
+    #     debugLevel: info
+    #   NamfCommunication:
+    #     debugLevel: info
+    #   NamfEventExposure:
+    #     debugLevel: info
+      NsmfPDUSession:
+        debugLevel: debug
+    #   NudrDataRepository:
+    #     debugLevel: info
+    #   OpenApi:
+    #     debugLevel: info
+    #   Aper:
+    #     debugLevel: info
+    #   Config5g:
+    #     debugLevel: info
+    #   MongoDBLibrary:
+    #     debugLevel: info
+    # # webui
+    #   WEBUI:
+    #     debugLevel: info
+
     upf:
       privileged: true
       name: "oaisim"
