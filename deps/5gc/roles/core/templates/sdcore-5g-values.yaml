@@ -823,7 +823,7 @@ omec-sub-provision:
             # Configure Network Slices (ignored if provision-network-slice is disabled)
             network-slices:
             - name: "default"      # can be any unique slice name
-              slice-id:            # must match with slice configured in gNB, UE
+              slice-id:        # must match with slice configured in gNB, UE
                 sd: "010203"
                 sst: 1
               site-device-group:
