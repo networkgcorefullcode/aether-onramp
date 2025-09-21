@@ -843,7 +843,7 @@ omec-sub-provision:
                   qci: 9
                   arp: 6
                   pdb: 300
-                  pelr: 6      
+                  pelr: 6
               site-info:
                 # Provide gNBs and UPF details and also PLMN for the site
                 gNodeBs:
