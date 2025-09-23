@@ -23,9 +23,9 @@ omec-control-plane:
       smf: omecproject/5gc-smf:3.0.0-dev
       udm: omecproject/5gc-udm:2.1.3-dev
       udr: omecproject/5gc-udr:2.1.4-dev
-      pcf: omecproject/5gc-pcf:2.0.1-dev
+      pcf: omecproject/5gc-pcf:1.7.0-dev
       nrf: omecproject/5gc-nrf:v1.2.1-new-dev
-      webui: omecproject/5gc-webui:1.10.2-dev
+      webui: omecproject/5gc-webui:1.9.5-dev
       nssf: omecproject/5gc-nssf:1.7.0-dev
       init: omecproject/pod-init:rel-1.1.3
       #sctplb: sctplb:1.6.6-dev
@@ -102,46 +102,6 @@ omec-control-plane:
 
     upfadapter:
       deploy: false
-    
-    pcf:
-      deploy: true
-      serviceType: ClusterIP
-      sbi:
-        port: 29507
-        # Provide nodePort when serviceType is NodePort
-        #nodePort: 30077
-      cfgFiles:
-        pcfcfg.yaml:
-          configuration:
-            pcfName: PCF
-            defaultBdtRefId: BdtPolicyId-
-            enableNrfCaching: true
-            nrfCacheEvictionInterval: 900
-            nrfUri: http://nrf:29510
-            webuiUri: http://webui:5001
-            sbi:
-              bindingIPv4: 0.0.0.0
-              registerIPv4: pcf
-              scheme: http
-              tls: # the local path of TLS key
-                key: /var/run/certs/tls.key # PCF TLS Private key
-                pem: /var/run/certs/tls.crt # PCF TLS Certificate
-            serviceList:
-            - serviceName: npcf-am-policy-control
-            - serviceName: npcf-smpolicycontrol
-              suppFeat: 3fff
-            - serviceName: npcf-bdtpolicycontrol
-            - serviceName: npcf-policyauthorization
-              suppFeat: 3
-            - serviceName: npcf-eventexposure
-            - serviceName: npcf-ue-policy-control
-    #       info:
-    #         description: PCF initial local configuration
-    #         version: 1.0.0
-    #       logger:
-    #         PCF:
-    #           debugLevel: debug
-    #           ReportCaller: false
 
 # Override values for omec-sub-provision (subscriber) Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml
@@ -149,9 +109,10 @@ omec-control-plane:
 omec-sub-provision:
   enable: true
   images:
-    repository: "registry.aetherproject.org/proxy/"
-    #tags:
-    #  simapp: #add simapp override image
+    repository: "192.168.12.15:8083/"
+    tags:
+      simapp: omecproject/simapp:1.6.5-dev
+      init: omecproject/pod-init:rel-1.1.3
 
   config:
     simapp:
