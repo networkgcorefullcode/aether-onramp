@@ -7,3 +7,7 @@
 - name: uninstall 5gc/core
   import_tasks: roles/core/tasks/uninstall.yml
   tags: uninstall
+
+- name: upgrade 5gc/core
+  import_tasks: roles/core/tasks/upgrade.yml
+  tags: upgrade
