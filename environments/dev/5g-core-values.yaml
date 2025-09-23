@@ -823,7 +823,7 @@ omec-sub-provision:
             # Configure Network Slices (ignored if provision-network-slice is disabled)
             network-slices:
             - name: "default"      # can be any unique slice name
-              slice-id:            # must match with slice configured in gNB, UE
+              slice-id:        # must match with slice configured in gNB, UE
                 sd: "010203"
                 sst: 1
               site-device-group:
@@ -835,6 +835,15 @@ omec-sub-provision:
                 priority: 250
                 action: "permit"
                 endpoint: "0.0.0.0/0"
+                app-mbr-uplink: 1 #1Mbps
+                app-mbr-downlink: 5 #5Mbps
+                bitrate-unit: Mbps
+                traffic-class : #if same as APN-AMBR then its default bearer rule
+                  name: "silver"
+                  qci: 9
+                  arp: 6
+                  pdb: 300
+                  pelr: 6
               site-info:
                 # Provide gNBs and UPF details and also PLMN for the site
                 gNodeBs:
@@ -875,7 +884,7 @@ omec-user-plane:
         - to: 192.168.12.11
           via: 169.254.1.1
       enb:
-        subnet: 192.168.0.0/16 # Subnet for the gNB network
+        subnet: 192.168.8.0/21 # Subnet for the gNB network
       access:
         ipam: static
         cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
