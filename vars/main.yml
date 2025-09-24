@@ -30,7 +30,7 @@ core:
       ip:
         access: "192.168.252.3" # when multihop_gnb set to true, make sure to assign IP from same subnet of data_iface
         core:   "192.168.250.3"
-      ue_ip_pool: "192.168.8.0/24"
+      ue_ip_pool: "192.168.100.0/24"
   amf:
     ip: "192.168.12.11"
 
