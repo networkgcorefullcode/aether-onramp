@@ -86,6 +86,10 @@ helm-dry-run-on-mr:
 
 render-and-commit-gitops-values:
   stage: render-and-commit
+  needs:
+    - lint-yaml
+    - validate-values-syntax
+    - helm-dry-run-on-mr
   tags:
     - aether-runner
   image: 192.168.12.15:8083/onramp-render-template:1.0
@@ -130,8 +134,7 @@ render-and-commit-gitops-values:
       fi
 
   rules:
-    # Esta regla es la clave: el job SÓLO se ejecuta en un push (como un merge)
-    # a las ramas de entorno, y NO en los MRs.
+    # el job SÓLO se ejecuta en un push (como un merge) a las ramas de entorno, y NO en los MRs.
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
 #    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
 
