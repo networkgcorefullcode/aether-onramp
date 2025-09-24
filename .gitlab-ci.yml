@@ -17,7 +17,11 @@ lint-yaml:
 
   rules:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    changes:
+      - deps/5gc/roles/core/templates/**/*
   - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+    changes:
+      - deps/5gc/roles/core/templates/**/*
     when: always
 
 # Validar sintaxis con yq
@@ -35,7 +39,11 @@ validate-values-syntax:
     - yq-go e . deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
   rules:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    changes:
+      - deps/5gc/roles/core/templates/**/*
   - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+    changes:
+      - deps/5gc/roles/core/templates/**/*
     when: always
 
 
@@ -79,13 +87,19 @@ helm-dry-run-on-mr:
 
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - deps/5gc/roles/core/templates/**/*
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-
+      changes:
+        - deps/5gc/roles/core/templates/**/*
       when: always
 
 
 render-and-commit-gitops-values:
   stage: render-and-commit
+  needs:
+    - validate-values-syntax
+    - helm-dry-run-on-mr
   tags:
     - aether-runner
   image: 192.168.12.15:8083/onramp-render-template:1.0
@@ -130,9 +144,8 @@ render-and-commit-gitops-values:
       fi
 
   rules:
-    # Esta regla es la clave: el job SÓLO se ejecuta en un push (como un merge)
-    # a las ramas de entorno, y NO en los MRs.
+    # el job SÓLO se ejecuta en un push (como un merge) a las ramas de entorno, y NO en los MRs.
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+      changes:
+        - deps/5gc/roles/core/templates/**/*
 #    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
-
-
