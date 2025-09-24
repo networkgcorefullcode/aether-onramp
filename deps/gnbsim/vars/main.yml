@@ -11,7 +11,7 @@ gnbsim:
   router:
     data_iface: eth0
     macvlan:
-      subnet_prefix: "192.168"
+      subnet_prefix: "172.20"
 
   servers:
     0:
