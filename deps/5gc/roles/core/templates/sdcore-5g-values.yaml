@@ -194,6 +194,15 @@ omec-sub-provision:
                 priority: 250
                 action: "permit"
                 endpoint: "0.0.0.0/0"
+                app-mbr-uplink: 1 #1Mbps
+                app-mbr-downlink: 5 #5Mbps
+                bitrate-unit: Mbps
+                traffic-class : #if same as APN-AMBR then its default bearer rule
+                  name: "silver"
+                  qci: 9
+                  arp: 6
+                  pdb: 300
+                  pelr: 6
               site-info:
                 # Provide gNBs and UPF details and also PLMN for the site
                 gNodeBs:
