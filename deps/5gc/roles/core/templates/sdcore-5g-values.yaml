@@ -659,7 +659,7 @@ omec-sub-provision:
   images:
     repository: "192.168.12.15:8083/"
     tags:
-      simapp: omecproject/simapp:v1.2.1-new-dev
+      simapp: omecproject/simapp:1.6.6-dev
 
   config:
     simapp:
