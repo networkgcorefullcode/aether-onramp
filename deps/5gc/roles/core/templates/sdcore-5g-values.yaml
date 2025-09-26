@@ -260,71 +260,20 @@ omec-user-plane:
   resources:
     enabled: false
   images:
-    repository: "registry.aetherproject.org/proxy/"
-    # following two lines pull busybox from Docker Hub instead of Aether Registry
-    tags:
-      tools: omecproject/busybox:stable
-    # uncomment following section to add update bess image tag
-    #tags:
-    #  bess: <bess image tag>
-    #  pfcpiface: <pfcp image tag>
+    repository: "192.168.12.15:8082/"
+     #tags:
+       #bess: omecproject/upf-epc-bess:v1.2.1-new-dev
+       #pfcpiface: omecproject/upf-epc-pfcpiface:v1.2.1-new-dev
+      # tools: omecproject/busybox:stable
   config:
-    GIN:
-      mode: debug          # Possible options are: release, debug
-    logger:
-      # network function
-      # AMF:
-      #   debugLevel: info
-      SMF:
-        debugLevel: debug
-    #   UDR:
-    #     debugLevel: info
-    #   UDM:
-    #     debugLevel: info
-    #   NRF:
-    #     debugLevel: info
-    #   PCF:
-    #     debugLevel: info
-    #   AUSF:
-    #     debugLevel: info
-    #   N3IWF:
-    #     debugLevel: info
-    # # library
-    #   NAS:
-    #     debugLevel: info
-    #   FSM:
-    #     debugLevel: info
-    #   NGAP:
-    #     debugLevel: info
-    #   NamfCommunication:
-    #     debugLevel: info
-    #   NamfEventExposure:
-    #     debugLevel: info
-      NsmfPDUSession:
-        debugLevel: debug
-    #   NudrDataRepository:
-    #     debugLevel: info
-    #   OpenApi:
-    #     debugLevel: info
-    #   Aper:
-    #     debugLevel: info
-    #   Config5g:
-    #     debugLevel: info
-    #   MongoDBLibrary:
-    #     debugLevel: info
-    # # webui
-    #   WEBUI:
-    #     debugLevel: info
-
     upf:
-      privileged: true
       name: "oaisim"
       sriov:
         enabled: false    # SRIOV is disabled by default
       hugepage:
         enabled: false    # Should be enabled if DPDK is enabled
       routes:
-        - to: {{ ansible_default_ipv4.address }}
+        - to: {{ core.amf.ip }}
           via: 169.254.1.1
       enb:
         subnet: {{ ran_subnet }} # Subnet for the gNB network
