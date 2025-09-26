@@ -260,7 +260,7 @@ omec-user-plane:
   resources:
     enabled: false
   images:
-    repository: ""
+    repository: "192.168.12.15:8082/"
     # tags:
     #   bess: network5gcore/upf-epc-bess:rel-2.1.1
     #   pfcpiface: network5gcore/upf-epc-pfcpiface:rel-2.1.1
