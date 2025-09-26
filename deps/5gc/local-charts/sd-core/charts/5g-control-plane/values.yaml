@@ -122,6 +122,10 @@ kafka:
       enabled: false
   persistence:
     enabled: false
+  initContainers:
+    - name: wait-for-zookeeper
+      image: busybox
+      command: ['sh', '-c', 'until nc -z sd-core-zookeeper 2181; do echo waiting for zookeeper; sleep 2; done;']
 
 mongodb:
   deploy: true
@@ -137,9 +141,6 @@ mongodb:
   replicaCount: 1
 
 config:
-  managedByConfigPod:      # config comes from helm by default, if enabled true, then discard
-    enabled: true          # helm chart config and use the config from config Pod
-    syncUrl: ""            # Get the config from adapater in case control plane is down
   useExistingConfigMap: false
   coreDump:
     enabled: false
@@ -149,15 +150,11 @@ config:
     url: mongodb://mongodb-arbiter-headless
     authKeysDbName: authentication
     authUrl: mongodb://mongodb-arbiter-headless
-  grpc:
+  grpc:  # this is used by AMF and SCTPLB
     golog_verbosity: "0"
     severity: "info"
     trace: "none"
     verbosity: "none"
-    secure_server: false  # if 'true', you must set the path to where the credentials (pem and key) are located
-    tls:
-      crt: /var/run/certs/tls.crt
-      key: /var/run/certs/tls.key
 
   GIN:
     mode: release          # Possible options are: release, debug
@@ -216,28 +213,32 @@ config:
       port: 5000
       # Provide nodePort when serviceType is NodePort
       nodePort: 30001
-    grpc:
-      port: 9876
+    rest:
+      port: 5001
+      # Provide nodePort when serviceType is NodePort
       nodePort: 30002
-    # ingress:
-    #   enabled: false
-    #   hostname: free5gc.local
-    #   path: /
-    #   pathType: Prefix
+    ingress:
+      enabled: false
+      hostname: aether.local
+      path: /
+      pathType: Prefix
       # extraHosts:
-        # - host: free5gc.local
+        # - host: aether.local
         #   path: /
-    # cfgFiles:
-    #   webuicfg.yaml:
-    #     info:
-    #       version: 1.0.0
-    #       description: WebUI initial local configuration
-    #     configuration:
-    #       spec-compliant-sdf: false
-    #       secure-grpc-server: false  # if 'true', you must set the path to where the credentials (pem and key) are located
-    #       tls:
-    #         pem: /var/run/certs/tls.crt
-    #         key: /var/run/certs/tls.key
+    cfgFiles:
+      webuicfg.yaml:
+        info:
+          version: 1.0.0
+          description: WebUI initial local configuration
+        configuration:
+          enableAuthentication: false
+          spec-compliant-sdf: false
+          # webui-tls:
+          #   pem: /var/run/certs/tls.crt
+          #   key: /var/run/certs/tls.key
+          # nfconfig-tls:
+          #   pem: /var/run/certs/tls.crt
+          #   key: /var/run/certs/tls.key
 
   udm:
     deploy: true
@@ -317,6 +318,7 @@ config:
         configuration:
           pcfName: PCF
           nrfUri: http://nrf:29510
+          webuiUri: http://webui:5001
           sbi:
             scheme: http
             bindingIPv4: "0.0.0.0"
@@ -556,6 +558,7 @@ config:
           version: 1.0.0
           description: SMF initial local configuration
         configuration:
+          smfDBName: sdcore_smf
           enableDBStore: false
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900

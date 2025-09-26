@@ -63,36 +63,12 @@ omec-control-plane:
 
     webui:
       serviceType: NodePort
-      urlportConfigs:
-        port: 5001
-        nodePort: 30003
-
-      ingress:
-        enabled: false
-        hostname: aether.local
-        path: /
-        pathType: Prefix
-        # extraHosts:
-          # - host: aether.local
-          #   path: /
       cfgFiles:
         webuicfg.yaml:
           info:
             version: 1.0.0
             description: WebUI initial local configuration
           configuration:
-            enableAuthentication: false
-            spec-compliant-sdf: false
-            secure-grpc-server: false  # if 'true', you must set the path to where the credentials (pem and key) are located
-            webui-tls:
-              # pem: "/var/run/certs/tls.crt"
-              # key: "/var/run/certs/tls.key"
-            nfconfig-tls:
-              # pem: "/var/run/certs/tls.crt"
-              # key: "/var/run/certs/tls.key"
-            managedByConfigPod:
-              enabled: false
-              syncUrl: http://roc-sdcore-adapter-v2-1.aether-roc.svc:8080/synchronize
             mongodb:                    # Configuración de la base de datos MongoDB
               name: "aether"              # (string) Nombre de la base de datos principal
               url: "mongodb://mongodb-arbiter-headless" # (string) URL de conexión a MongoDB
@@ -103,39 +79,6 @@ omec-control-plane:
     upfadapter:
       deploy: false
     
-    pcf:
-      deploy: true
-      serviceType: ClusterIP
-      sbi:
-        port: 29507
-        # Provide nodePort when serviceType is NodePort
-        #nodePort: 30077
-      cfgFiles:
-        pcfcfg.yaml:
-          configuration:
-            pcfName: PCF
-            defaultBdtRefId: BdtPolicyId-
-            enableNrfCaching: true
-            nrfCacheEvictionInterval: 900
-            nrfUri: http://nrf:29510
-            webuiUri: http://webui:5001
-            sbi:
-              bindingIPv4: 0.0.0.0
-              registerIPv4: pcf
-              scheme: http
-              tls: # the local path of TLS key
-                key: /var/run/certs/tls.key # PCF TLS Private key
-                pem: /var/run/certs/tls.crt # PCF TLS Certificate
-            serviceList:
-            - serviceName: npcf-am-policy-control
-            - serviceName: npcf-smpolicycontrol
-              suppFeat: 3fff
-            - serviceName: npcf-bdtpolicycontrol
-            - serviceName: npcf-policyauthorization
-              suppFeat: 3
-            - serviceName: npcf-eventexposure
-            - serviceName: npcf-ue-policy-control
-
 # Override values for omec-sub-provision (subscriber) Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml
 # ***Note: Most of these values can (and should) be set via ROC API***
