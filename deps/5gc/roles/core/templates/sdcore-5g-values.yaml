@@ -72,7 +72,7 @@ omec-control-plane:
     #     port: 38412
 
     sctplb:
-      deploy: true
+      deploy: false
       podAnnotations:
         field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
       serviceType: ClusterIP
@@ -158,6 +158,9 @@ omec-control-plane:
     # directly provided through Helm Charts
     amf:
       deploy: true
+      serviceType: NodePort
+      ngapp:
+        nodePort: 30071
       cfgFiles:
         amfcfg.yaml:
           configuration:
