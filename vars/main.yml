@@ -15,7 +15,7 @@ core:
   standalone: true			# set to false to place under control of ROC
   data_iface: eth0
   values_file: "deps/5gc/roles/core/templates/sdcore-5g-values.yaml"
-  ran_subnet: "192.168.8.0/21"		# set to empty string to get subnet from 'data_iface'
+  ran_subnet: "172.20.0.0/16"		# set to empty string to get subnet from 'data_iface'
   helm:
     local_charts: true			# set chart_ref to local path name if true
     chart_ref: "local-charts/sd-core"
@@ -32,6 +32,25 @@ core:
       ue_ip_pool: "192.168.100.0/24"
   amf:
     ip: "192.168.12.16"
+
+gnbsim:
+  docker:
+    container:
+      image: omecproject/5gc-gnbsim:rel-1.6.3
+      prefix: gnbsim
+      count: 1
+    network:
+      macvlan:
+        name: gnbnet
+
+  router:
+    data_iface: eth0
+    macvlan:
+      subnet_prefix: "172.20"
+
+  servers:
+    0:
+      - "deps/gnbsim/config/gnbsim-default.yaml"
 
 ueransim:
   gnb:
