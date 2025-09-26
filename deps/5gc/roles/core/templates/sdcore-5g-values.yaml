@@ -60,6 +60,29 @@ omec-control-plane:
       ngapp:
         #externalIp:
         nodePort: 30071
+      cfgFiles:
+        amfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: AMF initial configuration
+          configuration:
+            amfDBName: sdcore_amf
+            enableDBStore: true
+    smf:
+      cfgFiles:
+        # https://github.com/omec-project/smf/blob/main/config/uerouting.yaml
+        uerouting.yaml:
+          info:
+            version: 1.0.0
+            description: Routing information for UE
+        # https://github.com/omec-project/smf/blob/main/config/smfcfg.yaml
+        smfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: SMF initial local configuration
+          configuration:
+            smfDBName: sdcore_smf
+            enableDBStore: true
 
     webui:
       serviceType: NodePort
