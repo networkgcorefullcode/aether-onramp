@@ -33,25 +33,6 @@ core:
   amf:
     ip: "192.168.12.16"
 
-gnbsim:
-  docker:
-    container:
-      image: omecproject/5gc-gnbsim:rel-1.6.3
-      prefix: gnbsim
-      count: 1
-    network:
-      macvlan:
-        name: gnbnet
-
-  router:
-    data_iface: eth0
-    macvlan:
-      subnet_prefix: "172.20"
-
-  servers:
-    0:
-      - "deps/gnbsim/config/gnbsim-default.yaml"
-
 ueransim:
   gnb:
     ip: "192.168.12.16"

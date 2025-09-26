@@ -226,7 +226,7 @@ omec-user-plane:
   resources:
     enabled: false
   images:
-    repository: "registry.aetherproject.org/proxy/"
+    repository: "192.168.12.15:8082/"
     # tags:
       # bess: <bess image tag>
       # pfcpiface: <pfcp image tag>
