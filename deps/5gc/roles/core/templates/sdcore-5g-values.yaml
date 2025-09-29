@@ -734,6 +734,12 @@ omec-control-plane:
           configuration:
             enableAuthentication: false
             spec-compliant-sdf: false
+            mongodb:                    # Configuración de la base de datos MongoDB
+              name: "aether"              # (string) Nombre de la base de datos principal
+              url: "mongodb://mongodb-arbiter-headless" # (string) URL de conexión a MongoDB
+              authKeysDbName: "authentication"   # (string) Nombre de la base de datos de llaves de autenticación
+              authUrl: "mongodb://mongodb-arbiter-headless" # (string) URL de autenticación
+              checkReplica: true
             # webui-tls:
             #   pem: /var/run/certs/tls.crt
             #   key: /var/run/certs/tls.key
