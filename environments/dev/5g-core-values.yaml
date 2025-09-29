@@ -42,11 +42,98 @@ omec-control-plane:
     replicaCount: 2
 
   resources:
-    enabled: false
+    enabled: true
+    sctplb:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 3Gi
+    amf:
+      requests:
+        cpu: 1
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    nrf:
+      requests:
+        cpu: 1
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    smf:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    upfadapter:
+      requests:
+        cpu: 10m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    ausf:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    nssf:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    pcf:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    udr:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    udm:
+      requests:
+        cpu: 1
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    webui:
+      requests:
+        cpu: 1
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+
+    metricfunc:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+      limits:
+        cpu: 100m
+        memory: 1Gi
 
   config:
     logger:
         NRF:
+          debugLevel: debug
+        WEBUI:
           debugLevel: debug
     #   Util:
     #     debugLevel: warn
@@ -647,6 +734,12 @@ omec-control-plane:
           configuration:
             enableAuthentication: false
             spec-compliant-sdf: false
+            mongodb:                    # Configuración de la base de datos MongoDB
+              name: "aether"              # (string) Nombre de la base de datos principal
+              url: "mongodb://mongodb-arbiter-headless" # (string) URL de conexión a MongoDB
+              authKeysDbName: "authentication"   # (string) Nombre de la base de datos de llaves de autenticación
+              authUrl: "mongodb://mongodb-arbiter-headless" # (string) URL de autenticación
+              checkReplica: true
             # webui-tls:
             #   pem: /var/run/certs/tls.crt
             #   key: /var/run/certs/tls.key
