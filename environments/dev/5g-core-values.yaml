@@ -411,7 +411,7 @@ omec-sub-provision:
   images:
     repository: "192.168.12.15:8083/"
     tags:
-      simapp: omecproject/simapp:1.6.7-dev
+      simapp: omecproject/simapp:1.6.8-dev
 
   config:
     simapp:
@@ -421,7 +421,7 @@ omec-sub-provision:
             max-time-interval: 35
             provision-network-slice: True # if enabled, Device Groups & Slices configure by simapp
             sub-provision-endpt:
-              addr: web # subscriber configuation endpoint.
+              addr: webui # subscriber configuation endpoint.
             # sub-proxy-endpt: # used if subscriber proxy is enabled in the ROC.
             #   addr: subscriber-proxy.aether-roc.svc.cluster.local
             #   port: 5000
