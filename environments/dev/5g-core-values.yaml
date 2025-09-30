@@ -115,10 +115,10 @@ omec-control-plane:
         memory: 1Gi
     webui:
       requests:
-        cpu: 1
+        cpu: 4
         memory: 1Gi
       limits:
-        cpu: 1
+        cpu: 4
         memory: 1Gi
 
     metricfunc:
