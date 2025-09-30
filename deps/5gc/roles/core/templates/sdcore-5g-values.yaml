@@ -58,6 +58,54 @@ omec-control-plane:
       enabled: true
       syncUrl: http://sdcore-adapter-v2-1.aether-roc.svc:8080/synchronize
 
+    metricfunc:
+      deploy: true
+      serviceType: ClusterIP
+      prometheus:
+        port: 9089
+      apiEndpoint:
+        port: 9301
+      cfgFiles:
+        metricscfg.yaml:
+          configuration:
+            controllerFlag: false
+            nfStreams:
+              - topic:
+                  topicGroup: analytics
+                  topicName: sdcore-data-source-amf
+                urls:
+                  - uri: "kafka-headless"
+                    port: 9092
+              - topic:
+                  topicGroup: analytics
+                  topicName: sdcore-data-source-smf
+                urls:
+                  - uri: "kafka-headless"
+                    port: 9092
+            prometheusServer:
+              addr: POD_IP
+              port: 9089
+            apiServer:
+              addr: POD_IP
+              port: 9301
+            debugProfileServer:
+              addr: POD_IP
+              port: 5001
+            userAppApiServer:
+              addr: "userAppapp"
+              port: 9301
+            rocEndPoint:
+              addr: "roc-aether-roc-gui-v2-1-external.aether-roc.svc"
+              port: 80
+            metricFuncEndPoint:
+              addr: "metricfunc.aether-5gc.svc"
+              port: 5001
+          info:
+            description: Metrics initial local configuration
+            version: 1.0.0
+          logger:
+            level: info
+
     sctplb:
       deploy: true
       podAnnotations:
