@@ -25,7 +25,7 @@ omec-control-plane:
       udr: omecproject/5gc-udr:2.1.4-dev
       pcf: omecproject/5gc-pcf:2.0.1-dev
       nrf: omecproject/5gc-nrf:2.0.3-dev
-      webui: omecproject/5gc-webui:1.10.3-dev
+      webui: omecproject/5gc-webui:1.10.6-dev
       sctplb: omecproject/sctplb:1.6.6-dev
       nssf: omecproject/5gc-nssf:1.7.0-dev
       upfadapter: omecproject/upfadapter:2.0.6-dev
@@ -42,11 +42,98 @@ omec-control-plane:
     replicaCount: 2
 
   resources:
-    enabled: false
+    enabled: true
+    sctplb:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 3Gi
+    amf:
+      requests:
+        cpu: 1
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    nrf:
+      requests:
+        cpu: 1
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    smf:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    upfadapter:
+      requests:
+        cpu: 10m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    ausf:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    nssf:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    pcf:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    udr:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    udm:
+      requests:
+        cpu: 1
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    webui:
+      requests:
+        cpu: 4
+        memory: 1Gi
+      limits:
+        cpu: 4
+        memory: 1Gi
+
+    metricfunc:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+      limits:
+        cpu: 100m
+        memory: 1Gi
 
   config:
     logger:
         NRF:
+          debugLevel: debug
+        WEBUI:
           debugLevel: debug
     #   Util:
     #     debugLevel: warn
@@ -72,7 +159,7 @@ omec-control-plane:
     #     port: 38412
 
     sctplb:
-      deploy: false
+      deploy: true
       podAnnotations:
         field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
       serviceType: ClusterIP
@@ -158,9 +245,9 @@ omec-control-plane:
     # directly provided through Helm Charts
     amf:
       deploy: true
-      serviceType: NodePort
-      ngapp:
-        nodePort: 30071
+      serviceType: ClusterIP
+      #ngapp:
+       # nodePort: 30071
       cfgFiles:
         amfcfg.yaml:
           configuration:
@@ -647,6 +734,12 @@ omec-control-plane:
           configuration:
             enableAuthentication: false
             spec-compliant-sdf: false
+            mongodb:                    # Configuración de la base de datos MongoDB
+              name: "aether"              # (string) Nombre de la base de datos principal
+              url: "mongodb://mongodb-arbiter-headless" # (string) URL de conexión a MongoDB
+              authKeysDbName: "authentication"   # (string) Nombre de la base de datos de llaves de autenticación
+              authUrl: "mongodb://mongodb-arbiter-headless" # (string) URL de autenticación
+              checkReplica: true
             # webui-tls:
             #   pem: /var/run/certs/tls.crt
             #   key: /var/run/certs/tls.key
@@ -671,7 +764,7 @@ omec-sub-provision:
           configuration:
             provision-network-slice: True # if enabled, Device Groups & Slices configure by simapp
             sub-provision-endpt:
-              addr: webui  # subscriber configuation endpoint.
+              addr: web # subscriber configuation endpoint.
             # sub-proxy-endpt: # used if subscriber proxy is enabled in the ROC.
             #   addr: subscriber-proxy.aether-roc.svc.cluster.local
             #   port: 5000
