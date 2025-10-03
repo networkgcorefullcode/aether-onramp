@@ -82,6 +82,11 @@ omec-control-plane:
                 key: /var/run/certs/tls.key # AMF TLS Private key
                 pem: /var/run/certs/tls.crt # AMF TLS Certificate
             nrfUri: "http://nrf:29510" # a valid URI of NRF
+            kafkaInfo:
+              enableKafka: true
+              brokerUri: "kafka-headless"
+              brokerPort: 9092
+              topicName: "sdcore-data-source-amf"
     smf:
       cfgFiles:
         # https://github.com/omec-project/smf/blob/main/config/uerouting.yaml
@@ -97,6 +102,11 @@ omec-control-plane:
           configuration:
             smfDBName: sdcore_smf
             enableDBStore: true
+            kafkaInfo:
+              enableKafka: false
+              brokerUri: "kafka-headless"
+              brokerPort: 9092
+              topicName: "sdcore-data-source-amf"
 
     webui:
       serviceType: NodePort
