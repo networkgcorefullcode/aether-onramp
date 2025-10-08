@@ -105,9 +105,12 @@ lint-yaml:
       when: always
 
 # Validar sintaxis con yq
-validate-values-syntax:
+validate-yaml-syntax:
   stage: validate
   image: 192.168.12.15:8083/yq-go-alpine:3.19
+  variables:
+    GIT_STRATEGY: fetch
+    GIT_DEPTH: "50"
   tags:
     - aether-runner
   # before_script:
@@ -115,15 +118,84 @@ validate-values-syntax:
   #   - wget -qO /usr/local/bin/yq-go https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
   #   - chmod +x /usr/local/bin/yq-go
   script:
-    - echo "Validando sintaxis de values.yaml"
-    - yq-go e . deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
+    - |
+      set -euo pipefail
+      echo "=== validate-values-syntax: detectando archivos YAML modificados ===" >&2
+
+      get_changed_yaml_files() {
+        if [ "${CI_PIPELINE_SOURCE:-}" = "merge_request_event" ]; then
+          echo "Pipeline: merge_request_event" >&2
+          if [ -n "${CI_MERGE_REQUEST_DIFF_BASE_SHA:-}" ] && [ "${CI_MERGE_REQUEST_DIFF_BASE_SHA}" != "0000000000000000000000000000000000000000" ]; then
+            git fetch --no-tags --depth=50 origin "${CI_COMMIT_SHA}" || true
+            git diff --name-only -z "${CI_MERGE_REQUEST_DIFF_BASE_SHA}" "${CI_COMMIT_SHA}" \
+              | tr '\0' '\n' \
+              | grep -E '\.ya?ml$' \
+              | grep -vE '^(.*/)?\.gitlab-ci\.yml$' || true
+          else
+            echo "No está CI_MERGE_REQUEST_DIFF_BASE_SHA -> fetch de origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" >&2
+            git fetch --no-tags --depth=50 origin "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" || true
+            git diff --name-only -z "origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}...${CI_COMMIT_SHA}" \
+              | tr '\0' '\n' \
+              | grep -E '\.ya?ml$' \
+              | grep -vE '^(.*/)?\.gitlab-ci\.yml$' || true
+          fi
+        elif [ "${CI_PIPELINE_SOURCE:-}" = "push" ]; then
+          echo "Pipeline: push" >&2
+            git diff --name-only -z "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" \
+              | tr '\0' '\n' \
+              | grep -E '\.ya?ml$' \
+              | grep -vE '^(.*/)?\.gitlab-ci\.yml$' || true
+        else
+          git ls-files -z | tr '\0' '\n' | grep -E '\.ya?ml$' | grep -vE '^(.*/)?\.gitlab-ci\.yml$' || true
+        fi
+      }
+
+      CHANGED_FILES=$(get_changed_yaml_files)
+      if [ -z "${CHANGED_FILES:-}" ]; then
+        echo "No se detectaron archivos YAML modificados. Salimos con éxito." >&2
+        exit 0
+      fi
+
+      echo "Archivos YAML cambiados:" >&2
+      echo "${CHANGED_FILES}" | sed 's/^/  - /' >&2
+
+      FAIL=0
+      while IFS= read -r file; do
+        [ -z "$file" ] && continue
+        # Excluir manualmente .gitlab-ci.yml por seguridad extra
+        if [ "$(basename "$file")" = ".gitlab-ci.yml" ]; then
+          echo "Saltando .gitlab-ci.yml (excluido)" >&2
+          continue
+        fi
+        if [ ! -f "$file" ]; then
+          echo "Aviso: '$file' no existe en el workspace (se omite)." >&2
+          continue
+        fi
+        echo ">>> yq-go e . $file (validar sintaxis)" >&2
+        if ! yq-go e . "$file" >/dev/null 2>&1; then
+          echo "Error de sintaxis YAML en: $file" >&2
+          FAIL=1
+        fi
+      done <<EOF
+      ${CHANGED_FILES}
+      EOF
+
+      if [ "$FAIL" -ne 0 ]; then
+        echo "Errores de sintaxis detectados por yq-go." >&2
+        exit 1
+      fi
+
+      echo "yq-go: sintaxis OK para todos los archivos cambiados." >&2
+
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - deps/5gc/roles/core/templates/**/*
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+        - "**/*.yml"
+        - "**/*.yaml"
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "update-pipeline")'
       changes:
-        - deps/5gc/roles/core/templates/**/*
+        - "**/*.yml"
+        - "**/*.yaml"
       when: always
 
 helm-dry-run-on-mr:
@@ -176,7 +248,7 @@ helm-dry-run-on-mr:
 render-and-commit-gitops-values:
   stage: render-and-commit
   needs:
-    - validate-values-syntax
+    - validate-yaml-syntax
     - helm-dry-run-on-mr
   tags:
     - aether-runner
