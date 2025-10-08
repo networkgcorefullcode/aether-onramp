@@ -19,16 +19,16 @@ group_rke2_config:
   kube-proxy-arg:
     - --metrics-bind-address=0.0.0.0:10249
     - --proxy-mode=ipvs
-  kube-proxy-image: 192.168.12.15:8083/kube-proxy-new-ipset:ipset-7.23.v4
-    #- --feature-gates=RemoveSelfLink=false
-    #- --v=4
-    #- --ipvs-strict-arp=true
-    #- --feature-gates=SCTPSupport=true
-    #- --enable-sctp-support=true
-    ###
-    #para modo iptables
-    #- --conntrack-max-per-core=131072 # Aumentar conexiones concurrentes (N2/N4)
-    #- --iptables-sync-period=30s      # Sincronización más frecuente
+  #kube-proxy-image: 192.168.12.15:8083/kube-proxy-new-ipset:ipset-7.23.v4
+  #- --feature-gates=RemoveSelfLink=false
+  #- --v=4
+  #- --ipvs-strict-arp=true
+  #- --feature-gates=SCTPSupport=true
+  #- --enable-sctp-support=true
+  ###
+  #para modo iptables
+  #- --conntrack-max-per-core=131072 # Aumentar conexiones concurrentes (N2/N4)
+  #- --iptables-sync-period=30s      # Sincronización más frecuente
   kube-apiserver-arg:
     - --service-node-port-range=2000-36767
     #- --feature-gates=SCTPSupport=true
