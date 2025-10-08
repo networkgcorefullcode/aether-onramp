@@ -42,3 +42,5 @@ rke2_version_majmin: ""
 rke2_version_rpm: ""
 rke2_package_state: "installed"
 rke2_systemd_env_config_file_path: ""
+
+target_kernel: "6.8.0-55-generic"
