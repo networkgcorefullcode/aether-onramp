@@ -98,7 +98,7 @@ lint-yaml:
       changes:
       - "**/*.yml"
       - "**/*.yaml"
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "update-pipeline")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
       changes:
       - "**/*.yml"
       - "**/*.yaml"
@@ -192,7 +192,7 @@ validate-yaml-syntax:
       changes:
         - "**/*.yml"
         - "**/*.yaml"
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "update-pipeline")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
       changes:
         - "**/*.yml"
         - "**/*.yaml"
