@@ -9,3 +9,5 @@
 
   roles:
     - aether
+
+### prueba de helm lint y template con los values renderizados

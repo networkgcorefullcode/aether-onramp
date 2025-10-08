@@ -4,25 +4,91 @@ stages:
   - dry-run
   - render-and-commit
 
-# Lint básico de YAMLs con yamllint
+# Basic lint of YAMLs with yamllint
 lint-yaml:
   stage: lint
   image:
     name: cytopia/yamllint:alpine
     entrypoint: [""]
+  variables:
+      # Runner makes fetch (necessary to compare with target branch)
+    GIT_STRATEGY: fetch
+    GIT_DEPTH: "50"
   tags:
     - aether-runner
+  before_script:
+    - apk add --no-cache git bash || true
   script:
-    - yamllint -c .yamllint deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+    - |
+      set -euo pipefail
+      echo "=== lint-yaml: detectando archivos YAML modificados ==="
+      # función para obtener YAMLs cambiados (devuelve una lista separada por newline)
+      get_changed_yaml_files() {
+        # Merge Request pipeline
+        if [ "${CI_PIPELINE_SOURCE:-}" = "merge_request_event" ]; then
+          echo "Pipeline: merge_request_event"
+          # Si GitLab nos da el SHA base del diff (a veces disponible) lo usamos
+          if [ -n "${CI_MERGE_REQUEST_DIFF_BASE_SHA:-}" ] && [ "${CI_MERGE_REQUEST_DIFF_BASE_SHA}" != "0000000000000000000000000000000000000000" ]; then
+            echo "Usando CI_MERGE_REQUEST_DIFF_BASE_SHA para diff..."
+            git fetch --no-tags --depth=50 origin "${CI_COMMIT_SHA}" || true
+            git diff --name-only -z "${CI_MERGE_REQUEST_DIFF_BASE_SHA}" "${CI_COMMIT_SHA}" | tr '\0' '\n' | grep -E '\.ya?ml$' || true
+          else
+            # fallback: fetch de la rama target y comparar
+            echo "No está CI_MERGE_REQUEST_DIFF_BASE_SHA -> fetch de origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
+            git fetch --no-tags --depth=50 origin "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" || true
+            git diff --name-only -z "origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}...${CI_COMMIT_SHA}" | tr '\0' '\n' | grep -E '\.ya?ml$' || true
+          fi
 
+        # Push pipeline
+        elif [ "${CI_PIPELINE_SOURCE:-}" = "push" ]; then
+          echo "Pipeline: push"
+            git diff --name-only -z "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" | tr '\0' '\n' | grep -E '\.ya?ml$' || true
+        
+        else
+          # Otros casos: guardamos archivos YAML modificados en workspace
+          git ls-files -z | tr '\0' '\n' | grep -E '\.ya?ml$' || true
+        fi
+      }
+
+      CHANGED_FILES=$(get_changed_yaml_files)
+      if [ -z "${CHANGED_FILES:-}" ]; then
+        echo "No se detectaron archivos YAML modificados. Salimos con éxito."
+        exit 0
+      fi
+
+      echo "Archivos YAML cambiados:"
+      echo "${CHANGED_FILES}" | sed 's/^/  - /'
+
+      # ejecutar yamllint en cada archivo (acumular fallo si alguno falla)
+      FAIL=0
+      while IFS= read -r file; do
+        [ -z "$file" ] && continue
+        if [ ! -f "$file" ]; then
+          echo "Aviso: el archivo '$file' no existe en el workspace (se omite)."
+          continue
+        fi
+        echo ">>> yamllint -c .yamllint $file"
+        yamllint -c .yamllint "$file" || FAIL=1
+      done <<EOF
+      ${CHANGED_FILES}
+      EOF
+
+      if [ "$FAIL" -ne 0 ]; then
+        echo "yamllint detectó errores."
+        exit 1
+      fi
+
+      echo "yamllint OK para todos los archivos cambiados."
   rules:
-  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    changes:
-      - deps/5gc/roles/core/templates/**/*
-  - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-    changes:
-      - deps/5gc/roles/core/templates/**/*
-    when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+      - "**/*.yml"
+      - "**/*.yaml"
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "update-pipeline")'
+      changes:
+      - "**/*.yml"
+      - "**/*.yaml"
+      when: always
 
 # Validar sintaxis con yq
 validate-values-syntax:
@@ -38,14 +104,13 @@ validate-values-syntax:
     - echo "Validando sintaxis de values.yaml"
     - yq-go e . deps/5gc/roles/core/templates/sdcore-5g-values.yaml >/dev/null
   rules:
-  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    changes:
-      - deps/5gc/roles/core/templates/**/*
-  - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-    changes:
-      - deps/5gc/roles/core/templates/**/*
-    when: always
-
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - deps/5gc/roles/core/templates/**/*
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+      changes:
+        - deps/5gc/roles/core/templates/**/*
+      when: always
 
 helm-dry-run-on-mr:
   stage: dry-run
@@ -94,7 +159,6 @@ helm-dry-run-on-mr:
         - deps/5gc/roles/core/templates/**/*
       when: always
 
-
 render-and-commit-gitops-values:
   stage: render-and-commit
   needs:
@@ -107,14 +171,14 @@ render-and-commit-gitops-values:
   #   - pip install --quiet "ansible<11"
   #   - apt update && apt install git -y
   script:
-    # Configuración de Git 
+    # Configuración de Git
     - echo "Configuring Git user..."
     - git config --global user.email "ci-bot@aether.local"
     - git config --global user.name "CI Bot"
     # Usamos CI_JOB_TOKEN para autenticarnos y poder hacer push
     - git remote set-url origin "https://$TOKEN_USER:$ONRAMP_TOKEN@$GITLAB_SERVER_URL/5g/aether.git"
 
-    # Preparar variables y rutas 
+    # Preparar variables y rutas
     - ENV_DIR="${CI_PROJECT_DIR}/environments/${CI_COMMIT_BRANCH}"
     - OUTPUT_FILE="${ENV_DIR}/5g-core-values.yaml"
     - echo "Rendering values for branch '${CI_COMMIT_BRANCH}' into '${OUTPUT_FILE}'"
