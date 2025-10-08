@@ -84,3 +84,6 @@ amp:
     helm:
       chart_ref: rancher/rancher-monitoring-crd
       chart_version: 101.0.0+up19.0.3
+
+### prueba de helm lint y template con los values renderizados
+# Validar sintaxis con yq
