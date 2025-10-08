@@ -1,4 +1,4 @@
-#### Variables #####
+#### Variables ####
 
 export ROOT_DIR ?= $(PWD)
 export K8S_ROOT_DIR ?= $(ROOT_DIR)
