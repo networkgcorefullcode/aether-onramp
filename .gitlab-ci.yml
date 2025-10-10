@@ -107,7 +107,7 @@ lint-yaml:
 # Validar sintaxis con yq
 validate-yaml-syntax:
   stage: validate
-  image: mikefarah/yq-go:4.44.5-r5
+  image: mikefarah/yq-go:4.44.1
   variables:
     GIT_STRATEGY: fetch
     GIT_DEPTH: "50"
