@@ -407,7 +407,7 @@ omec-control-plane:
               authKeysDbName: "authentication"   # (string) Nombre de la base de datos de llaves de autenticación
               authUrl: "mongodb://mongodb-arbiter-headless" # (string) URL de autenticación
               checkReplica: true
-            ssm-uri: https://192.168.12.16
+            ssm-uri: https://192.168.12.16:9000
             allow-ssm: true
 
 # Override values for omec-sub-provision (subscriber) Helm Chart
