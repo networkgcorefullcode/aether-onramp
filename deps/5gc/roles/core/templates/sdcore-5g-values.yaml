@@ -44,10 +44,10 @@ omec-control-plane:
 
   config:
     logger:
-        NRF:
-          debugLevel: debug
-        WEBUI:
-          debugLevel: debug
+      NRF:
+        debugLevel: debug
+      WEBUI:
+        debugLevel: debug
 
     mongodb:
       name: aether
@@ -154,12 +154,12 @@ omec-control-plane:
               imsVoPS: 1 # IMS voice over PS session indicator (uinteger, range: 0~1)
             security:
               integrityOrder:
-                 - NIA3
-                 - NIA2
+                - NIA3
+                - NIA2
             #     - NIA0
               cipheringOrder:
-                 - NEA3
-                 - NEA2
+                - NEA3
+                - NEA2
             #     - NEA0
             sbi: # Service-based interface information
               scheme: http # the protocol for sbi (http or https)
@@ -212,8 +212,8 @@ omec-control-plane:
                 key: /var/run/certs/tls.key # UDR TLS Private key
                 pem: /var/run/certs/tls.crt # UDR TLS Certificate
             mongodb:
-               name: "aether"                      # Nombre de la base de datos
-               url: mongodb://mongodb-arbiter-headless  # URL de conexión con credenciales y host:puerto
+              name: "aether"                      # Nombre de la base de datos
+              url: mongodb://mongodb-arbiter-headless  # URL de conexión con credenciales y host:puerto
             nrfUri: "http://nrf:29510"
             webuiUri: "http://webui:5001"
           logger:
@@ -228,7 +228,7 @@ omec-control-plane:
         udmcfg.yaml:
           configuration:
             enableDBStore: true
-            ssm: 
+            ssm:
               enable: true
               scheme: https
               host: 192.168.12.16
@@ -242,12 +242,12 @@ omec-control-plane:
                 pem: /var/run/certs/tls.crt # UDM TLS Certificate
             nrfUri: "http://nrf:29510"
             plmnList:
-            - plmnId:
-                mcc: "208"
-                mnc: "93"
-            - plmnId:
-                mcc: "222"
-                mnc: "88"
+              - plmnId:
+                  mcc: "208"
+                  mnc: "93"
+              - plmnId:
+                  mcc: "222"
+                  mnc: "88"
             enableNrfCaching: true
             nrfCacheEvictionInterval: 900
             webuiUri: "http://webui:5001"
@@ -291,10 +291,10 @@ omec-control-plane:
             nrfUri: http://nrf:29510
             webuiUri: http://webui:5001
             nsiList:
-            - nsiInformationList:
-              - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
-                nsiId: 22
-              snssai:
+              - nsiInformationList:
+                  - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+                    nsiId: 22
+                snssai:
                 sd: "010203"
                 sst: 1
             nssfName: NSSF
@@ -309,8 +309,6 @@ omec-control-plane:
             serviceNameList:
               - nnssf-nsselection
               - nnssf-nssaiavailability
-
-
 
     pcf:
       deploy: true
@@ -336,15 +334,14 @@ omec-control-plane:
                 key: /var/run/certs/tls.key # PCF TLS Private key
                 pem: /var/run/certs/tls.crt # PCF TLS Certificate
             serviceList:
-            - serviceName: npcf-am-policy-control
-            - serviceName: npcf-smpolicycontrol
-              suppFeat: 3fff
-            - serviceName: npcf-bdtpolicycontrol
-            - serviceName: npcf-policyauthorization
-              suppFeat: 3
-            - serviceName: npcf-eventexposure
-            - serviceName: npcf-ue-policy-control
-
+              - serviceName: npcf-am-policy-control
+              - serviceName: npcf-smpolicycontrol
+                suppFeat: 3fff
+              - serviceName: npcf-bdtpolicycontrol
+              - serviceName: npcf-policyauthorization
+                suppFeat: 3
+              - serviceName: npcf-eventexposure
+              - serviceName: npcf-ue-policy-control
 
     nrf:
       deploy: true
@@ -437,25 +434,25 @@ omec-sub-provision:
             # You can have any number of subscriber ranges
             # This block is always necessary to establish range(s) of valid IMSIs
             subscribers:
-            - ueId-start: "208930100007487"
-              ueId-end: "208930100007500"
-              plmnId: "20893"
-              opc: "981d464c7c52eb6e5036234984ad0bcf"
-              op: ""
-              key: "5122250214c33e723a5dd523fc145fc0"
-              sequenceNumber: "16f3b3f70fc2"
-            - ueId-start: "208930100007501"
-              ueId-end: "208930100007586"
-              plmnId: "20893"
-              opc: "981d464c7c52eb6e5036234984ad0bcf"
-              op: ""
-              key: "5122250214c33e723a5dd523fc145fc0"
-              sequenceNumber: "16f3b3f70fc2"
+              - ueId-start: "208930100007487"
+                ueId-end: "208930100007500"
+                plmnId: "20893"
+                opc: "981d464c7c52eb6e5036234984ad0bcf"
+                op: ""
+                key: "5122250214c33e723a5dd523fc145fc0"
+                sequenceNumber: "16f3b3f70fc2"
+              - ueId-start: "208930100007501"
+                ueId-end: "208930100007586"
+                plmnId: "20893"
+                opc: "981d464c7c52eb6e5036234984ad0bcf"
+                op: ""
+                key: "5122250214c33e723a5dd523fc145fc0"
+                sequenceNumber: "16f3b3f70fc2"
 
             # Configure Device Groups (ignored if provision-network-slice is disabled)
             device-groups:
-            - name:  "gnbsim-user-group1"
-              imsis:
+              - name: "gnbsim-user-group1"
+                imsis:
                 - "208930100007487"
                 - "208930100007488"
                 - "208930100007489"
@@ -570,7 +567,7 @@ omec-sub-provision:
                   dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
                   dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
                   bitrate-unit: Mbps          # Unit for above QoS rates
-                  traffic-class:              # Default bearer QCI/ARP (not used in 5G)
+                  traffic-class: # Default bearer QCI/ARP (not used in 5G)
                     name: "platinum"
                     qci: 9
                     arp: 6
@@ -587,18 +584,18 @@ omec-sub-provision:
                 sd: "010203"
                 sst: 1
               site-device-group:
-              - "gnbsim-user-group1"   # All UEs in this device-group are assigned to this slice
+                - "gnbsim-user-group1"   # All UEs in this device-group are assigned to this slice
               # Applicaiton filters control what each user can access.
               # Default, allow access to all applications
               application-filtering-rules:
-              - rule-name: "ALLOW-ALL"
-                priority: 250
-                action: "permit"
-                endpoint: "0.0.0.0/0"
-                app-mbr-uplink: 1 #1Mbps
-                app-mbr-downlink: 5 #5Mbps
-                bitrate-unit: Mbps
-                traffic-class : #if same as APN-AMBR then its default bearer rule
+                - rule-name: "ALLOW-ALL"
+                  priority: 250
+                  action: "permit"
+                  endpoint: "0.0.0.0/0"
+                  app-mbr-uplink: 1 #1Mbps
+                  app-mbr-downlink: 5 #5Mbps
+                  bitrate-unit: Mbps
+                  traffic-class: #if same as APN-AMBR then its default bearer rule
                   name: "silver"
                   qci: 9
                   arp: 6
@@ -607,10 +604,10 @@ omec-sub-provision:
               site-info:
                 # Provide gNBs and UPF details and also PLMN for the site
                 gNodeBs:
-                - name: "gnb1"
-                  tac: 1
-                - name: "gnb2"
-                  tac: 2
+                  - name: "gnb1"
+                    tac: 1
+                  - name: "gnb2"
+                    tac: 2
                 plmn:
                   mcc: "208"
                   mnc: "93"
