@@ -565,7 +565,7 @@ omec-sub-provision:
               ue-ip-pool: {{ core.upf.default_upf.ue_ip_pool }}  # IP address pool for subscribers
               ue-dnn-qos:
                 dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
-                dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
+                dnn-mbr-uplink: 1000      # UE level uplink QoS (Maximum bit rate per UE)
                 bitrate-unit: Mbps          # Unit for above QoS rates
                 traffic-class: # Default bearer QCI/ARP (not used in 5G)
                   name: "platinum"
@@ -579,42 +579,42 @@ omec-sub-provision:
 
             # Configure Network Slices (ignored if provision-network-slice is disabled)
             network-slices:
-            - name: "default"      # can be any unique slice name
-              slice-id:        # must match with slice configured in gNB, UE
-                sd: "010203"
-                sst: 1
-              site-device-group:
-                - "gnbsim-user-group1"   # All UEs in this device-group are assigned to this slice
-              # Applicaiton filters control what each user can access.
-              # Default, allow access to all applications
-              application-filtering-rules:
-                - rule-name: "ALLOW-ALL"
-                  priority: 250
-                  action: "permit"
-                  endpoint: "0.0.0.0/0"
-                  app-mbr-uplink: 1 #1Mbps
-                  app-mbr-downlink: 5 #5Mbps
-                  bitrate-unit: Mbps
-                  traffic-class: #if same as APN-AMBR then its default bearer rule
-                  name: "silver"
-                  qci: 9
-                  arp: 6
-                  pdb: 300
-                  pelr: 6
-              site-info:
-                # Provide gNBs and UPF details and also PLMN for the site
-                gNodeBs:
-                  - name: "gnb1"
-                    tac: 1
-                  - name: "gnb2"
-                    tac: 2
-                plmn:
-                  mcc: "208"
-                  mnc: "93"
-                site-name: "enterprise"
-                upf:
-                  upf-name: "upf"  # associated UPF for this slice. One UPF per Slice.
-                  upf-port: 8805
+              - name: "default"      # can be any unique slice name
+                slice-id:        # must match with slice configured in gNB, UE
+                  sd: "010203"
+                  sst: 1
+                site-device-group:
+                  - "gnbsim-user-group1"   # All UEs in this device-group are assigned to this slice
+            # Applicaiton filters control what each user can access.
+            # Default, allow access to all applications
+            application-filtering-rules:
+              - rule-name: "ALLOW-ALL"
+                priority: 250
+                action: "permit"
+                endpoint: "0.0.0.0/0"
+                app-mbr-uplink: 1 #1Mbps
+                app-mbr-downlink: 5 #5Mbps
+                bitrate-unit: Mbps
+                traffic-class: #if same as APN-AMBR then its default bearer rule
+                name: "silver"
+                qci: 9
+                arp: 6
+                pdb: 300
+                pelr: 6
+            site-info:
+              # Provide gNBs and UPF details and also PLMN for the site
+              gNodeBs:
+                - name: "gnb1"
+                  tac: 1
+                - name: "gnb2"
+                  tac: 2
+              plmn:
+                mcc: "208"
+                mnc: "93"
+              site-name: "enterprise"
+              upf:
+                upf-name: "upf"  # associated UPF for this slice. One UPF per Slice.
+                upf-port: 8805
 
 # Override values for omec-user-plane Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/bess-upf/values.yaml
