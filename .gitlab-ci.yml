@@ -15,7 +15,7 @@ lint-yaml:
     GIT_STRATEGY: fetch
     GIT_DEPTH: "50"
   tags:
-    - aether-runner
+    - doks
   before_script:
     - apk add --no-cache git bash || true
   script:
@@ -107,12 +107,12 @@ lint-yaml:
 # Validar sintaxis con yq
 validate-yaml-syntax:
   stage: validate
-  image: 192.168.12.15:8083/yq-go-alpine:3.19
+  image: mikefarah/yq:4.44.1
   variables:
     GIT_STRATEGY: fetch
     GIT_DEPTH: "50"
   tags:
-    - aether-runner
+    - doks
   # before_script:
   #   - apk add --no-cache git bash wget
   #   - wget -qO /usr/local/bin/yq-go https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
