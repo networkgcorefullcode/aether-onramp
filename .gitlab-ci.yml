@@ -201,12 +201,12 @@ validate-yaml-syntax:
 helm-dry-run-on-mr:
   stage: dry-run
   tags:
-    - aether-runner
-  image: 192.168.12.15:8083/onramp-render-template:1.0
-  # before_script:
-  #   - pip install --quiet "ansible<11"
-  #   - apt-get update && apt-get install -y curl git
-  #   - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    - doks
+  image: python:3.12-slim
+  before_script:
+    - pip install --quiet "ansible<11"
+    - apt-get update && apt-get install -y curl git
+    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
   script:
     # Definir la ruta absoluta para el archivo temporal
     #  $CI_PROJECT_DIR para garantizar que la ruta es inequívoca.
@@ -251,11 +251,11 @@ render-and-commit-gitops-values:
     - validate-yaml-syntax
     - helm-dry-run-on-mr
   tags:
-    - aether-runner
-  image: 192.168.12.15:8083/onramp-render-template:1.0
-  # before_script:
-  #   - pip install --quiet "ansible<11"
-  #   - apt update && apt install git -y
+    - doks
+  image: python:3.12-slim
+  before_script:
+    - pip install --quiet "ansible<11"
+    - apt update && apt install git -y
   script:
     # Configuración de Git
     - echo "Configuring Git user..."
