@@ -16,6 +16,7 @@ omec-control-plane:
 5g-control-plane:
   enable5G: true
   images:
+    # repository: "ghcr.io/networkgcorefullcode/"
     repository: "192.168.12.15:8083/"
     tags:
       amf: omecproject/5gc-amf:2.0.1-dev
@@ -415,6 +416,7 @@ omec-control-plane:
 omec-sub-provision:
   enable: true
   images:
+    # repository: "ghcr.io/networkgcorefullcode/"
     repository: "192.168.12.15:8083/"
     tags:
       simapp: omecproject/simapp:1.6.8-dev
@@ -627,8 +629,9 @@ omec-user-plane:
   resources:
     enabled: false
   images:
+    # repository: "registry.aetherproject.org/proxy/"
     repository: "192.168.12.15:8082/"
-     #tags:
+    # tags:
        #bess: omecproject/upf-epc-bess:v1.2.1-new-dev
        #pfcpiface: omecproject/upf-epc-pfcpiface:v1.2.1-new-dev
       # tools: omecproject/busybox:stable
