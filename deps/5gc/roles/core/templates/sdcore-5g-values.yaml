@@ -22,7 +22,7 @@ omec-control-plane:
       amf: omecproject/5gc-amf:2.0.1-dev
       ausf: omecproject/5gc-ausf:2.0.3-dev
       smf: omecproject/5gc-smf:3.0.0-dev
-      udm: omecproject/5gc-udm:2.2.1-dev
+      udm: omecproject/5gc-udm:2.2.3-dev
       udr: omecproject/5gc-udr:2.1.5-dev
       pcf: omecproject/5gc-pcf:2.0.1-dev
       nrf: omecproject/5gc-nrf:2.0.3-dev
