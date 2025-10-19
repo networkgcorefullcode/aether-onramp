@@ -117,7 +117,7 @@ omec-control-plane:
         port: 9000
         #nodePort: 30088
       ngapp:
-        externalIp: {{ core.amf.ip }}
+        externalIp: 192.168.12.11
         port: 38412
         #nodePort: 30071
       cfgFiles:
