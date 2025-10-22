@@ -413,11 +413,6 @@ omec-control-plane:
               ssm-uri: https://192.168.12.16:9000
               allow-ssm: true
               tls-insecure: true
-              ssm-synchronize:
-                enable: true
-                interval-minute: 30
-                max-keys-create: 5
-                delete-missing: true
 
 # Override values for omec-sub-provision (subscriber) Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml
