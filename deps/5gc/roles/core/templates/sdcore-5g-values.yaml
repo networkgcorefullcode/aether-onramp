@@ -26,7 +26,7 @@ omec-control-plane:
       udr: omecproject/5gc-udr:2.1.5-dev
       pcf: omecproject/5gc-pcf:2.0.1-dev
       nrf: omecproject/5gc-nrf:2.0.3-dev
-      webui: omecproject/5gc-webui:1.13.4-dev
+      webui: omecproject/5gc-webui:1.13.5-dev
       sctplb: omecproject/sctplb:1.6.6-dev
       nssf: omecproject/5gc-nssf:1.7.0-dev
       upfadapter: omecproject/upfadapter:2.0.6-dev
