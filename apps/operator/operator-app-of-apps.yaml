@@ -11,7 +11,7 @@ spec:
 
     #  Apunta a la rama y la carpeta donde viven los manifiestos de las apps.
     targetRevision: dev
-    path: apps
+    path: apps/operator
 
   destination:
     server: 'https://kubernetes.default.svc'
@@ -20,3 +20,4 @@ spec:
     automated:
       prune: true
       selfHeal: true
+      
