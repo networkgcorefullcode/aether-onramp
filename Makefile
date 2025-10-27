@@ -12,6 +12,7 @@ export OAI_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/oai
 export SRSRAN_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/srsran
 export UERANSIM_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/ueransim
 export K8S_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/k8s
+export ARGOCD_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/argocd
 
 export ANSIBLE_NAME ?= ansible-aether
 export ANSIBLE_CONFIG ?= $(AETHER_ROOT_DIR)/ansible.cfg
@@ -64,6 +65,10 @@ aether-gnbsim-run: gnbsim-simulator-run
 aether-add-upfs: 5gc-upf-install
 aether-remove-upfs: 5gc-upf-uninstall
 aether-ueransim-run: ueransim-run
+
+#### Provision ArgoCD ####
+aether-argocd-install: argocd-install
+aether-argocd-uninstall: argocd-uninstall
 
 # Rules:
 #	amp-install: roc-install roc-load monitor-install monitor-load
@@ -132,3 +137,4 @@ include $(4GC_ROOT_DIR)/Makefile
 include $(AMP_ROOT_DIR)/Makefile
 include $(SDRAN_ROOT_DIR)/Makefile
 include $(UERANSIM_ROOT_DIR)/Makefile
+include $(ARGOCD_ROOT_DIR)/Makefile
