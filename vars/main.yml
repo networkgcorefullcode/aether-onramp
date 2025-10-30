@@ -13,7 +13,7 @@ k8s:
 
 core:
   standalone: true # set to false to place under control of ROC
-  data_iface: eth0
+  data_iface: ens160
   values_file: "deps/5gc/roles/core/templates/sdcore-5g-values.yaml"
   ran_subnet: "192.168.8.0/21" # set to empty string to get subnet from 'data_iface',the given value is for Lab Environment
   helm:
@@ -32,7 +32,7 @@ core:
         core: "192.168.250.3"
       ue_ip_pool: "192.168.100.0/24"
   amf:
-    ip: "192.168.12.11"
+    ip: "192.168.10.50"
 
 ueransim:
   gnb:
