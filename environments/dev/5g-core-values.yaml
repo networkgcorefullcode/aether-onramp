@@ -654,7 +654,7 @@ omec-user-plane:
       routes:
         - to: 192.168.12.11
           via: 169.254.1.1
-        - to: 192.168.0.0/16
+        - to: 192.168.97.0/16
           via: 192.168.252.1
       enb:
         subnet: 192.168.8.0/21 # Subnet for the gNB network
