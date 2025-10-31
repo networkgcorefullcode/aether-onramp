@@ -675,6 +675,7 @@ omec-user-plane:
           mode: af_packet
           hwcksum: true
           log_level: "info"
+          workers: 1
           measure_upf: true
           measure_flow: true
           gtppsc: true                   # Extension header enabled in 5G.
