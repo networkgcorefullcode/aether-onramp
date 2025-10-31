@@ -654,7 +654,7 @@ omec-user-plane:
       routes:
         - to: {{ core.amf.ip }}
           via: 169.254.1.1
-        - to: 192.168.0.0/16
+        - to: 192.168.97.0/16
           via: 192.168.252.1
       enb:
         subnet: {{ ran_subnet }} # Subnet for the gNB network
