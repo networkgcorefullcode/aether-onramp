@@ -48,7 +48,7 @@ omec-control-plane:
       NRF:
         debugLevel: debug
       WEBUI:
-        debugLevel: debug
+        debugLevel: info
 
     mongodb:
       name: aether
