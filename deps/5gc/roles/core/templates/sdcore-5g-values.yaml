@@ -259,7 +259,7 @@ omec-control-plane:
               - nudm-ee
               - nudm-pp
             ssm:
-              enable: true
+              enable: false
               host: https://192.168.12.16:9000
               tls_insecure: true
           info:
@@ -411,7 +411,7 @@ omec-control-plane:
               checkReplica: true
             ssm:
               ssm-uri: https://192.168.12.16:9000
-              allow-ssm: true
+              allow-ssm: false
               tls-insecure: true
               ssm-synchronize:
                 enable: true
