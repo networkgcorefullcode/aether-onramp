@@ -1,6 +1,3 @@
-
-#### adapt properlly the path and targetRevision fields below ####
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -10,7 +7,7 @@ spec:
   # El proyecto por defecto donde viven los recursos de la App
   project: default
 
-# SECCIÓN 'source' PRINCIPAL
+  # SECCIÓN 'source' PRINCIPAL
   sources:
     # El repositorio de Helm que contiene el CHART
     - chart: sd-core
@@ -18,7 +15,7 @@ spec:
       targetRevision: 3.0.0
       helm:
         valueFiles:
-          - $values-from-git/environments/dev/5g-core-values.yaml
+          - $values-from-git/environments/operator/5g-core-operator-values.yaml
         # postRenderer:
         #   command: ["./helm-patches/webui/post-render.sh"]
 
