@@ -19,18 +19,18 @@ omec-control-plane:
     # repository: "ghcr.io/networkgcorefullcode/"
     repository: "192.168.12.15:8083/"
     tags:
-      amf: ghcr.io/networkgcorefullcode/omecproject/5gc-amf:2.0.1-dev
-      ausf: ghcr.io/networkgcorefullcode/omecproject/5gc-ausf:2.0.3-dev
-      smf: ghcr.io/networkgcorefullcode/omecproject/5gc-smf:3.0.0-dev
-      udm: ghcr.io/networkgcorefullcode/omecproject/5gc-udm:2.3.1-dev
-      udr: ghcr.io/networkgcorefullcode/omecproject/5gc-udr:2.1.5-dev
-      pcf: ghcr.io/networkgcorefullcode/omecproject/5gc-pcf:2.0.1-dev
-      nrf: ghcr.io/networkgcorefullcode/omecproject/5gc-nrf:2.0.6-dev
-      webui: ghcr.io/networkgcorefullcode/omecproject/5gc-webui:1.14.1-dev
-      sctplb: ghcr.io/networkgcorefullcode/omecproject/sctplb:1.6.6-dev
-      nssf: ghcr.io/networkgcorefullcode/omecproject/5gc-nssf:1.7.0-dev
-      upfadapter: ghcr.io/networkgcorefullcode/omecproject/upfadapter:2.0.6-dev
-      metricfunc: ghcr.io/networkgcorefullcode/omecproject/metricfunc:rel-1.6.2
+      amf: omecproject/5gc-amf:2.0.1-dev
+      ausf: omecproject/5gc-ausf:2.0.3-dev
+      smf: omecproject/5gc-smf:3.0.0-dev
+      udm: omecproject/5gc-udm:2.3.1-dev
+      udr: omecproject/5gc-udr:2.1.5-dev
+      pcf: omecproject/5gc-pcf:2.0.1-dev
+      nrf: omecproject/5gc-nrf:2.0.6-dev
+      webui: omecproject/5gc-webui:1.14.1-dev
+      sctplb: omecproject/sctplb:1.6.6-dev
+      nssf: omecproject/5gc-nssf:1.7.0-dev
+      upfadapter: omecproject/upfadapter:2.0.6-dev
+      metricfunc: omecproject/metricfunc:rel-1.6.2
     # refer to above Helm Chart to add other NF images
 
   kafka:
