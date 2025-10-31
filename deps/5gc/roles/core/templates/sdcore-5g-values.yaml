@@ -26,7 +26,7 @@ omec-control-plane:
       udr: ghcr.io/networkgcorefullcode/omecproject/5gc-udr:2.1.5-dev
       pcf: ghcr.io/networkgcorefullcode/omecproject/5gc-pcf:2.0.1-dev
       nrf: ghcr.io/networkgcorefullcode/omecproject/5gc-nrf:2.0.6-dev
-      webui: ghcr.io/networkgcorefullcode/omecproject/5gc-webui:1.14.0-dev
+      webui: ghcr.io/networkgcorefullcode/omecproject/5gc-webui:1.14.1-dev
       sctplb: ghcr.io/networkgcorefullcode/omecproject/sctplb:1.6.6-dev
       nssf: ghcr.io/networkgcorefullcode/omecproject/5gc-nssf:1.7.0-dev
       upfadapter: ghcr.io/networkgcorefullcode/omecproject/upfadapter:2.0.6-dev
