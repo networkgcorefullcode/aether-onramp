@@ -118,6 +118,7 @@
 
 - name: Start all other rke2 nodes
   ansible.builtin.include_tasks: other_nodes.yml
+  when: inventory_hostname != groups['rke2_servers'][0]
 
 - name: Configure kubectl,crictl,ctr
   ansible.builtin.include_tasks: utilities.yml
