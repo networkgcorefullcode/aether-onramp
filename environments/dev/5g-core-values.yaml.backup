@@ -17,7 +17,7 @@ omec-control-plane:
   enable5G: true
   images:
     # repository: "ghcr.io/networkgcorefullcode/"
-    repository: "ghcr.io/networkgcorefullcode/"
+    repository: "192.168.12.15:8083/"
     tags:
       amf: omecproject/5gc-amf:2.0.1-dev
       ausf: omecproject/5gc-ausf:2.0.3-dev
@@ -25,8 +25,8 @@ omec-control-plane:
       udm: omecproject/5gc-udm:2.3.1-dev
       udr: omecproject/5gc-udr:2.1.5-dev
       pcf: omecproject/5gc-pcf:2.0.1-dev
-      nrf: omecproject/5gc-nrf:2.0.5-dev
-      webui: omecproject/5gc-webui:1.14.0-dev
+      nrf: omecproject/5gc-nrf:2.0.6-dev
+      webui: omecproject/5gc-webui:1.14.1-dev
       sctplb: omecproject/sctplb:1.6.6-dev
       nssf: omecproject/5gc-nssf:1.7.0-dev
       upfadapter: omecproject/upfadapter:2.0.6-dev
@@ -48,7 +48,7 @@ omec-control-plane:
       NRF:
         debugLevel: debug
       WEBUI:
-        debugLevel: debug
+        debugLevel: info
 
     mongodb:
       name: aether
@@ -117,7 +117,7 @@ omec-control-plane:
         port: 9000
         #nodePort: 30088
       ngapp:
-        externalIp: 192.168.10.50
+        externalIp: 192.168.12.11
         port: 38412
         #nodePort: 30071
       cfgFiles:
@@ -259,7 +259,7 @@ omec-control-plane:
               - nudm-ee
               - nudm-pp
             ssm:
-              enable: true
+              enable: false
               host: https://192.168.12.16:9000
               tls_insecure: true
           info:
@@ -411,7 +411,7 @@ omec-control-plane:
               checkReplica: true
             ssm:
               ssm-uri: https://192.168.12.16:9000
-              allow-ssm: true
+              allow-ssm: false
               tls-insecure: true
               ssm-synchronize:
                 enable: true
@@ -426,7 +426,7 @@ omec-sub-provision:
   enable: true
   images:
     # repository: "ghcr.io/networkgcorefullcode/"
-    repository: "ghcr.io/networkgcorefullcode/"
+    repository: "192.168.12.15:8083/"
     tags:
       simapp: omecproject/simapp:1.6.8-dev
 
@@ -436,7 +436,7 @@ omec-sub-provision:
         simapp.yaml:
           configuration:
             max-time-interval: 35
-            provision-network-slice: true # if enabled, Device Groups & Slices configure by simapp
+            provision-network-slice: True # if enabled, Device Groups & Slices configure by simapp
             sub-provision-endpt:
               addr: webui # subscriber configuation endpoint.
             # sub-proxy-endpt: # used if subscriber proxy is enabled in the ROC.
@@ -575,7 +575,7 @@ omec-sub-provision:
                 dnn: internet
                 dns-primary: "8.8.8.8"        # Value is sent to UE
                 mtu: 1460                     # Value is sent to UE when PDU Session Established
-                ue-ip-pool: 192.168.100.0/24 # IP address pool for subscribers
+                ue-ip-pool: 192.168.100.0/24  # IP address pool for subscribers
                 ue-dnn-qos:
                   dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
                   dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
@@ -639,7 +639,7 @@ omec-user-plane:
     enabled: false
   images:
     # repository: "registry.aetherproject.org/proxy/"
-    repository: "ghcr.io/networkgcorefullcode/"
+    repository: "192.168.12.15:8082/"
     # tags:
        #bess: omecproject/upf-epc-bess:v1.2.1-new-dev
        #pfcpiface: omecproject/upf-epc-pfcpiface:v1.2.1-new-dev
@@ -652,20 +652,22 @@ omec-user-plane:
       hugepage:
         enabled: false    # Should be enabled if DPDK is enabled
       routes:
-        - to: 192.168.10.50
+        - to: 192.168.12.11
           via: 169.254.1.1
+        - to: 192.168.97.0/16
+          via: 192.168.252.1
       enb:
-        subnet: 192.168.10.0/24 # Subnet for the gNB network
+        subnet: 192.168.8.0/21 # Subnet for the gNB network
       access:
         ipam: static
         cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
-        iface: ens160
+        iface: eth0
         gateway: 192.168.252.1
         ip: 192.168.252.3/24
       core:
         ipam: static
         cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
-        iface: ens160
+        iface: eth0
         gateway: 192.168.250.1
         ip: 192.168.250.3/24
       cfgFiles:
@@ -673,6 +675,7 @@ omec-user-plane:
           mode: af_packet
           hwcksum: true
           log_level: "info"
+          workers: 1
           measure_upf: true
           measure_flow: true
           gtppsc: true                   # Extension header enabled in 5G.
