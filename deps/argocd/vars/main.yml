@@ -1,0 +1,6 @@
+---
+
+kubeconfig_path: /home/fernando/.kube/config
+argocd_manifest_url: "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
+downloaded_manifest: "/tmp/argocd-install.yaml"
+kubectl_bin: /var/lib/rancher/rke2/bin/kubectl
