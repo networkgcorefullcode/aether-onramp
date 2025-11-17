@@ -640,6 +640,7 @@ omec-user-plane:
   images:
     # repository: "registry.aetherproject.org/proxy/"
     repository: "ghcr.io/networkgcorefullcode/"
+    pullSecrets: []
     # tags:
        #bess: omecproject/upf-epc-bess:v1.2.1-new-dev
        #pfcpiface: omecproject/upf-epc-pfcpiface:v1.2.1-new-dev
