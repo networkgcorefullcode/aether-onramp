@@ -645,6 +645,9 @@ omec-user-plane:
        #bess: omecproject/upf-epc-bess:v1.2.1-new-dev
        #pfcpiface: omecproject/upf-epc-pfcpiface:v1.2.1-new-dev
       # tools: omecproject/busybox:stable
+  bessd:
+    args:
+      - bessd -m 0 -f --grpc_url=0.0.0.0:10514
   config:
     upf:
       name: "oaisim"
