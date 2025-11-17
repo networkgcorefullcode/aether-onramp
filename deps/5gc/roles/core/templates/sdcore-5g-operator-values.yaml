@@ -380,11 +380,11 @@ omec-control-plane:
       urlport:
         port: 5000
         # Provide nodePort when serviceType is NodePort
-        nodePort: 35000
+        nodePort: 31000
       rest:
         port: 5001
         # Provide nodePort when serviceType is NodePort
-        nodePort: 35001
+        nodePort: 31001
       grpc:
         port: 9876
       ingress:
