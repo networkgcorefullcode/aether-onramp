@@ -18,6 +18,7 @@ export EXTRA_VARS ?= "@$(5GC_ROOT_DIR)/vars/main.yml"
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
 #### b. Provision k8s ####
+5gc-provision: 5gc-router-install 5gc-sriov-install
 5gc-install: 5gc-router-install 5gc-sriov-install 5gc-core-install
 5gc-uninstall: 5gc-core-uninstall 5gc-router-uninstall
 

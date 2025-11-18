@@ -31,6 +31,7 @@ aether-pingall:
 aether-k8s-install: k8s-install
 aether-k8s-uninstall: k8s-uninstall
 aether-5gc-install: 5gc-install
+aether-5gc-provision: 5gc-provision
 aether-5gc-uninstall: 5gc-uninstall
 aether-gnbsim-install: gnbsim-install
 aether-gnbsim-uninstall: gnbsim-uninstall

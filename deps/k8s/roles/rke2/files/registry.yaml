@@ -8,9 +8,9 @@ mirrors:
   "docker.io": # El nombre de tu registry tal como se usa en la imagen
     endpoint:
       - "http://192.168.12.15:8082" # Especificar explícitamente HTTP
-    "ghcr.io/networkgcorefullcode":
-      endpoint:
+  "ghcr.io/networkgcorefullcode":
+    endpoint:
       - "https://ghcr.io"
-    "registry.aetherproject.org/proxy/":
-      endpoint:
+  "registry.aetherproject.org/proxy/":
+    endpoint:
       - "https://registry.aetherproject.org"
