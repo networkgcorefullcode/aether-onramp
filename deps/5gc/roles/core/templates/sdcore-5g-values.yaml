@@ -114,6 +114,8 @@ omec-control-plane:
     webui:
       tlsSecretName: "webui-tls"
       credentialsSecretName: "webui-credentials"
+      ssm:
+        enable: false
       credentials:
         usernameKey: username
         passwordKey: password
@@ -166,7 +168,7 @@ omec-control-plane:
               syncUrl: http://roc-service:8080/sync
               enabled: false
             ssm:
-              ssm-uri: https://localhost:9000
+              ssm-uri: https://192.168.12.16:9000
               allow-ssm: false
               tls-insecure: true
               ssm-synchronize:
@@ -191,6 +193,8 @@ omec-control-plane:
       serviceType: ClusterIP
       credentialsSecretName: "udm-credentials"
       tlsSecretName: "udm-tls"
+      ssm:
+        enable: false
       credentials:
         usernameKey: username
         passwordKey: password
@@ -226,7 +230,7 @@ omec-control-plane:
               udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
             ssm:
               enable: false
-              host: https://localhost:9000
+              host: https://192.168.12.16:9000
               tls_insecure: true
               m-tls:
                 crt: /etc/udm/tls/tls.crt

@@ -217,6 +217,8 @@ config:
       port: 5001
       # Provide nodePort when serviceType is NodePort
       nodePort: 30002
+    ssm:
+      enable: false
     ingress:
       enabled: false
       hostname: aether.local
@@ -280,6 +282,8 @@ config:
     deploy: true
     #podAnnotations:
     serviceType: ClusterIP
+    ssm:
+      enable: false
     sbi:
       port: 29503
       # Provide nodePort when serviceType is NodePort
