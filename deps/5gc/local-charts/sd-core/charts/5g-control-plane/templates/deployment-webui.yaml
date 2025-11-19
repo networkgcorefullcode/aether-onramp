@@ -53,12 +53,12 @@ spec:
           value: release
       {{- end }}
       {{- if .Values.config.webui.useSecrets }}
-            - name: WEBCONSOLE_USERNAME
+            - name: SSM_SERVICE_ID
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.config.webui.credentialsSecretName }}
                   key: {{ .Values.config.webui.credentials.usernameKey | quote }}
-            - name: WEBCONSOLE_PASSWORD
+            - name: SSM_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.config.webui.credentialsSecretName }}

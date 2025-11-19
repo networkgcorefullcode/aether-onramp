@@ -66,12 +66,12 @@ spec:
           value: release
       {{- end }}
       {{- if .Values.config.udm.useSecrets }}
-            - name: UDM_USERNAME
+            - name: SSM_SERVICE_ID
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.config.udm.credentialsSecretName }}
                   key: {{ .Values.config.udm.credentials.usernameKey | quote }}
-            - name: UDM_PASSWORD
+            - name: SSM_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.config.udm.credentialsSecretName }}
