@@ -52,6 +52,18 @@ spec:
         - name: GIN_MODE
           value: release
       {{- end }}
+      {{- if .Values.config.webui.useSecrets }}
+            - name: WEBCONSOLE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.config.webui.credentialsSecretName }}
+                  key: {{ .Values.config.webui.credentials.usernameKey | quote }}
+            - name: WEBCONSOLE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.config.webui.credentialsSecretName }}
+                  key: {{ .Values.config.webui.credentials.passwordKey | quote }}
+      {{- end }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
         securityContext:
@@ -71,6 +83,11 @@ spec:
         - name: coredump
           mountPath: /tmp/coredump
       {{- end }}
+      {{- if .Values.config.udm.useSecrets }}
+            - name: udm-tls
+              mountPath: /etc/udm/tls
+              readOnly: true
+      {{- end }}
       volumes:
       - name: nf-config
         configMap:
@@ -83,5 +100,17 @@ spec:
       - name: coredump
         hostPath:
           path: {{ .Values.config.coreDump.path }}
+    {{- end }}
+    {{- if .Values.config.webui.useSecrets }}
+        - name: webui-tls
+          secret:
+            secretName: {{ .Values.config.webui.tlsSecretName }}
+            items:
+              - key: {{ .Values.config.webui.tlsSecretKeys.cert | quote }}
+                path: tls.crt
+              - key: {{ .Values.config.webui.tlsSecretKeys.key | quote }}
+                path: tls.key
+              - key: {{ .Values.config.webui.tlsSecretKeys.ca | quote }}
+                path: ca.crt
     {{- end }}
 {{- end }}
