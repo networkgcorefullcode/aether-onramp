@@ -65,7 +65,7 @@ spec:
         - name: GIN_MODE
           value: release
       {{- end }}
-      {{- if .Values.config.udm.useSecrets }}
+      {{- if .Values.config.udm.ssm.enable }}
             - name: SSM_SERVICE_ID
               valueFrom:
                 secretKeyRef:
@@ -91,7 +91,7 @@ spec:
         - name: certs
           mountPath: /var/run/certs
           readOnly: true
-      {{- if .Values.config.udm.useSecrets }}
+      {{- if .Values.config.udm.ssm.enable }}
         - name: udm-tls
           mountPath: /etc/udm/tls
           readOnly: true
@@ -108,7 +108,7 @@ spec:
       - name: certs
         secret:
           secretName: udm-certs
-      {{- if .Values.config.udm.useSecrets }}
+      {{- if .Values.config.udm.ssm.enable }}
         - name: udm-tls
           secret:
             secretName: {{ .Values.config.udm.tlsSecretName }}

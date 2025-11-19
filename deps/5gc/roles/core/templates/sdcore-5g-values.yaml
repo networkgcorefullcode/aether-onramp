@@ -109,6 +109,7 @@ omec-control-plane:
               topicName: "sdcore-data-source-amf"
 
     webui:
+      tlsSecretName: "webui-tls"
       credentialsSecretName: "webui-credentials"
       credentials:
         usernameKey: username
@@ -186,6 +187,7 @@ omec-control-plane:
       deploy: true
       serviceType: ClusterIP
       credentialsSecretName: "udm-credentials"
+      tlsSecretName: "udm-tls"
       credentials:
         usernameKey: username
         passwordKey: password
