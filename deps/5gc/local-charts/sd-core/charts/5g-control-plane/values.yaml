@@ -231,14 +231,50 @@ config:
           version: 1.0.0
           description: WebUI initial local configuration
         configuration:
+          # 5G mode
+          spec-compliant-sdf: false
+          enableAuthentication: false
+          send-pebble-notifications: false
+          # MongoDB configuration
+          mongodb:
+            name: aether
+            url: "mongodb://172.28.31.5:27017/?replicaSet=rs0&connectTimeoutMS=10000"
+            authKeysDbName: authentication
+            authUrl: "mongodb://172.28.31.5:27017/?replicaSet=rs0&connectTimeoutMS=10000"
+            webuiDbName: aether
+            webuiDbUrl: "mongodb://172.28.31.5:27017/?replicaSet=rs0&connectTimeoutMS=10000"
+            checkReplica: false
           enableAuthentication: false
           spec-compliant-sdf: false
-          # webui-tls:
-          #   pem: /var/run/certs/tls.crt
-          #   key: /var/run/certs/tls.key
-          # nfconfig-tls:
-          #   pem: /var/run/certs/tls.crt
-          #   key: /var/run/certs/tls.key
+          webui-tls:
+            pem: /var/run/certs/tls.crt
+            key: /var/run/certs/tls.key
+          nfconfig-tls:
+            pem: /var/run/certs/tls.crt
+            key: /var/run/certs/tls.key
+          managedByConfigPod:
+            syncUrl: http://roc-service:8080/sync
+            enabled: false
+          ssm:
+            ssm-uri: https://localhost:9000
+            allow-ssm: false
+            tls-insecure: true
+            ssm-synchronize:
+              enable: true
+              interval-minute: 30
+              max-keys-create: 5
+              delete-missing: true
+              max-sync-keys: 5
+              max-sync-users: 5
+              max-sync-rotations: 5
+            m-tls:
+              crt: /etc/webui/tls/tls.crt
+              key: /etc/webui/tls/tls.key
+              ca: /etc/webui/tls/ca.crt
+            # read in cascade if gcm is false then cbc is used if gcm is true cbc is ignored, both is false no encryption is used (disabled SSM jjjj)
+            is-encrypt-aes-gcm: true
+            is-encrypt-aes-cbc: false
+          metricsPort: ":8080"
 
   udm:
     deploy: true
@@ -255,8 +291,8 @@ config:
           version: 1.0.0
           description: UDM initial local configuration
         configuration:
-          nrfUri: http://nrf:29510
-          webuiUri: http://webui:5001
+          nrfUri: https://nrf:29510
+          webuiUri: https://webui:5001
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
           serviceList:
@@ -266,7 +302,7 @@ config:
             - nudm-ee
             - nudm-pp
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: udm
             tls:
@@ -277,6 +313,15 @@ config:
             udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
             udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
             udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
+          ssm:
+            enable: false
+            host: https://localhost:9000
+            tls_insecure: true
+            m-tls:
+              crt: /etc/udm/tls/tls.crt
+              key: /etc/udm/tls/tls.key
+              ca: /etc/udm/tls/ca.crt
+          metricsPort: ":8080"
   udr:
     deploy: true
     #podAnnotations:
@@ -292,10 +337,10 @@ config:
           version: 1.0.0
           description: UDR initial local configuration
         configuration:
-          nrfUri: http://nrf:29510
-          webuiUri: http://webui:5001
+          nrfUri: https://nrf:29510
+          webuiUri: https://webui:5001
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: udr
             tls:
@@ -317,10 +362,10 @@ config:
           description: PCF initial local configuration
         configuration:
           pcfName: PCF
-          nrfUri: http://nrf:29510
-          webuiUri: http://webui:5001
+          nrfUri: https://nrf:29510
+          webuiUri: https://webui:5001
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: pcf
             tls:
@@ -353,10 +398,10 @@ config:
           description: NSSF initial local configuration
         configuration:
           nssfName: NSSF
-          nrfUri: http://nrf:29510
-          webuiUri: http://webui:5001
+          nrfUri: https://nrf:29510
+          webuiUri: https://webui:5001
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: nssf
             tls:
@@ -370,7 +415,7 @@ config:
                 sst: 1
                 sd: "010203"
               nsiInformationList:
-                - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+                - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
                   nsiId: 22
   sctplb:
     deploy: false
@@ -439,10 +484,10 @@ config:
           ngapIpList:
             - "0.0.0.0"
           amfName: AMF
-          nrfUri: http://nrf:29510
-          webuiUri: http://webui:5001
+          nrfUri: https://nrf:29510
+          webuiUri: https://webui:5001
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: amf
             tls:
@@ -519,9 +564,9 @@ config:
           mongoDBStreamEnable: true
           nfProfileExpiryEnable: true
           nfKeepAliveTime: 60
-          webuiUri: http://webui:5001
+          webuiUri: https://webui:5001
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: nrf
             tls:
@@ -571,10 +616,10 @@ config:
           pfcp:
             addr: "POD_IP"
           smfName: SMF
-          nrfUri: http://nrf:29510
-          webuiUri: http://webui:5001
+          nrfUri: https://nrf:29510
+          webuiUri: https://webui:5001
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: smf
             tls:
@@ -599,12 +644,12 @@ config:
           version: 1.0.0
           description: AUSF initial local configuration
         configuration:
-          nrfUri: http://nrf:29510
-          webuiUri: http://webui:5001
+          nrfUri: https://nrf:29510
+          webuiUri: https://webui:5001
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
           sbi:
-            scheme: http
+            scheme: https
             bindingIPv4: "0.0.0.0"
             registerIPv4: ausf
             tls:

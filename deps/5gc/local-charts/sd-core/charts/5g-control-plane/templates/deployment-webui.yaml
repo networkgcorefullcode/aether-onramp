@@ -52,7 +52,7 @@ spec:
         - name: GIN_MODE
           value: release
       {{- end }}
-      {{- if .Values.config.webui.useSecrets }}
+      {{- if .Values.config.webui.ssm.allow-ssm }}
             - name: SSM_SERVICE_ID
               valueFrom:
                 secretKeyRef:
@@ -83,9 +83,9 @@ spec:
         - name: coredump
           mountPath: /tmp/coredump
       {{- end }}
-      {{- if .Values.config.udm.useSecrets }}
-            - name: udm-tls
-              mountPath: /etc/udm/tls
+      {{- if .Values.config.webui.ssm.allow-ssm }}
+            - name: webui-tls
+              mountPath: /etc/webui/tls
               readOnly: true
       {{- end }}
       volumes:
@@ -101,7 +101,7 @@ spec:
         hostPath:
           path: {{ .Values.config.coreDump.path }}
     {{- end }}
-    {{- if .Values.config.webui.useSecrets }}
+    {{- if .Values.config.webui.ssm.allow-ssm }}
         - name: webui-tls
           secret:
             secretName: {{ .Values.config.webui.tlsSecretName }}
