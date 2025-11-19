@@ -45,6 +45,9 @@ omec-control-plane:
       enabled: false
     architecture: replicaset
     replicaCount: 1
+    service:
+      type: NodePort
+      nodePort: 30050
 
   config:
     mongodb:
@@ -145,11 +148,11 @@ omec-control-plane:
             # MongoDB configuration
             mongodb:
               name: aether
-              url: "mongodb://172.28.31.5:27017/?replicaSet=rs0&connectTimeoutMS=10000"
+              url: "mongodb://mongodb-arbiter-headless"
               authKeysDbName: authentication
-              authUrl: "mongodb://172.28.31.5:27017/?replicaSet=rs0&connectTimeoutMS=10000"
+              authUrl: "mongodb://mongodb-arbiter-headless"
               webuiDbName: aether
-              webuiDbUrl: "mongodb://172.28.31.5:27017/?replicaSet=rs0&connectTimeoutMS=10000"
+              webuiDbUrl: "mongodb://mongodb-arbiter-headless"
               checkReplica: false
             enableAuthentication: false
             spec-compliant-sdf: false

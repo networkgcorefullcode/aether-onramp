@@ -5,7 +5,6 @@
     state: absent
   when: inventory_hostname in groups['master_nodes']
 
-# TODO: check if interface subnet is valid
 - set_fact:
     ran_subnet: "{{ result.stdout if (core.ran_subnet == '') else core.ran_subnet }}"
     access_gw: "{{ core.upf.access_subnet[:-3] }}"
@@ -20,32 +19,6 @@
     dest: "/tmp/sdcore-5g-values.yaml"
   when: inventory_hostname in groups['master_nodes']
 
-- set_fact:
-    chart_ref_sd_core: "{{ core.helm.chart_ref }}"
-  when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
-
-- debug:
-    var: "chart_ref_sd_core"
-  when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
-
-- name: copy local_charts {{ chart_ref_sd_core }} to /tmp/sdcore-helm-charts
-  synchronize:
-    src: "{{ chart_ref_sd_core }}/"
-    dest: /tmp/sdcore-helm-charts
-    recursive: yes
-    rsync_opts:
-      - "--exclude=.git"
-  when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
-
-- set_fact:
-    chart_ref_sd_core: "/tmp/sdcore-helm-charts/{{ core.helm.chart_ref }}"
-  when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
-
-- debug:
-    var: "chart_ref_sd_core"
-  when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
-
-# TODO: add systems check to avoid issues (e.g., mongodb needing avx support)
 - name: deploy aether 5gc
   block:
     - name: deploy aether 5gc
@@ -60,7 +33,7 @@
           - /tmp/sdcore-5g-values.yaml
         wait: true
         wait_timeout: "2m30s"
-        force: true
+        force: false
       when: inventory_hostname in groups['master_nodes']
 
   rescue:
