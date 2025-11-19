@@ -117,6 +117,9 @@ resources:
 kafka:
   deploy: false
   fullnameOverride: kafka
+  auth:
+    interBrokerProtocol: PLAINTEXT
+    clientProtocol: PLAINTEXT
   listeners:
     client:
       protocol: PLAINTEXT
