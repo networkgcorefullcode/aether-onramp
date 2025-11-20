@@ -45,25 +45,7 @@ omec-control-plane:
     usePassword: false          # para pruebas
     persistence:
       enabled: false
-    rbac:
-      create: true
-    automountServiceAccountToken: true
-    service:
-      type: ClusterIP           # interno para replicaset
-      port: 27017
-    replicaSet:
-      enabled: true
-      name: rs0
-      replicas: 3
-    externalAccess:
-      enabled: true
-      service:
-        type: NodePort        # también puede ser LoadBalancer si tu cluster lo soporta
-        nodePorts: [30050, 30051, 30052]  # un puerto para cada miembro
-      autoDiscovery:
-        enabled: true         # permite que los clientes descubran todos los miembros
-
-
+      
   config:
     mongodb:
       name: aether
