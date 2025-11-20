@@ -36,18 +36,45 @@ omec-control-plane:
     pullPolicy: IfNotPresent
 
   kafka:
-    deploy: true
+    deploy: false
+    fullnameOverride: kafka
+    auth:
+      interBrokerProtocol: PLAINTEXT
+      clientProtocol: PLAINTEXT
+    listeners:
+      client:
+        protocol: PLAINTEXT
+      controller:
+        protocol: PLAINTEXT
+      interbroker:
+        protocol: PLAINTEXT
+      external:
+        protocol: PLAINTEXT
+    controller:
+      replicaCount: 1
+      persistence:
+        enabled: false
+    image:
+      repository: bitnamilegacy/kafka # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/kafka)
 
   mongodb:
     deploy: true
-    usePassword: false
+    fullnameOverride: mongodb
     persistence:
       enabled: false
+    auth:
+      enabled: false
+    serviceAccount:
+      create: false
+    #clusterDomain: cluster.local
     architecture: replicaset
     replicaCount: 1
     service:
       type: NodePort
       nodePort: 30050
+    image:
+      repository: bitnamilegacy/mongodb # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/mongodb)
+
 
   config:
     mongodb:
