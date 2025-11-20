@@ -537,16 +537,16 @@ omec-sub-provision:
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/bess-upf/values.yaml
 omec-user-plane:
   enable: true
-  nodeSelectors:
-    enabled: true
-  resources:
-    enabled: false
   images:
     repository: "192.168.12.15:8082/"
     # tags:
       # bess: <bess image tag>
       # pfcpiface: <pfcp image tag>
       # tools: omecproject/busybox:stable
+  nodeSelectors:
+    enabled: true
+  resources:
+    enabled: false
   config:
     upf:
       name: "oaisim"
