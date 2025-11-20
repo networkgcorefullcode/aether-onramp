@@ -45,9 +45,13 @@ omec-control-plane:
       enabled: false
     architecture: replicaset
     replicaCount: 1
-    service:
-      type: NodePort
-      nodePort: 30050
+    externalAccess:
+      enabled: true
+      service:
+        type: NodePort
+        nodePorts: [30050]
+      autoDiscovery:
+        enabled: true
 
   config:
     mongodb:
