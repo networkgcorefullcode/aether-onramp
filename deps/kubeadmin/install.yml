@@ -1,0 +1,12 @@
+---
+# Playbook to install and configure Kubernetes cluster using kubeadm
+# Usage: ansible-playbook -i hosts.ini install.yml
+
+- name: Setup Kubernetes cluster with kubeadm
+  hosts: all
+  become: yes
+  roles:
+    - task
+  tags:
+    - install
+    - setup

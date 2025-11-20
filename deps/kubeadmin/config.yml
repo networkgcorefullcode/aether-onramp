@@ -1,0 +1,14 @@
+---
+# Playbook to configure containerd on all nodes
+# Usage: ansible-playbook -i hosts.ini config.yml
+
+- name: Configure containerd
+  hosts: all
+  become: yes
+  vars_files:
+    - vars/main.yml
+  roles:
+    - task
+  tags:
+    - config
+    - containerd

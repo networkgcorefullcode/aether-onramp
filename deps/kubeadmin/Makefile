@@ -1,42 +1,48 @@
 #### Variables ####
 
 export ROOT_DIR ?= $(PWD)
-export K8S_ROOT_DIR ?= $(ROOT_DIR)
+export KUBEADMIN_ROOT_DIR ?= $(ROOT_DIR)
+export HOSTS_INI_FILE ?= $(ROOT_DIR)/hosts.ini
 
-export EXTRA_VARS ?= ""
-export K8S_INVENTARY_DIR ?= "/home/pedro/aether-forks/aether/deps/k8s/inventory/storage/hosts.yml"
+#### Default target ####
+.PHONY: help
+help:
+	@echo "Kubernetes cluster management with kubeadm"
+	@echo ""
+	@echo "Available targets:"
+	@echo "  install         - Install complete Kubernetes cluster"
+	@echo "  config          - Configure containerd on all nodes"
+	@echo "  health          - Check health of all nodes"
+	@echo "  health-master   - Check health of master nodes"
+	@echo "  health-worker   - Check health of worker nodes"
+	@echo "  uninstall       - Remove Kubernetes cluster (WIP)"
+	@echo ""
 
-#### a. Debugging ####
-k8s-debug:
-	ansible-playbook -i $(K8S_INVENTARY_DIR) $(K8S_ROOT_DIR)/debug.yml \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+#### a. Installation ####
+.PHONY: install
+install:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/install.yml
 
-#### b. Provision k8s ####
-k8s-install: k8s-rke2-install k8s-helm-install
-k8s-uninstall: k8s-helm-uninstall k8s-rke2-uninstall
+#### b. Configuration ####
+.PHONY: config
+config:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/config.yml
 
-#### c. Provision rke2 ####
-k8s-rke2-install:
-	ansible-playbook -i $(K8S_INVENTARY_DIR) $(K8S_ROOT_DIR)/rke2.yml --tags install
-#### --extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
-k8s-rke2-uninstall:
-	ansible-playbook -i $(K8S_INVENTARY_DIR) $(K8S_ROOT_DIR)/rke2.yml --tags uninstall
-#### --extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+#### c. Health checks ####
+.PHONY: health
+health:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/health.yml
 
-#### d. Provision helm ####
-k8s-helm-install:
-	ansible-playbook -i $(K8S_INVENTARY_DIR) $(K8S_ROOT_DIR)/helm.yml --tags install \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
-k8s-helm-uninstall:
-	ansible-playbook -i $(K8S_INVENTARY_DIR) $(K8S_ROOT_DIR)/helm.yml --tags uninstall \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+.PHONY: health-master
+health-master:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/health.yml --tags master
 
+.PHONY: health-worker
+health-worker:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/health.yml --tags worker
 
-
-#### cambiar la variable $(HOSTS_INI_FILE) por el archivo host.yml con la sintaxis nueva
-
-#### $(K8S_ROOT_DIR) esta variable si debe estar bien
-
-#### $(EXTRA_VARS) esta variable no hace nada
-
-#### k8s-rke2-uninstall: este target de make hay quen hacerlo
+#### d. Uninstall (TODO) ####
+.PHONY: uninstall
+uninstall:
+	@echo "Uninstall functionality not yet implemented"
+	@echo "Manual steps required to remove Kubernetes cluster"

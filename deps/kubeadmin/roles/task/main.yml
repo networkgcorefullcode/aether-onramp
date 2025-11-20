@@ -1,0 +1,32 @@
+---
+# Main task file for kubeadmin role
+# This file orchestrates the execution of different tasks based on tags
+
+- name: Include kubeadmin installation tasks
+  include_tasks: kubeadmin.yml
+  tags:
+    - install
+    - kubeadmin
+    - setup
+
+- name: Include containerd configuration tasks
+  include_tasks: containerd_config.yml
+  tags:
+    - config
+    - containerd
+
+- name: Include master nodes health check tasks
+  include_tasks: check_master.yml
+  when: inventory_hostname in groups['master_nodes']
+  tags:
+    - check
+    - health
+    - master
+
+- name: Include worker nodes health check tasks
+  include_tasks: check_worker.yml
+  when: inventory_hostname in groups['worker_nodes']
+  tags:
+    - check
+    - health
+    - worker
