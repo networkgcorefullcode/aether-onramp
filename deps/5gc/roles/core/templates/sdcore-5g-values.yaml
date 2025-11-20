@@ -91,7 +91,7 @@ omec-control-plane:
               tls: # the local path of TLS key
                 key: /var/run/certs/tls.key # AMF TLS Private key
                 pem: /var/run/certs/tls.crt # AMF TLS Certificate
-            nrfUri: "https://nrf:29510" # a valid URI of NRF
+            nrfUri: "https://nrf.aether-5gc:29510" # a valid URI of NRF
             kafkaInfo:
               enableKafka: true
               brokerUri: "kafka-headless"
@@ -213,8 +213,8 @@ omec-control-plane:
             version: 1.0.0
             description: UDM initial local configuration
           configuration:
-            nrfUri: https://nrf:29510
-            webuiUri: https://webui:5001
+            nrfUri: https://nrf.aether-5gc:29510
+            webuiUri: https://webui.aether-5gc:5001
             enableNrfCaching: true
             nrfCacheEvictionInterval: 900
             serviceList:
