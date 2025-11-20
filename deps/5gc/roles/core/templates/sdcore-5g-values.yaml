@@ -52,7 +52,7 @@ omec-control-plane:
       enabled: true
       service:
         type: NodePort
-        nodePorts: [30050]
+        nodePorts: [30050, 30051, 30052]
       autoDiscovery:
         enabled: true
 
