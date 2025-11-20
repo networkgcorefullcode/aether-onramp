@@ -45,6 +45,9 @@ omec-control-plane:
       enabled: false
     architecture: replicaset
     replicaCount: 1
+    rbac:
+      create: true
+    automountServiceAccountToken: true
     externalAccess:
       enabled: true
       service:
