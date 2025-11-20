@@ -37,44 +37,24 @@ omec-control-plane:
 
   kafka:
     deploy: true
-    fullnameOverride: kafka
-    auth:
-      interBrokerProtocol: PLAINTEXT
-      clientProtocol: PLAINTEXT
-    listeners:
-      client:
-        protocol: PLAINTEXT
-      controller:
-        protocol: PLAINTEXT
-      interbroker:
-        protocol: PLAINTEXT
-      external:
-        protocol: PLAINTEXT
-    controller:
-      replicaCount: 1
-      persistence:
-        enabled: false
-    image:
-      repository: bitnamilegacy/kafka # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/kafka)
 
   mongodb:
     deploy: true
-    fullnameOverride: mongodb
+    usePassword: false
     persistence:
       enabled: false
-    auth:
-      enabled: false
-    serviceAccount:
-      create: false
-    #clusterDomain: cluster.local
     architecture: replicaset
     replicaCount: 1
-    service:
-      type: NodePort
-      nodePort: 30050
-    image:
-      repository: bitnamilegacy/mongodb # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/mongodb)
-
+    rbac:
+      create: true
+    automountServiceAccountToken: true
+    externalAccess:
+      enabled: true
+      service:
+        type: NodePort
+        nodePorts: [30050]
+      autoDiscovery:
+        enabled: true
 
   config:
     mongodb:
@@ -111,7 +91,7 @@ omec-control-plane:
               tls: # the local path of TLS key
                 key: /var/run/certs/tls.key # AMF TLS Private key
                 pem: /var/run/certs/tls.crt # AMF TLS Certificate
-            nrfUri: "https://nrf:29510" # a valid URI of NRF
+            nrfUri: "https://nrf.aether-5gc:29510" # a valid URI of NRF
             kafkaInfo:
               enableKafka: true
               brokerUri: "kafka-headless"
@@ -233,8 +213,8 @@ omec-control-plane:
             version: 1.0.0
             description: UDM initial local configuration
           configuration:
-            nrfUri: https://nrf:29510
-            webuiUri: https://webui:5001
+            nrfUri: https://nrf.aether-5gc:29510
+            webuiUri: https://webui.aether-5gc:5001
             enableNrfCaching: true
             nrfCacheEvictionInterval: 900
             serviceList:
