@@ -91,7 +91,7 @@ omec-control-plane:
               tls: # the local path of TLS key
                 key: /var/run/certs/tls.key # AMF TLS Private key
                 pem: /var/run/certs/tls.crt # AMF TLS Certificate
-            nrfUri: "https://nrf.aether-5gc:29510" # a valid URI of NRF
+            nrfUri: "https://nrf:29510" # a valid URI of NRF
             kafkaInfo:
               enableKafka: true
               brokerUri: "kafka-headless"
@@ -213,8 +213,8 @@ omec-control-plane:
             version: 1.0.0
             description: UDM initial local configuration
           configuration:
-            nrfUri: https://nrf.aether-5gc:29510
-            webuiUri: https://5g-control-plane.aether-5gc:5001
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui:5001
             enableNrfCaching: true
             nrfCacheEvictionInterval: 900
             serviceList:
@@ -288,7 +288,7 @@ omec-control-plane:
               addr: "roc-aether-roc-gui-v2-1-external.aether-roc.svc"
               port: 80
             metricFuncEndPoint:
-              addr: "metricfunc.aether-5gc.svc"
+              addr: "metricfunc.svc"
               port: 5001
           info:
             description: Metrics initial local configuration
@@ -535,18 +535,18 @@ omec-sub-provision:
 
 # Override values for omec-user-plane Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/bess-upf/values.yaml
-omec-user-plane:
+bess-upf:
   enable: true
+  nodeSelectors:
+    enabled: true
+  resources:
+    enabled: false
   images:
     repository: "192.168.12.15:8082/"
     # tags:
       # bess: <bess image tag>
       # pfcpiface: <pfcp image tag>
       # tools: omecproject/busybox:stable
-  nodeSelectors:
-    enabled: true
-  resources:
-    enabled: false
   config:
     upf:
       name: "oaisim"
@@ -584,7 +584,7 @@ omec-user-plane:
             dnn: "internet"              # Must match Slice dnn
             hostname: "upf"
             #http_port: "8080"
-            enable_ue_ip_alloc: false    # If true, UPF allocates address from following pool
+            enable_ue_ip_alloc: true    # If true, UPF allocates address from following pool
             ue_ip_pool: {{ core.upf.default_upf.ue_ip_pool }} # IP pool used UEs if enable_ue_ip_alloc=true
           slice_rate_limit_config:       # Slice-level rate limiting (also controlled by ROC)
             # Uplink
