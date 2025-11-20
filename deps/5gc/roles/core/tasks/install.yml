@@ -66,6 +66,7 @@
   shell: |
     helm dep up /tmp/sdcore-helm-charts/
     helm dep up /tmp/sdcore-helm-charts/charts/5g-control-plane
+    helm dep up /tmp/sdcore-helm-charts/charts/bess-upf
   when: inventory_hostname in groups['master_nodes'] and core.helm.local_charts
 
 # TODO: add systems check to avoid issues (e.g., mongodb needing avx support)
