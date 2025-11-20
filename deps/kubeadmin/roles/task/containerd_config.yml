@@ -1,0 +1,111 @@
+---
+
+- name: Check if containerd is installed
+  command: which containerd
+  register: containerd_check
+  ignore_errors: yes
+
+- name: Fail if containerd is not installed
+  fail:
+    msg: "Containerd is not installed on {{ inventory_hostname }}"
+  when: containerd_check.rc != 0
+
+- name: Ensure /etc/containerd directory exists
+  file:
+    path: /etc/containerd
+    state: directory
+    mode: '0755'
+
+- name: Backup existing containerd config if exists
+  copy:
+    src: /etc/containerd/config.toml
+    dest: /etc/containerd/config.toml.backup.{{ ansible_date_time.epoch }}
+    remote_src: yes
+  ignore_errors: yes
+  when: containerd_custom_config is defined or containerd_config_file is defined
+
+- name: Generate default containerd config if custom config is not provided
+  shell: containerd config default > /etc/containerd/config.toml
+  when: 
+    - containerd_custom_config is not defined
+    - containerd_config_file is not defined
+
+- name: Apply custom containerd configuration from variable
+  copy:
+    content: "{{ containerd_custom_config }}"
+    dest: /etc/containerd/config.toml
+    mode: '0644'
+  when: containerd_custom_config is defined
+  notify: restart containerd
+
+- name: Apply custom containerd configuration from file
+  copy:
+    src: "{{ containerd_config_file }}"
+    dest: /etc/containerd/config.toml
+    mode: '0644'
+  when: 
+    - containerd_config_file is defined
+    - containerd_custom_config is not defined
+  notify: restart containerd
+
+- name: Enable SystemdCgroup in containerd config (for Kubernetes compatibility)
+  lineinfile:
+    path: /etc/containerd/config.toml
+    regexp: '^(\s*)SystemdCgroup\s*='
+    line: '            SystemdCgroup = true'
+    insertafter: '\[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options\]'
+  when: containerd_enable_systemd_cgroup | default(true)
+  notify: restart containerd
+
+- name: Add custom registry mirrors if defined
+  blockinfile:
+    path: /etc/containerd/config.toml
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Registry Mirrors"
+    insertafter: '\[plugins."io.containerd.grpc.v1.cri".registry\]'
+    block: |
+      {% if containerd_registry_mirrors is defined %}
+      {% for registry, mirrors in containerd_registry_mirrors.items() %}
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ registry }}"]
+        endpoint = {{ mirrors | to_json }}
+      {% endfor %}
+      {% endif %}
+  when: containerd_registry_mirrors is defined
+  notify: restart containerd
+
+- name: Add insecure registries if defined
+  blockinfile:
+    path: /etc/containerd/config.toml
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Insecure Registries"
+    insertafter: '\[plugins."io.containerd.grpc.v1.cri".registry\]'
+    block: |
+      {% if containerd_insecure_registries is defined %}
+      {% for registry in containerd_insecure_registries %}
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ registry }}".tls]
+        insecure_skip_verify = true
+      {% endfor %}
+      {% endif %}
+  when: containerd_insecure_registries is defined
+  notify: restart containerd
+
+- name: Validate containerd configuration
+  command: containerd config dump
+  register: config_validation
+  changed_when: false
+  failed_when: config_validation.rc != 0
+
+- name: Display containerd config validation status
+  debug:
+    msg: "Containerd configuration is valid on {{ inventory_hostname }}"
+  when: config_validation.rc == 0
+
+  handlers:
+    - name: restart containerd
+      systemd:
+        name: containerd
+        state: restarted
+        daemon_reload: yes
+
+    - name: wait for containerd to be ready
+      wait_for:
+        timeout: 10
+      delegate_to: localhost

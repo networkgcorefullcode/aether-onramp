@@ -1,199 +1,194 @@
 ---
+- name: Update packages
+  apt:
+    update_cache: yes
+    upgrade: dist
 
-- name: Setup base environment, install Docker, Kubernetes, and Helm
-  hosts: all
-  become: yes
-  tasks:
-    - name: Update packages
-      apt:
-        update_cache: yes
-        upgrade: dist
+- name: Temporarily disable swap
+  command: swapoff -a
+  args:
+    warn: false
+  ignore_errors: yes
 
-    - name: Temporarily disable swap
-      command: swapoff -a
-      args:
-        warn: false
-      ignore_errors: yes
+- name: Permanently disable swap in /etc/fstab
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*\sswap\s)'
+    replace: '#\1'
 
-    - name: Permanently disable swap in /etc/fstab
-      replace:
-        path: /etc/fstab
-        regexp: '^([^#].*\sswap\s)'
-        replace: '#\1'
+- name: Install Docker dependencies
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    state: present
 
-    - name: Install Docker dependencies
-      apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - software-properties-common
-        state: present
+- name: Add Docker GPG key
+  shell: |
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  args:
+    creates: /etc/apt/keyrings/docker.gpg
 
-    - name: Add Docker GPG key
-      shell: |
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-      args:
-        creates: /etc/apt/keyrings/docker.gpg
+- name: Add Docker repository
+  shell: |
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+  args:
+    creates: /etc/apt/sources.list.d/docker.list
 
-    - name: Add Docker repository
-      shell: |
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
-      args:
-        creates: /etc/apt/sources.list.d/docker.list
+- name: Update packages after adding Docker repo
+  apt:
+    update_cache: yes
 
-    - name: Update packages after adding Docker repo
-      apt:
-        update_cache: yes
+- name: Install Docker
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
 
-    - name: Install Docker
-      apt:
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-        state: present
+- name: Enable and start Docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
 
-    - name: Enable and start Docker
-      systemd:
-        name: docker
-        enabled: yes
-        state: started
+- name: Add current user to docker group
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
+    append: yes
 
-    - name: Add current user to docker group
-      user:
-        name: "{{ ansible_user_id }}"
-        groups: docker
-        append: yes
+- name: Install Kubernetes dependencies
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gpg
+    state: present
 
-    - name: Install Kubernetes dependencies
-      apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - gpg
-        state: present
+- name: Create keyrings directory for Kubernetes
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
 
-    - name: Create keyrings directory for Kubernetes
-      file:
-        path: /etc/apt/keyrings
-        state: directory
-        mode: '0755'
+- name: Add Kubernetes GPG key
+  shell: |
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.33/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  args:
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-    - name: Add Kubernetes GPG key
-      shell: |
-        curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.33/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-      args:
-        creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+- name: Add Kubernetes repository
+  shell: |
+    echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.33/deb/ /' > /etc/apt/sources.list.d/kubernetes.list
+  args:
+    creates: /etc/apt/sources.list.d/kubernetes.list
 
-    - name: Add Kubernetes repository
-      shell: |
-        echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.33/deb/ /' > /etc/apt/sources.list.d/kubernetes.list
-      args:
-        creates: /etc/apt/sources.list.d/kubernetes.list
+- name: Update packages after adding Kubernetes repo
+  apt:
+    update_cache: yes
 
-    - name: Update packages after adding Kubernetes repo
-      apt:
-        update_cache: yes
+- name: Install kubelet, kubeadm, and kubectl
+  apt:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
 
-    - name: Install kubelet, kubeadm, and kubectl
-      apt:
-        name:
-          - kubelet
-          - kubeadm
-          - kubectl
-        state: present
+- name: Hold kubelet, kubeadm, and kubectl
+  shell: apt-mark hold kubelet kubeadm kubectl
 
-    - name: Hold kubelet, kubeadm, and kubectl
-      shell: apt-mark hold kubelet kubeadm kubectl
+- name: Enable kubelet
+  systemd:
+    name: kubelet
+    enabled: yes
+    state: started
 
-    - name: Enable kubelet
-      systemd:
-        name: kubelet
-        enabled: yes
-        state: started
+- name: Initialize Kubernetes cluster (single-node)
+  shell: |
+    kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=$(hostname -I | awk '{print $1}') --cri-socket=/var/run/containerd/containerd.sock
+  args:
+    creates: /etc/kubernetes/admin.conf
+  register: kubeadm_init
+  ignore_errors: yes
 
-    - name: Initialize Kubernetes cluster (single-node)
-      shell: |
-        kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=$(hostname -I | awk '{print $1}') --cri-socket=/var/run/containerd/containerd.sock
-      args:
-        creates: /etc/kubernetes/admin.conf
-      register: kubeadm_init
-      ignore_errors: yes
+- name: Check if containerd is installed
+  command: which containerd
+  register: containerd_path
+  ignore_errors: yes
 
-    - name: Check if containerd is installed
-      command: which containerd
-      register: containerd_path
-      ignore_errors: yes
+- name: Ensure containerd is running
+  systemd:
+    name: containerd
+    state: started
+    enabled: yes
+  ignore_errors: yes
 
-    - name: Ensure containerd is running
-      systemd:
-        name: containerd
-        state: started
-        enabled: yes
-      ignore_errors: yes
+- name: Generate default containerd config if not exists
+  shell: |
+    containerd config default | tee /etc/containerd/config.toml > /dev/null
+  args:
+    creates: /etc/containerd/config.toml
+  ignore_errors: yes
 
-    - name: Generate default containerd config if not exists
-      shell: |
-        containerd config default | tee /etc/containerd/config.toml > /dev/null
-      args:
-        creates: /etc/containerd/config.toml
-      ignore_errors: yes
+- name: Restart containerd
+  systemd:
+    name: containerd
+    state: restarted
+  ignore_errors: yes
 
-    - name: Restart containerd
-      systemd:
-        name: containerd
-        state: restarted
-      ignore_errors: yes
+- name: Retry kubeadm initialization if failed
+  shell: |
+    kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=$(hostname -I | awk '{print $1}') --cri-socket=/var/run/containerd/containerd.sock
+  when: kubeadm_init is failed
+  ignore_errors: yes
 
-    - name: Retry kubeadm initialization if failed
-      shell: |
-        kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=$(hostname -I | awk '{print $1}') --cri-socket=/var/run/containerd/containerd.sock
-      when: kubeadm_init is failed
-      ignore_errors: yes
+- name: Configure kube environment for current user
+  shell: |
+    mkdir -p $HOME/.kube
+    cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    chown $(id -u):$(id -g) $HOME/.kube/config
+  args:
+    executable: /bin/bash
 
-    - name: Configure kube environment for current user
-      shell: |
-        mkdir -p $HOME/.kube
-        cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-        chown $(id -u):$(id -g) $HOME/.kube/config
-      args:
-        executable: /bin/bash
+- name: Install Calico pod network
+  shell: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/calico.yaml
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
 
-    - name: Install Calico pod network
-      shell: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/calico.yaml
-      args:
-        executable: /bin/bash
-      ignore_errors: yes
+- name: Allow node to act as master and worker
+  shell: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
 
-    - name: Allow node to act as master and worker
-      shell: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
-      args:
-        executable: /bin/bash
-      ignore_errors: yes
+- name: Check nodes and pods status
+  shell: |
+    kubectl get nodes
+    kubectl get pods -A
+  args:
+    executable: /bin/bash
+  register: kubectl_status
+  ignore_errors: yes
 
-    - name: Check nodes and pods status
-      shell: |
-        kubectl get nodes
-        kubectl get pods -A
-      args:
-        executable: /bin/bash
-      register: kubectl_status
-      ignore_errors: yes
+- name: Install Helm
+  shell: |
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    ./get_helm.sh
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
 
-    - name: Install Helm
-      shell: |
-        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-        chmod 700 get_helm.sh
-        ./get_helm.sh
-      args:
-        executable: /bin/bash
-      ignore_errors: yes
-
-    - name: Install multus and localstorage
-      shell: |
-        kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset.yml
-        kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
-        kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-        
+- name: Install multus and localstorage
+  shell: |
+    kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset.yml
+    kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+    kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+    
