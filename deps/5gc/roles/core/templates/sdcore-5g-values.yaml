@@ -114,7 +114,7 @@ omec-control-plane:
               allow-ssm: false
               tls-insecure: true
               ssm-synchronize:
-                enable: true
+                enable: false
                 interval-minute: 30
                 max-keys-create: 5
                 delete-missing: true
