@@ -597,7 +597,7 @@ omec-sub-provision:
   images:
     repository: "192.168.12.15:8083/"
     tags:
-      simapp: omecproject/simapp:1.6.8-dev
+      simapp: omecproject/simapp:1.6.9-dev
       init: omecproject/pod-init:rel-1.1.3
 
   config:
