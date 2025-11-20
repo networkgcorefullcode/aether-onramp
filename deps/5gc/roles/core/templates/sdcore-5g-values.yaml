@@ -42,10 +42,10 @@ omec-control-plane:
     deploy: true
     architecture: replicaset
     replicaCount: 3
-    usePassword: false          # para pruebas
+    usePassword: false
     persistence:
       enabled: false
-      
+
   config:
     mongodb:
       name: aether
