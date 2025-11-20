@@ -44,7 +44,7 @@ omec-control-plane:
     persistence:
       enabled: false
     architecture: replicaset
-    replicaCount: 1
+    replicaCount: 3
     rbac:
       create: true
     automountServiceAccountToken: true
