@@ -214,7 +214,7 @@ omec-control-plane:
             description: UDM initial local configuration
           configuration:
             nrfUri: https://nrf.aether-5gc:29510
-            webuiUri: https://webui.aether-5gc:5001
+            webuiUri: https://5g-control-plane.aether-5gc:5001
             enableNrfCaching: true
             nrfCacheEvictionInterval: 900
             serviceList:

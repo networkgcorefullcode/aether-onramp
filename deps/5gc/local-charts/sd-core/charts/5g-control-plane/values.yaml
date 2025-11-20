@@ -307,7 +307,7 @@ config:
           description: UDM initial local configuration
         configuration:
           nrfUri: https://nrf.aether-5gc:29510
-          webuiUri: https://webui.aether-5gc:5001
+          webuiUri: https://5g-control-plane.aether-5gc:5001
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
           serviceList:
@@ -353,7 +353,7 @@ config:
           description: UDR initial local configuration
         configuration:
           nrfUri: https://nrf.aether-5gc:29510
-          webuiUri: https://webui.aether-5gc:5001
+          webuiUri: https://5g-control-plane.aether-5gc:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -378,7 +378,7 @@ config:
         configuration:
           pcfName: PCF
           nrfUri: https://nrf.aether-5gc:29510
-          webuiUri: https://webui.aether-5gc:5001
+          webuiUri: https://5g-control-plane.aether-5gc:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -414,7 +414,7 @@ config:
         configuration:
           nssfName: NSSF
           nrfUri: https://nrf.aether-5gc:29510
-          webuiUri: https://webui.aether-5gc:5001
+          webuiUri: https://5g-control-plane.aether-5gc:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -500,7 +500,7 @@ config:
             - "0.0.0.0"
           amfName: AMF
           nrfUri: https://nrf.aether-5gc:29510
-          webuiUri: https://webui.aether-5gc:5001
+          webuiUri: https://5g-control-plane.aether-5gc:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -579,7 +579,7 @@ config:
           mongoDBStreamEnable: true
           nfProfileExpiryEnable: true
           nfKeepAliveTime: 60
-          webuiUri: https://webui.aether-5gc:5001
+          webuiUri: https://5g-control-plane.aether-5gc:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -632,7 +632,7 @@ config:
             addr: "POD_IP"
           smfName: SMF
           nrfUri: https://nrf.aether-5gc:29510
-          webuiUri: https://webui.aether-5gc:5001
+          webuiUri: https://5g-control-plane.aether-5gc:5001
           sbi:
             scheme: https
             bindingIPv4: "0.0.0.0"
@@ -660,7 +660,7 @@ config:
           description: AUSF initial local configuration
         configuration:
           nrfUri: https://nrf.aether-5gc:29510
-          webuiUri: https://webui.aether-5gc:5001
+          webuiUri: https://5g-control-plane.aether-5gc:5001
           enableNrfCaching: true
           nrfCacheEvictionInterval: 900
           sbi:
