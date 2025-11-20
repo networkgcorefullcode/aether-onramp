@@ -650,6 +650,7 @@ omec-user-plane:
       - bessd -m 0 -f --grpc_url=0.0.0.0:10514
   config:
     upf:
+      privileged: true
       name: "oaisim"
       sriov:
         enabled: false    # SRIOV is disabled by default
