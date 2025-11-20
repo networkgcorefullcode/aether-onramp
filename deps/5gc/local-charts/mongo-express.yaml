@@ -4,7 +4,7 @@ metadata:
   name: mongodb
 spec:
   selector:
-    app.kubernetes.io/name: mongodb-arbiter-headless
+    app.kubernetes.io/name: mongodb
   ports:
     - port: 27017
       targetPort: 27017
