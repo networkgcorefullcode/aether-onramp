@@ -12,9 +12,9 @@
 
 - name: "GitOps | Render 5G Core Helm values file"
   ansible.builtin.template:
-    src: "sdcore-5g-values.yaml"
+    src: "{{ values_file }}"
     dest: "{{ output_path }}"
-  when: output_path is defined
+  when: output_path is defined and values_file is defined
   delegate_to: localhost
   run_once: true
   tags:

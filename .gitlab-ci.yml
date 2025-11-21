@@ -94,11 +94,12 @@ lint-yaml:
 
       echo "yamllint OK para todos los archivos cambiados." >&2
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-      - "**/*.yml"
-      - "**/*.yaml"
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+    # - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    #   changes:
+    #   - "**/*.yml"
+    #   - "**/*.yaml"
+    # - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "feat/operator-pipeline"'
       changes:
       - "**/*.yml"
       - "**/*.yaml"
@@ -188,11 +189,12 @@ validate-yaml-syntax:
       echo "yq-go: sintaxis OK para todos los archivos cambiados." >&2
 
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - "**/*.yml"
-        - "**/*.yaml"
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+    # - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    #   changes:
+    #     - "**/*.yml"
+    #     - "**/*.yaml"
+    # - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "feat/operator-pipeline"'
       changes:
         - "**/*.yml"
         - "**/*.yaml"
@@ -220,6 +222,7 @@ helm-dry-dev-run-on-mr:
       --connection local \
       -e @vars/main.yml \
       --tags "gitops_render_values" \
+      --extra-vars "values_file=../templates/sdcore-5g-values.yaml" \
       --extra-vars "output_path=${TEMP_VALUES_PATH}"
 
     # Añadir repos de Helm y validar
@@ -230,6 +233,7 @@ helm-dry-dev-run-on-mr:
     # Descargar y descomprimir el chart en el directorio local --
     # El flag --untar es crucial. Creará un directorio llamado 'sd-core' en el workspace.
     - echo "Descargando el chart 'aether/sd-core' localmente..."
+    - ls -lsa 
     - helm pull aether/sd-core --version 3.0.0 --untar
 
     # Linter y template. Helm usará el values TEMPORAL RENDERIZADO.
@@ -237,13 +241,14 @@ helm-dry-dev-run-on-mr:
     - helm template sd-core ./sd-core --version 3.0.0 --values ${TEMP_VALUES_PATH} > /dev/null
 
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-      changes:
-        - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
-      when: always
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "feat/operator-pipeline"'
+    # - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    #   changes:
+    #     - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+    # - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+    #   changes:
+    #     - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+    #   when: always
 
 render-and-commit-dev-values:
   stage: render-and-commit
@@ -295,11 +300,12 @@ render-and-commit-dev-values:
       fi
 
   rules:
-    # el job SÓLO se ejecuta en un push (como un merge) a las ramas de entorno, y NO en los MRs.
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-      changes:
-        - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
-#    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "feat/operator-pipeline"'
+#     # el job SÓLO se ejecuta en un push (como un merge) a las ramas de entorno, y NO en los MRs.
+#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+#       changes:
+#         - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+# #    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
 
 
 # helm-dry-operator-run-on-mr:
