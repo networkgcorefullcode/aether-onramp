@@ -133,6 +133,13 @@ kafka:
     replicaCount: 1
     persistence:
       enabled: false
+  broker:
+    replicaCount: 1
+
+  kraft:
+    enabled: true
+    controllerQuorum:
+      voters: "0@kafka-controller-0.kafka-controller-headless:9093"
   image:
     repository: bitnamilegacy/kafka # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/kafka)
 
