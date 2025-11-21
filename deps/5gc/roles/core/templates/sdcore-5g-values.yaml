@@ -295,21 +295,21 @@ omec-control-plane:
       #   external-dns.alpha.kubernetes.io/hostname: "aether-amf.tenant-site.company.com"
       podAnnotations:
         field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
-      serviceType: ClusterIP
+      serviceType: NodePort
       prometheus:
         port: 9089
         # Provide nodePort when serviceType is NodePort
-        #nodePort: 30084
+        # nodePort: 30084
       sctp_grpc:
         port: 9000
-        #nodePort: 30088
+        # nodePort: 30088
       sbi:
         port: 29518
         #nodePort: 30088
       ngapp:
         #externalIp:
         port: 38412
-        #nodePort: 30071
+        nodePort: 30071
       cfgFiles:
         amfcfg.yaml:
           info:
