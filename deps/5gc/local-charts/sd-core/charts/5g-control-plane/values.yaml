@@ -131,6 +131,9 @@ kafka:
       protocol: PLAINTEXT
     external:
       protocol: PLAINTEXT
+    advertisedListeners:
+      - CLIENT://kafka.aether-5gc.svc.cluster.local:9092
+      - CONTROLLER://kafka.aether-5gc.svc.cluster.local:9093
   controller:
     replicaCount: 1
     controllerOnly: false
