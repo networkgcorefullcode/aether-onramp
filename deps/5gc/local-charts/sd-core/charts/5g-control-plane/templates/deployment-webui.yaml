@@ -53,16 +53,16 @@ spec:
           value: release
       {{- end }}
       {{- if index .Values.config.webui.ssm.enable }}
-            - name: SSM_SERVICE_ID
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.config.webui.credentialsSecretName }}
-                  key: {{ .Values.config.webui.credentials.serviceIdKey | quote }}
-            - name: SSM_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.config.webui.credentialsSecretName }}
-                  key: {{ .Values.config.webui.credentials.passwordKey | quote }}
+        - name: SSM_SERVICE_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.config.webui.credentialsSecretName }}
+              key: {{ .Values.config.webui.credentials.serviceIdKey | quote }}
+        - name: SSM_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.config.webui.credentialsSecretName }}
+              key: {{ .Values.config.webui.credentials.passwordKey | quote }}
       {{- end }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
       {{- if .Values.config.coreDump.enabled }}
