@@ -55,6 +55,10 @@ omec-control-plane:
 
     webui:
       tlsSecretName: "webui-tls"
+      tlsSecretKeys:
+        cert: tls.crt
+        key: tls.key
+        ca: ca.crt
       credentialsSecretName: "webui-credentials"
       ssm:
         enable: true
@@ -135,6 +139,10 @@ omec-control-plane:
       serviceType: ClusterIP
       credentialsSecretName: "udm-credentials"
       tlsSecretName: "udm-tls"
+      tlsSecretKeys:
+        cert: tls.crt
+        key: tls.key
+        ca: ca.crt
       ssm:
         enable: true
       credentials:
