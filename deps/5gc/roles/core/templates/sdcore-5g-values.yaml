@@ -621,7 +621,7 @@ omec-sub-provision:
   images:
     repository: "192.168.12.15:8083/"
     tags:
-      simapp: omecproject/simapp:1.6.10-dev
+      simapp: omecproject/simapp:1.6.11-dev
       init: omecproject/pod-init:rel-1.1.3
 
   config:
@@ -629,6 +629,7 @@ omec-sub-provision:
       cfgFiles:
         simapp.yaml:
           configuration:
+            http-timeout: 200 # in seconds
             provision-network-slice: {{ core.standalone | string }} # if enabled, Device Groups & Slices configure by simapp
             sub-provision-endpt:
               addr: webui  # subscriber configuation endpoint.
