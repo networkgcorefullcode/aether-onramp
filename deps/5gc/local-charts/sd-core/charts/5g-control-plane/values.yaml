@@ -117,9 +117,9 @@ resources:
 kafka:
   deploy: true
   fullnameOverride: kafka
-  auth:
-    interBrokerProtocol: PLAINTEXT
-    clientProtocol: PLAINTEXT
+  # auth:
+  #   interBrokerProtocol: PLAINTEXT
+  #   clientProtocol: PLAINTEXT
   service:
     type: ClusterIP
   listeners:
@@ -131,12 +131,12 @@ kafka:
       protocol: PLAINTEXT
     external:
       protocol: PLAINTEXT
-    advertisedListeners:
-      - CLIENT://kafka.aether-5gc.svc.cluster.local:9092
-      - CONTROLLER://kafka.aether-5gc.svc.cluster.local:9093
+    # advertisedListeners:
+    #   - CLIENT://kafka.aether-5gc.svc.cluster.local:9092
+    #   - CONTROLLER://kafka.aether-5gc.svc.cluster.local:9093
   controller:
     replicaCount: 1
-    controllerOnly: false
+    # controllerOnly: false
     persistence:
       enabled: false
   image:
