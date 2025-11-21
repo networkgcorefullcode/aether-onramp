@@ -325,7 +325,7 @@ omec-control-plane:
             debugProfilePort: 5001
             kafkaInfo:
               enableKafka: true
-              brokerUri: "kafka-headless"
+              brokerUri: "kafka-controller-headless"
               brokerPort: 9092
               topicName: "sdcore-data-source-amf"
             ngapIpList:
@@ -461,7 +461,7 @@ omec-control-plane:
             debugProfilePort: 5001
             kafkaInfo:
               enableKafka: true
-              brokerUri: "kafka-headless"
+              brokerUri: "kafka-controller-headless"
               brokerPort: 9092
               topicName: "sdcore-data-source-smf"
             pfcp:
@@ -530,7 +530,7 @@ omec-control-plane:
                   topicGroup: analytics
                   topicName: sdcore-data-source-amf
                 urls:
-                  - uri: "kafka-headless"
+                  - uri: "kafka-controller-headless"
                     port: 9092
               - topic:
                   topicGroup: analytics
@@ -609,7 +609,7 @@ omec-control-plane:
             level: info
           configuration:
             kafkaInfo:
-              brokerUri: "kafka-headless"
+              brokerUri: "kafka-controller-headless"
               brokerPort: 9092
               topicName: "sdcore-data-source-smf"
     
