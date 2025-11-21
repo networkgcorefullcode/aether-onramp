@@ -318,7 +318,7 @@ omec-control-plane:
           configuration:
             amfDBName: sdcore_amf
             enableDBStore: true
-            enableSctpLb: true
+            enableSctpLb: false
             enableNrfCaching: true
             sctpGrpcPort: 9000
             nrfCacheEvictionInterval: 900
@@ -563,7 +563,7 @@ omec-control-plane:
             level: info
 
     sctplb:
-      deploy: true
+      deploy: false
       podAnnotations:
         field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
       serviceType: NodePort
