@@ -536,7 +536,7 @@ omec-control-plane:
                   topicGroup: analytics
                   topicName: sdcore-data-source-smf
                 urls:
-                  - uri: "kafka-headless"
+                  - uri: "kafka-controller-headless"
                     port: 9092
             prometheusServer:
               addr: POD_IP
