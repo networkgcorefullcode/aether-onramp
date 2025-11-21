@@ -108,17 +108,17 @@ spec:
       - name: certs
         secret:
           secretName: udm-certs
-      {{- if .Values.config.udm.ssm.enable }}
-        - name: udm-tls
-          secret:
-            secretName: {{ .Values.config.udm.tlsSecretName }}
-            items:
-              - key: {{ .Values.config.udm.tlsSecretKeys.cert | quote }}
-                path: tls.crt
-              - key: {{ .Values.config.udm.tlsSecretKeys.key | quote }}
-                path: tls.key
-              - key: {{ .Values.config.udm.tlsSecretKeys.ca | quote }}
-                path: ca.crt
+    {{- if .Values.config.udm.ssm.enable }}
+      - name: udm-tls
+        secret:
+          secretName: {{ .Values.config.udm.tlsSecretName }}
+          items:
+            - key: {{ .Values.config.udm.tlsSecretKeys.cert | quote }}
+              path: tls.crt
+            - key: {{ .Values.config.udm.tlsSecretKeys.key | quote }}
+              path: tls.key
+            - key: {{ .Values.config.udm.tlsSecretKeys.ca | quote }}
+              path: ca.crt
     {{- end }}
     {{- if .Values.config.coreDump.enabled }}
       - name: host-rootfs
