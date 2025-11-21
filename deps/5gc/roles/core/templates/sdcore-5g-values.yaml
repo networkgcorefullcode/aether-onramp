@@ -825,7 +825,7 @@ omec-sub-provision:
 # Override values for omec-user-plane Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/bess-upf/values.yaml
 bess-upf:
-  enable: true
+  enable: false
   nodeSelectors:
     enabled: true
   resources:
