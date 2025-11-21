@@ -16,7 +16,7 @@ omec-control-plane:
 5g-control-plane:
   enable5G: true
   images:
-    repository: "ghcr.io/networkgcorefullcode/"
+    repository: "192.168.12.15:8083/"
     tags:
       amf: omecproject/5gc-amf:2.0.5-dev
       ausf: omecproject/5gc-ausf:2.0.5-dev
@@ -595,7 +595,7 @@ omec-control-plane:
 omec-sub-provision:
   enable: true
   images:
-    repository: "ghcr.io/networkgcorefullcode/"
+    repository: "192.168.12.15:8083/"
     tags:
       simapp: omecproject/simapp:1.6.10-dev
       init: omecproject/pod-init:rel-1.1.3
@@ -807,7 +807,7 @@ bess-upf:
   resources:
     enabled: false
   images:
-    repository: "ghcr.io/networkgcorefullcode/"
+    repository: "192.168.12.15:8082/"
     # tags:
       # bess: <bess image tag>
       # pfcpiface: <pfcp image tag>
