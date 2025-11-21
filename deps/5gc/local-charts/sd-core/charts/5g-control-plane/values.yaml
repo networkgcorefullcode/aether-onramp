@@ -120,6 +120,8 @@ kafka:
   auth:
     interBrokerProtocol: PLAINTEXT
     clientProtocol: PLAINTEXT
+  service:
+    type: ClusterIP
   listeners:
     client:
       protocol: PLAINTEXT
@@ -129,17 +131,11 @@ kafka:
       protocol: PLAINTEXT
     external:
       protocol: PLAINTEXT
-  controller:
-    replicaCount: 1
-    persistence:
-      enabled: false
-  broker:
-    replicaCount: 1
-
-  kraft:
-    enabled: true
-    controllerQuorum:
-      voters: "0@kafka-controller-0.kafka-controller-headless:9093"
+    advertisedListeners:
+      - CLIENT://cluster-kafka-controller-0.cluster-kafka-controller-headless.default.svc.cluster.local:9092,CONTROLLER://cluster-kafka-controller-0.cluster-kafka-controller-headless.default.svc.cluster.local:9093
+      - CLIENT://cluster-kafka-controller-1.cluster-kafka-controller-headless.default.svc.cluster.local:9092,CONTROLLER://cluster-kafka-controller-1.cluster-kafka-controller-headless.default.svc.cluster.local:9093
+      - CLIENT://cluster-kafka-controller-2.cluster-kafka-controller-headless.default.svc.cluster.local:9092,CONTROLLER://cluster-kafka-controller-2.cluster-kafka-controller-headless.default.svc.cluster.local:9093
+  securityProtocolMap: "CLIENT:PLAINTEXT,CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
   image:
     repository: bitnamilegacy/kafka # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/kafka)
 
