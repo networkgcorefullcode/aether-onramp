@@ -212,6 +212,7 @@ omec-control-plane:
               tls:
                 pem: /var/run/certs/tls.crt
                 key: /var/run/certs/tls.key
+            metricsPort: ":8080"
 
     pcf:
       deploy: true
@@ -250,6 +251,8 @@ omec-control-plane:
                 suppFeat: 3
               - serviceName: npcf-eventexposure
               - serviceName: npcf-ue-policy-control
+            metricsPort: ":8080"
+
     nssf:
       deploy: true
       #podAnnotations:
@@ -284,33 +287,8 @@ omec-control-plane:
                 nsiInformationList:
                   - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
                     nsiId: 22
-    sctplb:
-      deploy: false
-      podAnnotations:
-        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
-      serviceType: ClusterIP
-      sctp_grpc:
-        port: 9000
-        #nodePort: 30088
-      ngapp:
-        #externalIp:
-        port: 38412
-        #nodePort: 30071
-      cfgFiles:
-        sctplb.yaml:
-          info:
-            version: 1.0.0
-            description: SCTPLB initial local configuration
-          logger:
-            sctpLogs: info
-            dispatcherLogs: info
-            clientdiscLogs: info
-          configuration:
-            type: "grpc"
-            services:
-              - uri: "amf-headless"
-            ngapIpList:
-              - 0.0.0.0
+            metricsPort: ":8080"
+          
     amf:
       deploy: true
       # serviceAnnotations:
@@ -340,7 +318,9 @@ omec-control-plane:
           configuration:
             amfDBName: sdcore_amf
             enableDBStore: true
+            enableSctpLb: true
             enableNrfCaching: true
+            sctpGrpcPort: 9000
             nrfCacheEvictionInterval: 900
             debugProfilePort: 5001
             kafkaInfo:
@@ -414,6 +394,8 @@ omec-control-plane:
               enable: true     # true or false
               expireTime: 6s   # default is 6 seconds
               maxRetryTimes: 4 # the max number of retransmission
+            metricsPort: ":8080"
+
     nrf:
       deploy: true
       #podAnnotations:
@@ -442,6 +424,8 @@ omec-control-plane:
             serviceNameList:
               - nnrf-nfm
               - nnrf-disc
+            metricsPort: ":8080"
+            
     smf:
       deploy: true
       podAnnotations:
@@ -495,6 +479,8 @@ omec-control-plane:
             serviceNameList:
               - nsmf-pdusession
               - nsmf-event-exposure
+            metricsPort: ":8080"
+            
             
     ausf:
       deploy: true
@@ -525,6 +511,8 @@ omec-control-plane:
             serviceNameList:
               - nausf-auth
             groupId: ausfGroup001
+            metricsPort: ":8080"
+
 
     metricfunc:
       deploy: true
@@ -573,6 +561,34 @@ omec-control-plane:
             version: 1.0.0
           logger:
             level: info
+
+    sctplb:
+      deploy: true
+      podAnnotations:
+        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+      serviceType: NodePort
+      sctp_grpc:
+        port: 9000
+        nodePort: 30088
+      ngapp:
+        #externalIp:
+        port: 38412
+        nodePort: 30087
+      cfgFiles:
+        sctplb.yaml:
+          info:
+            version: 1.0.0
+            description: SCTPLB initial local configuration
+          logger:
+            sctpLogs: info
+            dispatcherLogs: info
+            clientdiscLogs: info
+          configuration:
+            type: "grpc"
+            services:
+              - uri: "amf-headless"
+            ngapIpList:
+              - 0.0.0.0
 
     upfadapter:
       deploy: false
