@@ -7,7 +7,7 @@
 {{- if .Values.config.udm.deploy }}
 {{ tuple "udm" . | include "5g-control-plane.service_account" }}
 ---
-apiVersion: v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: udm
