@@ -70,7 +70,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.config.udm.credentialsSecretName }}
-                  key: {{ .Values.config.udm.credentials.usernameKey | quote }}
+                  key: {{ .Values.config.udm.credentials.serviceIdKey | quote }}
             - name: SSM_PASSWORD
               valueFrom:
                 secretKeyRef:

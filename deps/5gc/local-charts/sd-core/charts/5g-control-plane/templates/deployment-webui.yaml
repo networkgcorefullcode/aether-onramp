@@ -57,7 +57,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.config.webui.credentialsSecretName }}
-                  key: {{ .Values.config.webui.credentials.usernameKey | quote }}
+                  key: {{ .Values.config.webui.credentials.serviceIdKey | quote }}
             - name: SSM_PASSWORD
               valueFrom:
                 secretKeyRef:

@@ -57,9 +57,9 @@ omec-control-plane:
       tlsSecretName: "webui-tls"
       credentialsSecretName: "webui-credentials"
       ssm:
-        enable: false
+        enable: true
       credentials:
-        usernameKey: username
+        serviceIdKey: service_id
         passwordKey: password
       serviceType: NodePort
       deploy: true
@@ -111,10 +111,10 @@ omec-control-plane:
               enabled: false
             ssm:
               ssm-uri: https://192.168.12.16:9000
-              allow-ssm: false
+              allow-ssm: true
               tls-insecure: true
               ssm-synchronize:
-                enable: false
+                enable: true
                 interval-minute: 30
                 max-keys-create: 5
                 delete-missing: true
@@ -136,9 +136,9 @@ omec-control-plane:
       credentialsSecretName: "udm-credentials"
       tlsSecretName: "udm-tls"
       ssm:
-        enable: false
+        enable: true
       credentials:
-        usernameKey: username
+        serviceIdKey: service_id
         passwordKey: password
       sbi:
         port: 29503
@@ -171,7 +171,7 @@ omec-control-plane:
               udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
               udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
             ssm:
-              enable: false
+              enable: true
               host: https://192.168.12.16:9000
               tls_insecure: true
               m-tls:

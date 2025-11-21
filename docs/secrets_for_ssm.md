@@ -15,9 +15,9 @@ Ejemplo paso a paso (cambios al chart + comandos):
 
 ```bash
 kubectl create secret generic udm-tls \
-  --from-file=tls.crt=./server.crt \
-  --from-file=tls.key=./server.key \
-  --from-file=ca.crt=./ca.pem \
+  --from-file=tls.crt=/var/certs/client-udm.crt \
+  --from-file=tls.key=/var/certs/client-udm.key \
+  --from-file=ca.crt=/var/certs/ca.crt \
   --namespace aether-5gc
 ```
 
@@ -25,8 +25,25 @@ kubectl create secret generic udm-tls \
 
 ```bash
 kubectl create secret generic udm-credentials \
-  --from-literal=username=admin \
-  --from-literal=password='MiPasswordSecreto' \
+  --from-literal=service_id='<your_service_id>' \
+  --from-literal=password='<your_password>' \
+  --namespace aether-5gc
+```
+
+```bash
+kubectl create secret generic webui-tls \
+  --from-file=tls.crt=/var/certs/client-webconsole.crt \
+  --from-file=tls.key=/var/certs/client-webconsole.key \
+  --from-file=ca.crt=/var/certs/ca.crt \
+  --namespace aether-5gc
+```
+
+- Credenciales (service_id/password)
+
+```bash
+kubectl create secret generic webui-credentials \
+  --from-literal=service_id='<your_service_id>' \
+  --from-literal=password='<your_password>' \
   --namespace aether-5gc
 ```
 
