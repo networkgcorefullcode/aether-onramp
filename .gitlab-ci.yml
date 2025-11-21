@@ -94,12 +94,11 @@ lint-yaml:
 
       echo "yamllint OK para todos los archivos cambiados." >&2
   rules:
-    # - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    #   changes:
-    #   - "**/*.yml"
-    #   - "**/*.yaml"
-    # - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "feat/operator-pipeline"'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+      - "**/*.yml"
+      - "**/*.yaml"
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
       changes:
       - "**/*.yml"
       - "**/*.yaml"
@@ -189,12 +188,11 @@ validate-yaml-syntax:
       echo "yq-go: sintaxis OK para todos los archivos cambiados." >&2
 
   rules:
-    # - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    #   changes:
-    #     - "**/*.yml"
-    #     - "**/*.yaml"
-    # - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "feat/operator-pipeline"'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "**/*.yml"
+        - "**/*.yaml"
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
       changes:
         - "**/*.yml"
         - "**/*.yaml"
@@ -233,7 +231,6 @@ helm-dry-dev-run-on-mr:
     # Descargar y descomprimir el chart en el directorio local --
     # El flag --untar es crucial. Creará un directorio llamado 'sd-core' en el workspace.
     - echo "Descargando el chart 'aether/sd-core' localmente..."
-    - ls -lsa 
     - helm pull aether/sd-core --version 3.0.0 --untar
 
     # Linter y template. Helm usará el values TEMPORAL RENDERIZADO.
@@ -241,14 +238,13 @@ helm-dry-dev-run-on-mr:
     - helm template sd-core ./sd-core --version 3.0.0 --values ${TEMP_VALUES_PATH} > /dev/null
 
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "feat/operator-pipeline"'
-    # - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    #   changes:
-    #     - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
-    # - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-    #   changes:
-    #     - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
-    #   when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+      changes:
+        - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+      when: always
 
 render-and-commit-dev-values:
   stage: render-and-commit
@@ -271,9 +267,9 @@ render-and-commit-dev-values:
     - git remote set-url origin "https://$TOKEN_USER:$ONRAMP_TOKEN@$GITLAB_SERVER_URL/5g/aether.git"
 
     # Preparar variables y rutas
-    - ENV_DIR="${CI_PROJECT_DIR}/environments/${CI_COMMIT_BRANCH}"
+    - ENV_DIR="${CI_PROJECT_DIR}/environments/dev"
     - OUTPUT_FILE="${ENV_DIR}/5g-core-values.yaml"
-    - echo "Rendering values for '${CI_COMMIT_BRANCH}' env into '${OUTPUT_FILE}'"
+    - echo "Rendering values for dev env into '${OUTPUT_FILE}'"
     - mkdir -p ${ENV_DIR}
 
     # Ejecutar Ansible para renderizar la plantilla
@@ -284,6 +280,7 @@ render-and-commit-dev-values:
       --connection local \
       -e @vars/main.yml \
       --tags "gitops_render_values" \
+      --extra-vars "values_file=../templates/sdcore-5g-values.yaml" \
       --extra-vars "output_path=${OUTPUT_FILE}"
 
     # Commitear y pushear los cambios si los hay ---
@@ -293,120 +290,121 @@ render-and-commit-dev-values:
       if git diff --staged --quiet; then
         echo "No changes detected in Helm values. Nothing to commit."
       else
-        echo "Helm values changed. Committing and pushing back to '${CI_COMMIT_BRANCH}'..."
+        echo "Helm values changed. Committing and pushing back to {CI_COMMIT_BRANCH}..."
         # El [skip ci] es VITAL para evitar que este push dispare otro pipeline.
-        git commit -m "chore(ci): Render Helm values for ${CI_COMMIT_BRANCH} env [skip ci]"
+        git commit -m "chore(ci): Render Helm values for dev env [skip ci]"
         git push origin HEAD:${CI_COMMIT_BRANCH}
       fi
 
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "feat/operator-pipeline"'
-#     # el job SÓLO se ejecuta en un push (como un merge) a las ramas de entorno, y NO en los MRs.
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-#       changes:
-#         - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
-# #    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
+    # el job SÓLO se ejecuta en un push (como un merge) a las ramas de entorno, y NO en los MRs.
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+      changes:
+        - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+#    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
 
 
-# helm-dry-operator-run-on-mr:
-#   stage: dry-run
-#   tags:
-#     - doks
-#   image: python:3.12-slim
-#   before_script:
-#     - pip install --quiet "ansible<11"
-#     - apt-get update && apt-get install -y curl git
-#     - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-#   script:
-#     # Definir la ruta absoluta para el archivo temporal
-#     #  $CI_PROJECT_DIR para garantizar que la ruta es inequívoca.
-#     - TEMP_VALUES_PATH="${CI_PROJECT_DIR}/temp_values_for_validation.yaml"
-#     - echo "Se generará el archivo de validación en:" ${TEMP_VALUES_PATH}
-#     # Renderizar la plantilla de Helm values en un archivo temporal
-#     - echo "Renderizando plantilla para validación..."
-#     - |
-#       ansible-playbook deps/5gc/core.yml \
-#       --inventory localhost, \
-#       --connection local \
-#       -e @vars/main.yml \
-#       --tags "gitops_render_values" \
-#       --extra-vars "output_path=${TEMP_VALUES_PATH}"
+helm-dry-operator-run-on-mr:
+  stage: dry-run
+  tags:
+    - doks
+  image: python:3.12-slim
+  before_script:
+    - pip install --quiet "ansible<11"
+    - apt-get update && apt-get install -y curl git
+    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  script:
+    # Definir la ruta absoluta para el archivo temporal
+    #  $CI_PROJECT_DIR para garantizar que la ruta es inequívoca.
+    - TEMP_VALUES_PATH="${CI_PROJECT_DIR}/temp_values_for_validation.yaml"
+    - echo "Se generará el archivo de validación en:" ${TEMP_VALUES_PATH}
+    # Renderizar la plantilla de Helm values en un archivo temporal
+    - echo "Renderizando plantilla para validación..."
+    - |
+      ansible-playbook deps/5gc/core.yml \
+      --inventory localhost, \
+      --connection local \
+      -e @vars/main.yml \
+      --tags "gitops_render_values" \
+      --extra-vars "values_file=../templates/sdcore-5g-operator-values.yaml" \
+      --extra-vars "output_path=${TEMP_VALUES_PATH}"
 
-#     # Añadir repos de Helm y validar
-#     - echo "Validando con Helm..."
-#     - helm repo add aether https://charts.aetherproject.org
-#     - helm repo update
+    # Añadir repos de Helm y validar
+    - echo "Validando con Helm..."
+    - helm repo add aether https://charts.aetherproject.org
+    - helm repo update
 
-#     # Descargar y descomprimir el chart en el directorio local --
-#     # El flag --untar es crucial. Creará un directorio llamado 'sd-core' en el workspace.
-#     - echo "Descargando el chart 'aether/sd-core' localmente..."
-#     - helm pull aether/sd-core --version 3.0.0 --untar
+    # Descargar y descomprimir el chart en el directorio local --
+    # El flag --untar es crucial. Creará un directorio llamado 'sd-core' en el workspace.
+    - echo "Descargando el chart 'aether/sd-core' localmente..."
+    - helm pull aether/sd-core --version 3.0.0 --untar
 
-#     # Linter y template. Helm usará el values TEMPORAL RENDERIZADO.
-#     - helm lint ./sd-core --values ${TEMP_VALUES_PATH}
-#     - helm template sd-core ./sd-core --version 3.0.0 --values ${TEMP_VALUES_PATH} > /dev/null
+    # Linter y template. Helm usará el values TEMPORAL RENDERIZADO.
+    - helm lint ./sd-core --values ${TEMP_VALUES_PATH}
+    - helm template sd-core ./sd-core --version 3.0.0 --values ${TEMP_VALUES_PATH} > /dev/null
 
-#   rules:
-#     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#       changes:
-#         - deps/5gc/roles/core/templates/sdcore-5g-operator-values.yaml
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-#       changes:
-#         - deps/5gc/roles/core/templates/sdcore-5g-operator-values.yaml
-#       when: always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - deps/5gc/roles/core/templates/sdcore-5g-operator-values.yaml
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+      changes:
+        - deps/5gc/roles/core/templates/sdcore-5g-operator-values.yaml
+      when: always
 
-# render-and-commit-operator-values:
-#   stage: render-and-commit
-#   needs:
-#     - validate-yaml-syntax
-#     - helm-dry-operator-run-on-mr
-#     - lint-yaml
-#   tags:
-#     - doks
-#   image: python:3.12-slim
-#   before_script:
-#     - pip install --quiet "ansible<11"
-#     - apt update && apt install git -y
-#   script:
-#     # Configuración de Git
-#     - echo "Configuring Git user..."
-#     - git config --global user.email "ci-bot@aether.local"
-#     - git config --global user.name "CI Bot"
-#     # Usamos CI_JOB_TOKEN para autenticarnos y poder hacer push
-#     - git remote set-url origin "https://$TOKEN_USER:$ONRAMP_TOKEN@$GITLAB_SERVER_URL/5g/aether.git"
+render-and-commit-operator-values:
+  stage: render-and-commit
+  needs:
+    - validate-yaml-syntax
+    - helm-dry-operator-run-on-mr
+    - lint-yaml
+  tags:
+    - doks
+  image: python:3.12-slim
+  before_script:
+    - pip install --quiet "ansible<11"
+    - apt update && apt install git -y
+  script:
+    # Configuración de Git
+    - echo "Configuring Git user..."
+    - git config --global user.email "ci-bot@aether.local"
+    - git config --global user.name "CI Bot"
+    # Usamos CI_JOB_TOKEN para autenticarnos y poder hacer push
+    - git remote set-url origin "https://$TOKEN_USER:$ONRAMP_TOKEN@$GITLAB_SERVER_URL/5g/aether.git"
 
-#     # Preparar variables y rutas
-#     - ENV_DIR="${CI_PROJECT_DIR}/environments/operator"
-#     - OUTPUT_FILE="${ENV_DIR}/sdcore-5g-operator-values.yaml"
-#     - echo "Rendering values for operator env into '${OUTPUT_FILE}'"
-#     - mkdir -p ${ENV_DIR}
+    # Preparar variables y rutas
+    - ENV_DIR="${CI_PROJECT_DIR}/environments/operator"
+    - OUTPUT_FILE="${ENV_DIR}/5g-core-operator-values.yaml"
+    - echo "Rendering values for operator env into '${OUTPUT_FILE}'"
+    - mkdir -p ${ENV_DIR}
 
-#     # Ejecutar Ansible para renderizar la plantilla
-#     # Usamos el mismo comando que en el dry-run, pero ahora guardamos en la ruta permanente
-#     - |
-#       ansible-playbook deps/5gc/core.yml \
-#       --inventory localhost, \
-#       --connection local \
-#       -e @vars/main.yml \
-#       --tags "gitops_render_values" \
-#       --extra-vars "output_path=${OUTPUT_FILE}"
+    # Ejecutar Ansible para renderizar la plantilla
+    # Usamos el mismo comando que en el dry-run, pero ahora guardamos en la ruta permanente
+    - |
+      ansible-playbook deps/5gc/core.yml \
+      --inventory localhost, \
+      --connection local \
+      -e @vars/main.yml \
+      --tags "gitops_render_values" \
+      --extra-vars "values_file=../templates/sdcore-5g-operator-values.yaml" \
+      --extra-vars "output_path=${OUTPUT_FILE}"
 
-#     # Commitear y pushear los cambios si los hay ---
-#     - echo "Checking for changes in the rendered file..."
-#     - git add ${OUTPUT_FILE}
-#     - |
-#       if git diff --staged --quiet; then
-#         echo "No changes detected in Helm values. Nothing to commit."
-#       else
-#         echo "Helm values changed. Committing and pushing back to '${CI_COMMIT_BRANCH}'..."
-#         # El [skip ci] es VITAL para evitar que este push dispare otro pipeline.
-#         git commit -m "chore(ci): Render Helm values for operator env [skip ci]"
-#         git push origin HEAD:${CI_COMMIT_BRANCH}
-#       fi
+    # Commitear y pushear los cambios si los hay ---
+    - echo "Checking for changes in the rendered file..."
+    - git add ${OUTPUT_FILE}
+    - |
+      if git diff --staged --quiet; then
+        echo "No changes detected in Helm values. Nothing to commit."
+      else
+        echo "Helm values changed. Committing and pushing back to {CI_COMMIT_BRANCH}..."
+        # El [skip ci] es VITAL para evitar que este push dispare otro pipeline.
+        git commit -m "chore(ci): Render Helm values for operator env [skip ci]"
+        git push origin HEAD:${CI_COMMIT_BRANCH}
+      fi
 
-#   rules:
-#     # el job SÓLO se ejecuta en un push (como un merge) a las ramas de entorno, y NO en los MRs.
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-#       changes:
-#         - deps/5gc/roles/core/templates/sdcore-5g-operator-values.yaml
-# #    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
+  rules:
+    # el job SÓLO se ejecuta en un push (como un merge) a las ramas de entorno, y NO en los MRs.
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+      changes:
+        - deps/5gc/roles/core/templates/sdcore-5g-operator-values.yaml
+#    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
