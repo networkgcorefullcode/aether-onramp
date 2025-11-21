@@ -133,7 +133,7 @@ kafka:
       protocol: PLAINTEXT
   controller:
     replicaCount: 1
-    controllerOnly: true
+    controllerOnly: false
     persistence:
       enabled: false
   image:
