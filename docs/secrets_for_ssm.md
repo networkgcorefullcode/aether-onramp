@@ -18,7 +18,7 @@ kubectl create secret generic udm-tls \
   --from-file=tls.crt=./server.crt \
   --from-file=tls.key=./server.key \
   --from-file=ca.crt=./ca.pem \
-  --namespace <tu-namespace>
+  --namespace aether-5gc
 ```
 
 - Credenciales (username/password)
@@ -27,7 +27,7 @@ kubectl create secret generic udm-tls \
 kubectl create secret generic udm-credentials \
   --from-literal=username=admin \
   --from-literal=password='MiPasswordSecreto' \
-  --namespace <tu-namespace>
+  --namespace aether-5gc
 ```
 
 2) Añadir opciones a values.yaml
