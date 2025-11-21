@@ -428,7 +428,7 @@ omec-sub-provision:
     # repository: "ghcr.io/networkgcorefullcode/"
     repository: "192.168.12.15:8083/"
     tags:
-      simapp: omecproject/simapp:1.6.8-dev
+      simapp: omecproject/simapp:1.6.11-dev
 
   config:
     simapp:
