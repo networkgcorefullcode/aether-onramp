@@ -115,32 +115,17 @@ resources:
       memory: 1Gi
 
 kafka:
-  deploy: true
+  deploy: false
   fullnameOverride: kafka
-  # auth:
-  #   interBrokerProtocol: PLAINTEXT
-  #   clientProtocol: PLAINTEXT
-  service:
-    type: ClusterIP
-  listeners:
-    client:
-      protocol: PLAINTEXT
-    controller:
-      protocol: PLAINTEXT
-    interbroker:
-      protocol: PLAINTEXT
-    external:
-      protocol: PLAINTEXT
-    # advertisedListeners:
-    #   - CLIENT://kafka.aether-5gc.svc.cluster.local:9092
-    #   - CONTROLLER://kafka.aether-5gc.svc.cluster.local:9093
-  controller:
-    replicaCount: 1
-    # controllerOnly: false
+  zookeeper:
     persistence:
       enabled: false
-  image:
-    repository: bitnamilegacy/kafka # Bitnami moved images to bitnamilegacy (https://hub.docker.com/r/bitnami/kafka)
+  persistence:
+    enabled: false
+  initContainers:
+    - name: wait-for-zookeeper
+      image: busybox
+      command: ['sh', '-c', 'until nc -z sd-core-zookeeper 2181; do echo waiting for zookeeper; sleep 2; done;']
 
 mongodb:
   deploy: true
