@@ -3,11 +3,13 @@ kind: Service
 metadata:
   name: mongodb
 spec:
+  type: NodePort  # ← Agregar esta línea
   selector:
     app.kubernetes.io/name: mongodb
   ports:
     - port: 27017
       targetPort: 27017
+      nodePort: 30017
 ---
 apiVersion: apps/v1
 kind: Deployment
