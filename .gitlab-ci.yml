@@ -50,7 +50,7 @@ lint-yaml:
             git diff --name-only -z "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" \
               | tr '\0' '\n' \
               | grep -E '\.ya?ml$' \
-              | grep -vE '^(.*/)?\.gitlab-ci\.yml$' || true        
+              | grep -vE '^(.*/)?\.gitlab-ci\.yml$' || true
         else
           # Otros casos: guardamos archivos YAML modificados en workspace
           git ls-files -z | tr '\0' '\n' | grep -E '\.ya?ml$' || true
@@ -70,7 +70,7 @@ lint-yaml:
       FAIL=0
       while IFS= read -r file; do
         [ -z "$file" ] && continue
-        
+
         if [ "$(basename "$file")" = ".gitlab-ci.yml" ]; then
           echo "Saltando .gitlab-ci.yml (excluido)" >&2
           continue
@@ -80,7 +80,7 @@ lint-yaml:
           echo "Aviso: el archivo '$file' no existe en el workspace (se omite)." >&2
           continue
         fi
-        
+
         echo ">>> yamllint -c .yamllint $file" >&2
         yamllint -c .yamllint "$file" || FAIL=1
       done <<EOF
@@ -192,13 +192,13 @@ validate-yaml-syntax:
       changes:
         - "**/*.yml"
         - "**/*.yaml"
+    # - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
       changes:
         - "**/*.yml"
         - "**/*.yaml"
       when: always
 
-<<<<<<< HEAD
 helm-dry-dev-run-on-mr:
   stage: dry-run
   tags:
@@ -439,81 +439,91 @@ render-and-commit-operator-values:
 #       changes:
 #         - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
 #       when: always
-###
 
 include:
-  - component: $CI_SERVER_FQDN/5g/cicd-components/template-onramp@main
+  - component: $CI_SERVER_FQDN/5g/cicd-components/template-helm-dry-run@main
+    inputs:
+      source_values_file: sdcore-5g-values.yaml
+      environment: dev
+      gitlab-runner: [doks]
+    rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+        changes:
+          - deps/5gc/roles/core/templates/$[[ inputs.source_values_file ]]
+      - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+        changes:
+          - deps/5gc/roles/core/templates/$[[ inputs.source_values_file ]]
+        when: always
+
+  - component: $CI_SERVER_FQDN/5g/cicd-components/template-render-and-commit-values@main
     inputs:
       source_values_file: sdcore-5g-values.yaml
       rendered_values_file: 5g-core-values.yaml
       environment: dev
       gitlab-runner: [doks]
     rules:
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-        # changes:
-        #   - deps/5gc/roles/core/templates/$[[ inputs.source_values_file ]]
-      # - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-      - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "feat/pipeline-template")'
-        # changes:
-        #   - deps/5gc/roles/core/templates/$[[ inputs.source_values_file ]]
-        when: always
+      # el job SÓLO se ejecuta en un push (como un merge) a las ramas de entorno, y NO en los MRs.
+      - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+        changes:
+          - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+    #  - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
 
-render-and-commit-dev-values:
-  stage: render-and-commit
-  needs:
-    - validate-yaml-syntax
-    - helm-dry-run
-    - lint-yaml
-  tags:
-    - doks
-  image: python:3.12-slim
-  before_script:
-    - pip install --quiet "ansible<11"
-    - apt update && apt install git -y
-  script:
-    # Configuración de Git
-    - echo "Configuring Git user..."
-    - git config --global user.email "ci-bot@aether.local"
-    - git config --global user.name "CI Bot"
-    # Usamos CI_JOB_TOKEN para autenticarnos y poder hacer push.
-    - git remote set-url origin "https://$TOKEN_USER:$ONRAMP_TOKEN@$GITLAB_SERVER_URL/5g/aether.git"
+# render-and-commit-dev-values:
+#   stage: render-and-commit
+#   needs:
+#     - validate-yaml-syntax
+#     - helm-dry-run
+#     - lint-yaml
+#   tags:
+#     - doks
+#   image: python:3.12-slim
+#   before_script:
+#     - pip install --quiet "ansible<11"
+#     - apt update && apt install git -y
+#   script:
+#     # Configuración de Git
+#     - echo "Configuring Git user..."
+#     - git config --global user.email "ci-bot@aether.local"
+#     - git config --global user.name "CI Bot"
+#     # Usamos CI_JOB_TOKEN para autenticarnos y poder hacer push.
+#     - git remote set-url origin "https://$TOKEN_USER:$ONRAMP_TOKEN@$GITLAB_SERVER_URL/5g/aether.git"
 
-    # Preparar variables y rutas
-    - ENV_DIR="${CI_PROJECT_DIR}/environments/dev"
-    - OUTPUT_FILE="${ENV_DIR}/5g-core-values.yaml"
-    - echo "Rendering values for dev env into '${OUTPUT_FILE}'"
-    - mkdir -p ${ENV_DIR}
+#     # Preparar variables y rutas
+#     - ENV_DIR="${CI_PROJECT_DIR}/environments/dev"
+#     - OUTPUT_FILE="${ENV_DIR}/5g-core-values.yaml"
+#     - echo "Rendering values for dev env into '${OUTPUT_FILE}'"
+#     - mkdir -p ${ENV_DIR}
 
-    # Ejecutar Ansible para renderizar la plantilla
-    # Usamos el mismo comando que en el dry-run, pero ahora guardamos en la ruta permanente
-    - |
-      ansible-playbook deps/5gc/core.yml \
-      --inventory localhost, \
-      --connection local \
-      -e @vars/main.yml \
-      --tags "gitops_render_values" \
-      --extra-vars "values_file=../templates/sdcore-5g-values.yaml" \
-      --extra-vars "output_path=${OUTPUT_FILE}"
+#     # Ejecutar Ansible para renderizar la plantilla
+#     # Usamos el mismo comando que en el dry-run, pero ahora guardamos en la ruta permanente
+#     - |
+#       ansible-playbook deps/5gc/core.yml \
+#       --inventory localhost, \
+#       --connection local \
+#       -e @vars/main.yml \
+#       --tags "gitops_render_values" \
+#       --extra-vars "values_file=../templates/sdcore-5g-values.yaml" \
+#       --extra-vars "output_path=${OUTPUT_FILE}"
 
-    # Commitear y pushear los cambios si los hay ---
-    - echo "Checking for changes in the rendered file..."
-    - git add ${OUTPUT_FILE}
-    - |
-      if git diff --staged --quiet; then
-        echo "No changes detected in Helm values. Nothing to commit."
-      else
-        echo "Helm values changed. Committing and pushing back to {CI_COMMIT_BRANCH}..."
-        # El [skip ci] es VITAL para evitar que este push dispare otro pipeline.
-        git commit -m "chore(ci): Render Helm values for dev env [skip ci]"
-        git push origin HEAD:${CI_COMMIT_BRANCH}
-      fi
+#     # Commitear y pushear los cambios si los hay ---
+#     - echo "Checking for changes in the rendered file..."
+#     - git add ${OUTPUT_FILE}
+#     - |
+#       if git diff --staged --quiet; then
+#         echo "No changes detected in Helm values. Nothing to commit."
+#       else
+#         echo "Helm values changed. Committing and pushing back to {CI_COMMIT_BRANCH}..."
+#         # El [skip ci] es VITAL para evitar que este push dispare otro pipeline.
+#         git commit -m "chore(ci): Render Helm values for dev env [skip ci]"
+#         git push origin HEAD:${CI_COMMIT_BRANCH}
+#       fi
 
-  rules:
-    # el job SÓLO se ejecuta en un push (como un merge) a las ramas de entorno, y NO en los MRs.
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
-      changes:
-        - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
-#    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
+#   rules:
+#     # el job SÓLO se ejecuta en un push (como un merge) a las ramas de entorno, y NO en los MRs.
+#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
+#       changes:
+#         - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
+# #    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
 
 
 helm-dry-operator-run-on-mr:
