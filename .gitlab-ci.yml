@@ -11,7 +11,7 @@ lint-yaml:
     name: cytopia/yamllint:alpine
     entrypoint: [""]
   variables:
-      # Runner makes fetch (necessary to compare with target branch)
+    # Runner makes fetch (necessary to compare with target branch)
     GIT_STRATEGY: fetch
     GIT_DEPTH: "50"
   tags:
@@ -96,12 +96,12 @@ lint-yaml:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-      - "**/*.yml"
-      - "**/*.yaml"
+        - "**/*.yml"
+        - "**/*.yaml"
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
       changes:
-      - "**/*.yml"
-      - "**/*.yaml"
+        - "**/*.yml"
+        - "**/*.yaml"
       when: always
 
 # Validar sintaxis con yq
@@ -256,10 +256,10 @@ include:
     rules:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event"
         changes:
-          - deps/5gc/roles/core/templates/$[[ inputs.source_values_file ]]
+          - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
       - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main")'
         changes:
-          - deps/5gc/roles/core/templates/$[[ inputs.source_values_file ]]
+          - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
         when: always
 
   - component: $CI_SERVER_FQDN/5g/cicd-components/template-render-and-commit-values@main
@@ -331,7 +331,6 @@ include:
 #       changes:
 #         - deps/5gc/roles/core/templates/sdcore-5g-values.yaml
 # #    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "main")'
-
 
 helm-dry-operator-run-on-mr:
   stage: dry-run
