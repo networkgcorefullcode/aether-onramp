@@ -1,1 +1,0 @@
-This is not be a helm chart, here deploying the gnbsim docker container with diferent configs
