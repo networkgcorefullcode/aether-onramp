@@ -10,7 +10,7 @@ spec:
     repoURL: https://github.com/networkgcorefullcode/aether-onramp
 
     #  Apunta a la rama y la carpeta donde viven los manifiestos de las apps.
-    targetRevision: feature/checkconfig
+    targetRevision: dev
     path: apps/test
 
   destination:
