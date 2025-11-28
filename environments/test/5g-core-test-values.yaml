@@ -69,11 +69,9 @@ omec-control-plane:
       deploy: true
       urlport:
         port: 5000
-        
         nodePort: 30001
       rest:
         port: 5001
-        
         nodePort: 30002
       ingress:
         enabled: false
@@ -102,8 +100,6 @@ omec-control-plane:
               webuiDbName: aether
               webuiDbUrl: "mongodb://mongodb-arbiter-headless"
               checkReplica: false
-            enableAuthentication: false
-            spec-compliant-sdf: false
             webui-tls:
               pem: /var/run/certs/tls.crt
               key: /var/run/certs/tls.key
@@ -288,11 +284,11 @@ omec-control-plane:
                   - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
                     nsiId: 22
             metricsPort: ":8080"
-          
+
     amf:
       deploy: true
       # serviceAnnotations:
-      #   external-dns.alpha.kubernetes.io/hostname: "aether-amf.tenant-site.company.com"
+      # external-dns.alpha.kubernetes.io/hostname: "aether-amf.tenant-site.company.com"
       podAnnotations:
         field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
       serviceType: NodePort
@@ -425,7 +421,7 @@ omec-control-plane:
               - nnrf-nfm
               - nnrf-disc
             metricsPort: ":8080"
-            
+
     smf:
       deploy: true
       podAnnotations:
@@ -480,11 +476,10 @@ omec-control-plane:
               - nsmf-pdusession
               - nsmf-event-exposure
             metricsPort: ":8080"
-            
-            
+
     ausf:
       deploy: true
-      #podAnnotations:
+      # podAnnotations:
       serviceType: ClusterIP
       sbi:
         port: 29509
@@ -612,7 +607,7 @@ omec-control-plane:
               brokerUri: "kafka-headless"
               brokerPort: 9092
               topicName: "sdcore-data-source-smf"
-    
+
 # Override values for omec-sub-provision (subscriber) Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml
 # ***Note: Most of these values can (and should) be set via ROC API***
