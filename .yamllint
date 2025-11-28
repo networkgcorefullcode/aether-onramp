@@ -1,0 +1,8 @@
+extends: relaxed
+
+rules:
+  line-length: disable
+  document-start: disable   # no obligar a poner '---' al inicio
+  indentation:              # controlar indentación
+    spaces: 2
+    indent-sequences: true

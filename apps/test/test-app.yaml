@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sd-core
+  namespace: argocd
+spec:
+  # El proyecto por defecto donde viven los recursos de la App
+  project: default
+
+# SECCIÓN 'source' PRINCIPAL
+  sources:
+    # El repositorio de Helm que contiene el CHART
+    - chart: sd-core
+      repoURL: https://networkgcorefullcode.github.io/helm-charts
+      targetRevision: 3.1.11
+      helm:
+        valueFiles:
+          - $values-from-git/environments/test/5g-core-test-values.yaml
+        # postRenderer:
+        #   command: ["./helm-patches/webui/post-render.sh"]
+
+
+      # El repositorio público que contiene los VALUES.YAML
+    - repoURL: https://github.com/networkgcorefullcode/aether-onramp.git
+      # La rama que debe observar en el repo PÚBLICO
+      targetRevision: dev
+      ref: values-from-git
+
+  destination:
+    # Apunta al clúster donde está instalado Argo CD
+    server: 'https://kubernetes.default.svc'
+    # El namespace donde se despliegan los recursos del 5G Core
+    namespace: aether-5gc
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      
