@@ -18,8 +18,8 @@ core:
   ran_subnet: "192.168.8.0/21"		# set to empty string to get subnet from 'data_iface'
   helm:
     local_charts: false			# set chart_ref to local path name if true
-    chart_ref: "local-charts/sd-core"
-    chart_version: 3.1.9
+    chart_ref: "aether/sd-core"
+    chart_version: 3.1.10
     repo_url: "https://networkgcorefullcode.github.io/helm-charts"
   upf:
     access_subnet: "192.168.252.1/24"	# access subnet & gateway
