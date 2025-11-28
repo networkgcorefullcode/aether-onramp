@@ -12,6 +12,7 @@ export OAI_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/oai
 export SRSRAN_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/srsran
 export UERANSIM_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/ueransim
 export K8S_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/k8s
+export ARGOCD_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/argocd
 
 export ANSIBLE_NAME ?= ansible-aether
 export ANSIBLE_CONFIG ?= $(AETHER_ROOT_DIR)/ansible.cfg
@@ -30,6 +31,7 @@ aether-pingall:
 aether-k8s-install: k8s-install
 aether-k8s-uninstall: k8s-uninstall
 aether-5gc-install: 5gc-install
+aether-5gc-provision: 5gc-provision
 aether-5gc-uninstall: 5gc-uninstall
 aether-gnbsim-install: gnbsim-install
 aether-gnbsim-uninstall: gnbsim-uninstall
@@ -59,12 +61,15 @@ aether-4gc-uninstall: 4gc-core-uninstall 5gc-router-uninstall
 
 #### Other Useful Targets ####
 aether-5gc-reset: 5gc-core-reset
-aether-5gc-upgrade: 5gc-core-upgrade
 aether-4gc-reset: 4gc-core-uninstall 4gc-core-install
 aether-gnbsim-run: gnbsim-simulator-run
 aether-add-upfs: 5gc-upf-install
 aether-remove-upfs: 5gc-upf-uninstall
 aether-ueransim-run: ueransim-run
+
+#### Provision ArgoCD ####
+aether-argocd-install: argocd-install
+aether-argocd-uninstall: argocd-uninstall
 
 # Rules:
 #	amp-install: roc-install roc-load monitor-install monitor-load
@@ -133,3 +138,4 @@ include $(4GC_ROOT_DIR)/Makefile
 include $(AMP_ROOT_DIR)/Makefile
 include $(SDRAN_ROOT_DIR)/Makefile
 include $(UERANSIM_ROOT_DIR)/Makefile
+include $(ARGOCD_ROOT_DIR)/Makefile
