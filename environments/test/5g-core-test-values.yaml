@@ -16,49 +16,503 @@ omec-control-plane:
 5g-control-plane:
   enable5G: true
   images:
-    # repository: "ghcr.io/networkgcorefullcode/"
-    repository: "192.168.12.15:8083/"
+    repository: "ghcr.io/networkgcorefullcode/"
     tags:
-      amf: omecproject/5gc-amf:2.0.1-dev
-      ausf: omecproject/5gc-ausf:2.0.3-dev
-      smf: omecproject/5gc-smf:3.0.0-dev
-      udm: omecproject/5gc-udm:2.3.1-dev
-      udr: omecproject/5gc-udr:2.1.5-dev
-      pcf: omecproject/5gc-pcf:2.0.1-dev
-      nrf: omecproject/5gc-nrf:2.0.7-dev
-      webui: omecproject/5gc-webui:1.14.1-dev
-      sctplb: omecproject/sctplb:1.6.6-dev
-      nssf: omecproject/5gc-nssf:1.7.0-dev
+      amf: omecproject/5gc-amf:2.0.5-dev
+      ausf: omecproject/5gc-ausf:2.0.5-dev
+      smf: omecproject/5gc-smf:3.0.2-dev
+      udm: omecproject/5gc-udm:2.7.1-dev
+      udr: omecproject/5gc-udr:2.1.7-dev
+      pcf: omecproject/5gc-pcf:2.0.3-dev
+      nrf: omecproject/5gc-nrf:2.0.8-dev
+      webui: omecproject/5gc-webui:2.0.1-dev
+      nssf: omecproject/5gc-nssf:1.7.2-dev
+      init: omecproject/pod-init:rel-1.1.3
       upfadapter: omecproject/upfadapter:2.0.6-dev
       metricfunc: omecproject/metricfunc:rel-1.6.2
-    # refer to above Helm Chart to add other NF images
+      sctplb: omecproject/sctplb:1.6.6-dev
+      #sctplb: sctplb:1.6.7-dev
+      #upfadapter: upfadapter:2.0.7-dev
+    pullPolicy: IfNotPresent
 
   kafka:
     deploy: true
 
   mongodb:
+    deploy: true
+    architecture: replicaset
+    replicaCount: 3
     usePassword: false
     persistence:
       enabled: false
-    architecture: replicaset
-    replicaCount: 2
 
   config:
-    logger:
-      NRF:
-        debugLevel: debug
-      WEBUI:
-        debugLevel: info
-
     mongodb:
       name: aether
       url: mongodb://mongodb-arbiter-headless # Enable if cluster deployment required
       authKeysDbName: authentication
       authUrl: mongodb://mongodb-arbiter-headless
 
-    managedByConfigPod:
-      enabled: true
-      syncUrl: http://sdcore-adapter-v2-1.aether-roc.svc:8080/synchronize
+    webui:
+      tlsSecretName: "webui-tls"
+      tlsSecretKeys:
+        cert: tls.crt
+        key: tls.key
+        ca: ca.crt
+      credentialsSecretName: "webui-credentials"
+      ssm:
+        enable: true
+      credentials:
+        serviceIdKey: service_id
+        passwordKey: password
+      serviceType: NodePort
+      deploy: true
+      urlport:
+        port: 5000
+        
+        nodePort: 30001
+      rest:
+        port: 5001
+        
+        nodePort: 30002
+      ingress:
+        enabled: false
+        hostname: aether.local
+        path: /
+        pathType: Prefix
+        # extraHosts:
+          # - host: aether.local
+          #   path: /
+      cfgFiles:
+        webuicfg.yaml:
+          info:
+            version: 1.0.0
+            description: WebUI initial local configuration
+          configuration:
+            # 5G mode
+            spec-compliant-sdf: false
+            enableAuthentication: false
+            send-pebble-notifications: false
+            # MongoDB configuration
+            mongodb:
+              name: aether
+              url: "mongodb://mongodb-arbiter-headless"
+              authKeysDbName: authentication
+              authUrl: "mongodb://mongodb-arbiter-headless"
+              webuiDbName: aether
+              webuiDbUrl: "mongodb://mongodb-arbiter-headless"
+              checkReplica: false
+            enableAuthentication: false
+            spec-compliant-sdf: false
+            webui-tls:
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
+            nfconfig-tls:
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
+            managedByConfigPod:
+              syncUrl: http://roc-service:8080/sync
+              enabled: false
+            ssm:
+              ssm-uri: https://192.168.12.16:9000
+              allow-ssm: true
+              tls-insecure: true
+              ssm-synchronize:
+                enable: true
+                interval-minute: 30
+                max-keys-create: 5
+                delete-missing: true
+                max-sync-keys: 5
+                max-sync-users: 5
+                max-sync-rotations: 5
+              m-tls:
+                crt: /etc/webui/tls/tls.crt
+                key: /etc/webui/tls/tls.key
+                ca: /etc/webui/tls/ca.crt
+              # read in cascade if gcm is false then cbc is used if gcm is true cbc is ignored, both is false no encryption is used (disabled SSM jjjj)
+              is-encrypt-aes-gcm: true
+              is-encrypt-aes-cbc: false
+            metricsPort: ":8080"
+
+    udm:
+      deploy: true
+      serviceType: ClusterIP
+      credentialsSecretName: "udm-credentials"
+      tlsSecretName: "udm-tls"
+      tlsSecretKeys:
+        cert: tls.crt
+        key: tls.key
+        ca: ca.crt
+      ssm:
+        enable: true
+      credentials:
+        serviceIdKey: service_id
+        passwordKey: password
+      sbi:
+        port: 29503
+      cfgFiles:
+        udmcfg.yaml:
+          info:
+            version: 1.0.0
+            description: UDM initial local configuration
+          configuration:
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            enableNrfCaching: true
+            nrfCacheEvictionInterval: 900
+            serviceList:
+              - nudm-sdm
+              - nudm-uecm
+              - nudm-ueau
+              - nudm-ee
+              - nudm-pp
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: udm
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            keys:
+              udmProfileAHNPublicKey: 5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650
+              udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
+              udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
+              udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
+            ssm:
+              enable: true
+              host: https://192.168.12.16:9000
+              tls_insecure: true
+              m-tls:
+                crt: /etc/udm/tls/tls.crt
+                key: /etc/udm/tls/tls.key
+                ca: /etc/udm/tls/ca.crt
+            metricsPort: ":8080"
+
+    udr:
+      deploy: true
+      #podAnnotations:
+      serviceType: ClusterIP
+      sbi:
+        port: 29504
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30074
+      cfgFiles:
+        # https://github.com/omec-project/udr/blob/main/factory/udr_config.yaml
+        udrcfg.yaml:
+          info:
+            version: 1.0.0
+            description: UDR initial local configuration
+          configuration:
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: udr
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            metricsPort: ":8080"
+
+    pcf:
+      deploy: true
+      #podAnnotations:
+      serviceType: ClusterIP
+      sbi:
+        port: 29507
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30077
+      cfgFiles:
+        # https://github.com/omec-project/pcf/blob/main/factory/pcfcfg.yaml
+        pcfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: PCF initial local configuration
+          configuration:
+            pcfName: PCF
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: pcf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            defaultBdtRefId: BdtPolicyId-
+            enableNrfCaching: true
+            nrfCacheEvictionInterval: 900
+            serviceList:
+              - serviceName: npcf-am-policy-control
+              - serviceName: npcf-smpolicycontrol
+                suppFeat: 3fff
+              - serviceName: npcf-bdtpolicycontrol
+              - serviceName: npcf-policyauthorization
+                suppFeat: 3
+              - serviceName: npcf-eventexposure
+              - serviceName: npcf-ue-policy-control
+            metricsPort: ":8080"
+
+    nssf:
+      deploy: true
+      #podAnnotations:
+      serviceType: ClusterIP
+      sbi:
+        port: 29531
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30081
+      cfgFiles:
+        nssfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: NSSF initial local configuration
+          configuration:
+            nssfName: NSSF
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: nssf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            serviceNameList:
+              - nnssf-nsselection
+              - nnssf-nssaiavailability
+            nsiList:
+              - snssai:
+                  sst: 1
+                  sd: "010203"
+                nsiInformationList:
+                  - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
+                    nsiId: 22
+            metricsPort: ":8080"
+          
+    amf:
+      deploy: true
+      # serviceAnnotations:
+      #   external-dns.alpha.kubernetes.io/hostname: "aether-amf.tenant-site.company.com"
+      podAnnotations:
+        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+      serviceType: NodePort
+      prometheus:
+        port: 9089
+        # Provide nodePort when serviceType is NodePort
+        # nodePort: 30084
+      sctp_grpc:
+        port: 9000
+        # nodePort: 30088
+      sbi:
+        port: 29518
+        #nodePort: 30088
+      ngapp:
+        #externalIp:
+        port: 38412
+        nodePort: 30071
+      cfgFiles:
+        amfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: AMF initial configuration
+          configuration:
+            amfDBName: sdcore_amf
+            enableDBStore: true
+            enableSctpLb: false
+            enableNrfCaching: true
+            sctpGrpcPort: 9000
+            nrfCacheEvictionInterval: 900
+            debugProfilePort: 5001
+            kafkaInfo:
+              enableKafka: true
+              brokerUri: "kafka-headless"
+              brokerPort: 9092
+              topicName: "sdcore-data-source-amf"
+            ngapIpList:
+              - "0.0.0.0"
+            amfName: AMF
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: amf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            serviceNameList:
+              - namf-comm
+              - namf-evts
+              - namf-mt
+              - namf-loc
+              - namf-oam
+            supportDnnList:
+              - internet
+            security:
+              integrityOrder:
+                - NIA1
+                - NIA2
+              cipheringOrder:
+                - NEA0
+            networkName:
+              full: Aether5G
+              short: Aether
+            networkFeatureSupport5GS: # 5gs Network Feature Support IE, refer to TS 24.501
+              enable: true # append this IE in Registration accept or not
+              imsVoPS: 0 # IMS voice over PS session indicator (uinteger, range: 0~1)
+              emc: 0 # Emergency service support indicator for 3GPP access (uinteger, range: 0~3)
+              emf: 0 # Emergency service fallback indicator for 3GPP access (uinteger, range: 0~3)
+              iwkN26: 0 # Interworking without N26 interface indicator (uinteger, range: 0~1)
+              mpsi: 0 # MPS indicator (uinteger, range: 0~1)
+              emcN3: 0 # Emergency service support indicator for Non-3GPP access (uinteger, range: 0~1)
+              mcsi: 0 # MCS indicator (uinteger, range: 0~1)
+            t3502Value: 720  # timer value (seconds) at UE side
+            t3512Value: 3600 # timer value (seconds) at UE side
+            non3gppDeregistrationTimerValue: 3240 # timer value (seconds) at UE side
+            # retransmission timer for paging message
+            t3513:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Deregistration Request message
+            t3522:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Registration Accept message
+            t3550:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Authentication Request/Security Mode Command message
+            t3560:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Notification message
+            t3565:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            metricsPort: ":8080"
+
+    nrf:
+      deploy: true
+      #podAnnotations:
+      serviceType: ClusterIP
+      sbi:
+        port: 29510
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30070
+      cfgFiles:
+        nrfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: NRF initial local configuration
+          configuration:
+            mongoDBStreamEnable: true
+            nfProfileExpiryEnable: true
+            nfKeepAliveTime: 60
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: nrf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            serviceNameList:
+              - nnrf-nfm
+              - nnrf-disc
+            metricsPort: ":8080"
+            
+    smf:
+      deploy: true
+      podAnnotations:
+        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+      serviceType: ClusterIP
+      upfPort: 8805
+      n4:
+        port: 8805
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30021
+      prometheus:
+        port: 9089
+        #nodePort: 30084
+      sbi:
+        port: 29502
+        #nodePort: 30080
+      cfgFiles:
+        # https://github.com/omec-project/smf/blob/main/config/uerouting.yaml
+        uerouting.yaml:
+          info:
+            version: 1.0.0
+            description: Routing information for UE
+        # https://github.com/omec-project/smf/blob/main/config/smfcfg.yaml
+        smfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: SMF initial local configuration
+          configuration:
+            smfDBName: sdcore_smf
+            enableDBStore: true
+            enableNrfCaching: true
+            nrfCacheEvictionInterval: 900
+            debugProfilePort: 5001
+            kafkaInfo:
+              enableKafka: true
+              brokerUri: "kafka-headless"
+              brokerPort: 9092
+              topicName: "sdcore-data-source-smf"
+            pfcp:
+              addr: "POD_IP"
+            smfName: SMF
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: smf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            serviceNameList:
+              - nsmf-pdusession
+              - nsmf-event-exposure
+            metricsPort: ":8080"
+            
+            
+    ausf:
+      deploy: true
+      #podAnnotations:
+      serviceType: ClusterIP
+      sbi:
+        port: 29509
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30082
+      cfgFiles:
+        # https://github.com/omec-project/ausf/blob/main/factory/ausfcfg.yaml
+        ausfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: AUSF initial local configuration
+          configuration:
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            enableNrfCaching: true
+            nrfCacheEvictionInterval: 900
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: ausf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            serviceNameList:
+              - nausf-auth
+            groupId: ausfGroup001
+            metricsPort: ":8080"
+
 
     metricfunc:
       deploy: true
@@ -100,7 +554,7 @@ omec-control-plane:
               addr: "roc-aether-roc-gui-v2-1-external.aether-roc.svc"
               port: 80
             metricFuncEndPoint:
-              addr: "metricfunc.aether-5gc.svc"
+              addr: "metricfunc.svc"
               port: 5001
           info:
             description: Metrics initial local configuration
@@ -109,17 +563,17 @@ omec-control-plane:
             level: info
 
     sctplb:
-      deploy: true
+      deploy: false
       podAnnotations:
         field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
-      serviceType: ClusterIP
+      serviceType: NodePort
       sctp_grpc:
         port: 9000
-        #nodePort: 30088
+        nodePort: 30088
       ngapp:
-        externalIp: 192.168.12.11
+        #externalIp:
         port: 38412
-        #nodePort: 30071
+        nodePort: 30087
       cfgFiles:
         sctplb.yaml:
           info:
@@ -137,310 +591,50 @@ omec-control-plane:
               - 0.0.0.0
 
     upfadapter:
-      deploy: false # If enabled then deploy upf adapter pod
-
-    # Change AMF config here if rquired
-    # Most of the AMF config comes from Slice APIs but some of the config is
-    # directly provided through Helm Charts
-    amf:
-      deploy: true
+      deploy: false
       serviceType: ClusterIP
-      #ngapp:
-       # nodePort: 30071
-      cfgFiles:
-        amfcfg.yaml:
-          configuration:
-            enableDBStore: true # Store AMF subscribers in the datastore
-            networkFeatureSupport5GS: # 5gs Network Feature Support IE, refer to TS 24.501 sec. 9.11.3.5
-              imsVoPS: 1 # IMS voice over PS session indicator (uinteger, range: 0~1)
-            security:
-              integrityOrder:
-                - NIA3
-                - NIA2
-            #     - NIA0
-              cipheringOrder:
-                - NEA3
-                - NEA2
-            #     - NEA0
-            sbi: # Service-based interface information
-              scheme: http # the protocol for sbi (http or https)
-              registerIPv4: amf # IP used to register to NRF
-              bindingIPv4: 0.0.0.0  # IP used to bind the service
-              port: 29518 # port used to bind the service
-              tls: # the local path of TLS key
-                key: /var/run/certs/tls.key # AMF TLS Private key
-                pem: /var/run/certs/tls.crt # AMF TLS Certificate
-            nrfUri: "http://nrf:29510" # a valid URI of NRF
-
-    ausf:
-      deploy: true
-      serviceType: ClusterIP
-      cfgFiles:
-        ausfcfg.yaml:
-          configuration:
-            enableDBStore: true
-            groupId: ausfGroup001
-            sbi:
-              bindingIPv4: 0.0.0.0
-              port: 29509
-              registerIPv4: ausf
-              scheme: http
-              tls: # the local path of TLS key
-                key: /var/run/certs/tls.key # AUSF TLS Private key
-                pem: /var/run/certs/tls.crt # AUSF TLS Certificate
-            serviceNameList:
-              - nausf-auth
-            nrfUri: "http://nrf:29510"
-            webuiUri: "http://webui:5001" # URI del WebUI del AMF
-          logger:
-            AUSF:
-              debugLevel: debug
-              ReportCaller: false
-
-
-    udr:
-      deploy: true
-      cfgFiles:
-        udrcfg.yaml:
-          configuration:
-            enableDBStore: true
-            sbi: # Service Based Interface
-              scheme: http
-              registerIPv4: udr
-              bindingIPv4: 0.0.0.0
-              port: 29504
-              tls: # the local path of TLS key
-                key: /var/run/certs/tls.key # UDR TLS Private key
-                pem: /var/run/certs/tls.crt # UDR TLS Certificate
-            mongodb:
-              name: "aether"                      # Nombre de la base de datos
-              url: mongodb://mongodb-arbiter-headless  # URL de conexión con credenciales y host:puerto
-            nrfUri: "http://nrf:29510"
-            webuiUri: "http://webui:5001"
-          logger:
-            UDR:
-              debugLevel: debug
-              ReportCaller: false
-
-
-    udm:
-      deploy: true
-      cfgFiles:
-        udmcfg.yaml:
-          configuration:
-            enableDBStore: true
-            # ssm:
-            #   enable: true
-            #   scheme: https
-            #   host: 192.168.12.16
-            sbi:
-              bindingIPv4: 0.0.0.0
-              port: 29503
-              registerIPv4: udm
-              scheme: http
-              tls:
-                key: /var/run/certs/tls.key # UDM TLS Private key
-                pem: /var/run/certs/tls.crt # UDM TLS Certificate
-            nrfUri: "http://nrf:29510"
-            plmnList:
-              - plmnId:
-                  mcc: "208"
-                  mnc: "93"
-              - plmnId:
-                  mcc: "222"
-                  mnc: "88"
-            enableNrfCaching: true
-            nrfCacheEvictionInterval: 900
-            webuiUri: "http://webui:5001"
-            serviceList:
-              - nudm-sdm
-              - nudm-uecm
-              - nudm-ueau
-              - nudm-ee
-              - nudm-pp
-            ssm:
-              enable: false
-              host: https://192.168.12.16:9000
-              tls_insecure: true
-          info:
-            description: UDM initial local configuration
-            version: 1.0.0
-          logger:
-            UDM:
-              debugLevel: debug
-              ReportCaller: false
-
-
-    # SMF config override. Refer to Helm Charts values for more options
-    smf:
-      deploy: true
-      cfgFiles:
-        smfcfg.yaml:
-          configuration:
-            enableDBStore: true  # Store SMF subscribers in the datastore
-            sbi: # Service-based interface information
-              scheme: http # the protocol for sbi (http or https)
-              registerIPv4: smf # IP used to register to NRF
-              bindingIPv4: 0.0.0.0  # IP used to bind the service
-              port: 29502 # Port used to bind the service
-              tls: # the local path of TLS key
-                key: /var/run/certs/tls.key # SMF TLS Private key
-                pem: /var/run/certs/tls.crt # SMF TLS Certificate
-            nrfUri: http://nrf:29510 # a valid URI of NRF
-
-    nssf:
-      deploy: true
-      cfgFiles:
-        nssfcfg.yaml:
-          configuration:
-            nrfUri: http://nrf:29510
-            webuiUri: http://webui:5001
-            nsiList:
-              - nsiInformationList:
-                  - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
-                    nsiId: 22
-                snssai:
-                  sd: "010203"
-                  sst: 1
-            nssfName: NSSF
-            sbi:
-              bindingIPv4: 0.0.0.0
-              port: 29531
-              registerIPv4: nssf
-              scheme: http
-              tls:
-                key: /var/run/certs/tls.key
-                pem: /var/run/certs/tls.crt
-            serviceNameList:
-              - nnssf-nsselection
-              - nnssf-nssaiavailability
-
-    pcf:
-      deploy: true
-      serviceType: ClusterIP
-      sbi:
-        port: 29507
+      n4:
+        port: 8805
         # Provide nodePort when serviceType is NodePort
-        #nodePort: 30077
-      cfgFiles:
-        pcfcfg.yaml:
-          configuration:
-            pcfName: PCF
-            defaultBdtRefId: BdtPolicyId-
-            enableNrfCaching: true
-            nrfCacheEvictionInterval: 900
-            nrfUri: http://nrf:29510
-            webuiUri: http://webui:5001
-            sbi:
-              bindingIPv4: 0.0.0.0
-              registerIPv4: pcf
-              scheme: http
-              tls: # the local path of TLS key
-                key: /var/run/certs/tls.key # PCF TLS Private key
-                pem: /var/run/certs/tls.crt # PCF TLS Certificate
-            serviceList:
-              - serviceName: npcf-am-policy-control
-              - serviceName: npcf-smpolicycontrol
-                suppFeat: 3fff
-              - serviceName: npcf-bdtpolicycontrol
-              - serviceName: npcf-policyauthorization
-                suppFeat: 3
-              - serviceName: npcf-eventexposure
-              - serviceName: npcf-ue-policy-control
-
-    nrf:
-      deploy: true
-      cfgFiles:
-        nrfcfg.yaml:
-          configuration:
-            mongoDBStreamEnable: false    # enable/disable MongoDB stream in NRF
-            nfProfileExpiryEnable: true   # If enabled, remove NF profile if no keepalive received
-            nfKeepAliveTime: 60           # default timeout for NF profiles
-            MongoDBName: aether # database name in MongoDB
-            MongoDBUrl: "mongodb://mongodb-arbiter-headless" # a valid URL of the mongodb
-            sbi: # Service-based interface information
-              scheme: http # the protocol for sbi (http or https)
-              registerIPv4: nrf # IP used to serve NFs or register to another NRF
-              bindingIPv4: 0.0.0.0  # IP used to bind the service
-              port: 29510 # port used to bind the service
-              tls: # the local path of TLS key
-                pem: /var/run/certs/tls.crt # NRF TLS Certificate
-                key: /var/run/certs/tls.key # NRF TLS Private key
-            serviceNameList: # the SBI services provided by this NRF, refer to TS 29.510
-              - nnrf-nfm # Nnrf_NFManagement service
-              - nnrf-disc # Nnrf_NFDiscovery service
-            webuiUri: "http://webui:5001"
-
-    webui:
-      deploy: true
-      #podAnnotations:
-      serviceType: NodePort
-      # serviceAnnotations:
-      #   external-dns.alpha.kubernetes.io/hostname: "aether-config.tenant-site.company.com"
-      urlport:
-        port: 5000
-        # Provide nodePort when serviceType is NodePort
-        nodePort: 35000
+        # nodePort: 30021
       rest:
-        port: 5001
-        # Provide nodePort when serviceType is NodePort
-        nodePort: 35001
-      grpc:
-        port: 9876
-      ingress:
-        enabled: false
-        hostname: aether.local
-        path: /
-        pathType: Prefix
-        # extraHosts:
-          # - host: aether.local
-          #   path: /
+        port: 8090
+        #nodePort: 30080
       cfgFiles:
-        webuicfg.yaml:
+        upfadaptercfg.yaml:
           info:
             version: 1.0.0
-            description: WebUI initial local configuration
+            description: UPF Adapter initial local configuration
+          logger:
+            level: info
           configuration:
-            enableAuthentication: false
-            spec-compliant-sdf: false
-            mongodb:                    # Configuración de la base de datos MongoDB
-              name: "aether"              # (string) Nombre de la base de datos principal
-              url: "mongodb://mongodb-arbiter-headless" # (string) URL de conexión a MongoDB
-              authKeysDbName: "authentication"   # (string) Nombre de la base de datos de llaves de autenticación
-              authUrl: "mongodb://mongodb-arbiter-headless" # (string) URL de autenticación
-              checkReplica: true
-            ssm:
-              ssm-uri: https://192.168.12.16:9000
-              allow-ssm: false
-              tls-insecure: true
-              ssm-synchronize:
-                enable: true
-                interval-minute: 30
-                max-keys-create: 5
-                delete-missing: true
-
+            kafkaInfo:
+              brokerUri: "kafka-headless"
+              brokerPort: 9092
+              topicName: "sdcore-data-source-smf"
+    
 # Override values for omec-sub-provision (subscriber) Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml
 # ***Note: Most of these values can (and should) be set via ROC API***
 omec-sub-provision:
   enable: true
   images:
-    # repository: "ghcr.io/networkgcorefullcode/"
-    repository: "192.168.12.15:8083/"
+    repository: "ghcr.io/networkgcorefullcode/"
     tags:
-      simapp: omecproject/simapp:1.6.8-dev
+      simapp: omecproject/simapp:1.6.11-dev
+      init: omecproject/pod-init:rel-1.1.3
 
   config:
     simapp:
       cfgFiles:
         simapp.yaml:
           configuration:
-            max-time-interval: 35
-            provision-network-slice: True # if enabled, Device Groups & Slices configure by simapp
+            http-timeout: 600 # in seconds
+            provision-network-slice: {{ core.standalone | string }} # if enabled, Device Groups & Slices configure by simapp
             sub-provision-endpt:
-              addr: webui # subscriber configuation endpoint.
+              addr: webui  # subscriber configuation endpoint.
             # sub-proxy-endpt: # used if subscriber proxy is enabled in the ROC.
-            #   addr: subscriber-proxy.aether-roc.svc.cluster.local
+            #   addr: subscriber-proxy.aether-roc.svc.svc.cluster.local
             #   port: 5000
 
             # Configure Subscriber IMSIs and their security details.
@@ -461,10 +655,17 @@ omec-sub-provision:
               op: ""
               key: "5122250214c33e723a5dd523fc145fc0"
               sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930100008000"
+              ueId-end: "208930100008499"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
 
             # Configure Device Groups (ignored if provision-network-slice is disabled)
             device-groups:
-            - name:  "gnbsim-user-group1"
+            - name:  "test5g-gnbsim-user-group1"
               imsis:
                 - "208930100007487"
                 - "208930100007488"
@@ -575,12 +776,531 @@ omec-sub-provision:
                 dnn: internet
                 dns-primary: "8.8.8.8"        # Value is sent to UE
                 mtu: 1460                     # Value is sent to UE when PDU Session Established
-                ue-ip-pool: 192.168.100.0/24  # IP address pool for subscribers
+                ue-ip-pool: {{ core.upf.default_upf.ue_ip_pool }}  # IP address pool for subscribers
                 ue-dnn-qos:
                   dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
                   dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
                   bitrate-unit: Mbps          # Unit for above QoS rates
                   traffic-class:              # Default bearer QCI/ARP (not used in 5G)
+                    name: "platinum"
+                    qci: 9
+                    arp: 6
+                    pdb: 300
+                    pelr: 6
+              site-info: "enterprise"
+            - name:  "test5g-gnbsim-user-group2"
+              imsis:
+                - "208930100008000"
+                - "208930100008001"
+                - "208930100008002"
+                - "208930100008003"
+                - "208930100008004"
+                - "208930100008005"
+                - "208930100008006"
+                - "208930100008007"
+                - "208930100008008"
+                - "208930100008009"
+                - "208930100008010"
+                - "208930100008011"
+                - "208930100008012"
+                - "208930100008013"
+                - "208930100008014"
+                - "208930100008015"
+                - "208930100008016"
+                - "208930100008017"
+                - "208930100008018"
+                - "208930100008019"
+                - "208930100008020"
+                - "208930100008021"
+                - "208930100008022"
+                - "208930100008023"
+                - "208930100008024"
+                - "208930100008025"
+                - "208930100008026"
+                - "208930100008027"
+                - "208930100008028"
+                - "208930100008029"
+                - "208930100008030"
+                - "208930100008031"
+                - "208930100008032"
+                - "208930100008033"
+                - "208930100008034"
+                - "208930100008035"
+                - "208930100008036"
+                - "208930100008037"
+                - "208930100008038"
+                - "208930100008039"
+                - "208930100008040"
+                - "208930100008041"
+                - "208930100008042"
+                - "208930100008043"
+                - "208930100008044"
+                - "208930100008045"
+                - "208930100008046"
+                - "208930100008047"
+                - "208930100008048"
+                - "208930100008049"
+                - "208930100008050"
+                - "208930100008051"
+                - "208930100008052"
+                - "208930100008053"
+                - "208930100008054"
+                - "208930100008055"
+                - "208930100008056"
+                - "208930100008057"
+                - "208930100008058"
+                - "208930100008059"
+                - "208930100008060"
+                - "208930100008061"
+                - "208930100008062"
+                - "208930100008063"
+                - "208930100008064"
+                - "208930100008065"
+                - "208930100008066"
+                - "208930100008067"
+                - "208930100008068"
+                - "208930100008069"
+                - "208930100008070"
+                - "208930100008071"
+                - "208930100008072"
+                - "208930100008073"
+                - "208930100008074"
+                - "208930100008075"
+                - "208930100008076"
+                - "208930100008077"
+                - "208930100008078"
+                - "208930100008079"
+                - "208930100008080"
+                - "208930100008081"
+                - "208930100008082"
+                - "208930100008083"
+                - "208930100008084"
+                - "208930100008085"
+                - "208930100008086"
+                - "208930100008087"
+                - "208930100008088"
+                - "208930100008089"
+                - "208930100008090"
+                - "208930100008091"
+                - "208930100008092"
+                - "208930100008093"
+                - "208930100008094"
+                - "208930100008095"
+                - "208930100008096"
+                - "208930100008097"
+                - "208930100008098"
+                - "208930100008099"
+                - "208930100008100"
+                - "208930100008101"
+                - "208930100008102"
+                - "208930100008103"
+                - "208930100008104"
+                - "208930100008105"
+                - "208930100008106"
+                - "208930100008107"
+                - "208930100008108"
+                - "208930100008109"
+                - "208930100008110"
+                - "208930100008111"
+                - "208930100008112"
+                - "208930100008113"
+                - "208930100008114"
+                - "208930100008115"
+                - "208930100008116"
+                - "208930100008117"
+                - "208930100008118"
+                - "208930100008119"
+                - "208930100008120"
+                - "208930100008121"
+                - "208930100008122"
+                - "208930100008123"
+                - "208930100008124"
+                - "208930100008125"
+                - "208930100008126"
+                - "208930100008127"
+                - "208930100008128"
+                - "208930100008129"
+                - "208930100008130"
+                - "208930100008131"
+                - "208930100008132"
+                - "208930100008133"
+                - "208930100008134"
+                - "208930100008135"
+                - "208930100008136"
+                - "208930100008137"
+                - "208930100008138"
+                - "208930100008139"
+                - "208930100008140"
+                - "208930100008141"
+                - "208930100008142"
+                - "208930100008143"
+                - "208930100008144"
+                - "208930100008145"
+                - "208930100008146"
+                - "208930100008147"
+                - "208930100008148"
+                - "208930100008149"
+                - "208930100008150"
+                - "208930100008151"
+                - "208930100008152"
+                - "208930100008153"
+                - "208930100008154"
+                - "208930100008155"
+                - "208930100008156"
+                - "208930100008157"
+                - "208930100008158"
+                - "208930100008159"
+                - "208930100008160"
+                - "208930100008161"
+                - "208930100008162"
+                - "208930100008163"
+                - "208930100008164"
+                - "208930100008165"
+                - "208930100008166"
+                - "208930100008167"
+                - "208930100008168"
+                - "208930100008169"
+                - "208930100008170"
+                - "208930100008171"
+                - "208930100008172"
+                - "208930100008173"
+                - "208930100008174"
+                - "208930100008175"
+                - "208930100008176"
+                - "208930100008177"
+                - "208930100008178"
+                - "208930100008179"
+                - "208930100008180"
+                - "208930100008181"
+                - "208930100008182"
+                - "208930100008183"
+                - "208930100008184"
+                - "208930100008185"
+                - "208930100008186"
+                - "208930100008187"
+                - "208930100008188"
+                - "208930100008189"
+                - "208930100008190"
+                - "208930100008191"
+                - "208930100008192"
+                - "208930100008193"
+                - "208930100008194"
+                - "208930100008195"
+                - "208930100008196"
+                - "208930100008197"
+                - "208930100008198"
+                - "208930100008199"
+                - "208930100008200"
+                - "208930100008201"
+                - "208930100008202"
+                - "208930100008203"
+                - "208930100008204"
+                - "208930100008205"
+                - "208930100008206"
+                - "208930100008207"
+                - "208930100008208"
+                - "208930100008209"
+                - "208930100008210"
+                - "208930100008211"
+                - "208930100008212"
+                - "208930100008213"
+                - "208930100008214"
+                - "208930100008215"
+                - "208930100008216"
+                - "208930100008217"
+                - "208930100008218"
+                - "208930100008219"
+                - "208930100008220"
+                - "208930100008221"
+                - "208930100008222"
+                - "208930100008223"
+                - "208930100008224"
+                - "208930100008225"
+                - "208930100008226"
+                - "208930100008227"
+                - "208930100008228"
+                - "208930100008229"
+                - "208930100008230"
+                - "208930100008231"
+                - "208930100008232"
+                - "208930100008233"
+                - "208930100008234"
+                - "208930100008235"
+                - "208930100008236"
+                - "208930100008237"
+                - "208930100008238"
+                - "208930100008239"
+                - "208930100008240"
+                - "208930100008241"
+                - "208930100008242"
+                - "208930100008243"
+                - "208930100008244"
+                - "208930100008245"
+                - "208930100008246"
+                - "208930100008247"
+                - "208930100008248"
+                - "208930100008249"
+                - "208930100008250"
+                - "208930100008251"
+                - "208930100008252"
+                - "208930100008253"
+                - "208930100008254"
+                - "208930100008255"
+                - "208930100008256"
+                - "208930100008257"
+                - "208930100008258"
+                - "208930100008259"
+                - "208930100008260"
+                - "208930100008261"
+                - "208930100008262"
+                - "208930100008263"
+                - "208930100008264"
+                - "208930100008265"
+                - "208930100008266"
+                - "208930100008267"
+                - "208930100008268"
+                - "208930100008269"
+                - "208930100008270"
+                - "208930100008271"
+                - "208930100008272"
+                - "208930100008273"
+                - "208930100008274"
+                - "208930100008275"
+                - "208930100008276"
+                - "208930100008277"
+                - "208930100008278"
+                - "208930100008279"
+                - "208930100008280"
+                - "208930100008281"
+                - "208930100008282"
+                - "208930100008283"
+                - "208930100008284"
+                - "208930100008285"
+                - "208930100008286"
+                - "208930100008287"
+                - "208930100008288"
+                - "208930100008289"
+                - "208930100008290"
+                - "208930100008291"
+                - "208930100008292"
+                - "208930100008293"
+                - "208930100008294"
+                - "208930100008295"
+                - "208930100008296"
+                - "208930100008297"
+                - "208930100008298"
+                - "208930100008299"
+                - "208930100008300"
+                - "208930100008301"
+                - "208930100008302"
+                - "208930100008303"
+                - "208930100008304"
+                - "208930100008305"
+                - "208930100008306"
+                - "208930100008307"
+                - "208930100008308"
+                - "208930100008309"
+                - "208930100008310"
+                - "208930100008311"
+                - "208930100008312"
+                - "208930100008313"
+                - "208930100008314"
+                - "208930100008315"
+                - "208930100008316"
+                - "208930100008317"
+                - "208930100008318"
+                - "208930100008319"
+                - "208930100008320"
+                - "208930100008321"
+                - "208930100008322"
+                - "208930100008323"
+                - "208930100008324"
+                - "208930100008325"
+                - "208930100008326"
+                - "208930100008327"
+                - "208930100008328"
+                - "208930100008329"
+                - "208930100008330"
+                - "208930100008331"
+                - "208930100008332"
+                - "208930100008333"
+                - "208930100008334"
+                - "208930100008335"
+                - "208930100008336"
+                - "208930100008337"
+                - "208930100008338"
+                - "208930100008339"
+                - "208930100008340"
+                - "208930100008341"
+                - "208930100008342"
+                - "208930100008343"
+                - "208930100008344"
+                - "208930100008345"
+                - "208930100008346"
+                - "208930100008347"
+                - "208930100008348"
+                - "208930100008349"
+                - "208930100008350"
+                - "208930100008351"
+                - "208930100008352"
+                - "208930100008353"
+                - "208930100008354"
+                - "208930100008355"
+                - "208930100008356"
+                - "208930100008357"
+                - "208930100008358"
+                - "208930100008359"
+                - "208930100008360"
+                - "208930100008361"
+                - "208930100008362"
+                - "208930100008363"
+                - "208930100008364"
+                - "208930100008365"
+                - "208930100008366"
+                - "208930100008367"
+                - "208930100008368"
+                - "208930100008369"
+                - "208930100008370"
+                - "208930100008371"
+                - "208930100008372"
+                - "208930100008373"
+                - "208930100008374"
+                - "208930100008375"
+                - "208930100008376"
+                - "208930100008377"
+                - "208930100008378"
+                - "208930100008379"
+                - "208930100008380"
+                - "208930100008381"
+                - "208930100008382"
+                - "208930100008383"
+                - "208930100008384"
+                - "208930100008385"
+                - "208930100008386"
+                - "208930100008387"
+                - "208930100008388"
+                - "208930100008389"
+                - "208930100008390"
+                - "208930100008391"
+                - "208930100008392"
+                - "208930100008393"
+                - "208930100008394"
+                - "208930100008395"
+                - "208930100008396"
+                - "208930100008397"
+                - "208930100008398"
+                - "208930100008399"
+                - "208930100008400"
+                - "208930100008401"
+                - "208930100008402"
+                - "208930100008403"
+                - "208930100008404"
+                - "208930100008405"
+                - "208930100008406"
+                - "208930100008407"
+                - "208930100008408"
+                - "208930100008409"
+                - "208930100008410"
+                - "208930100008411"
+                - "208930100008412"
+                - "208930100008413"
+                - "208930100008414"
+                - "208930100008415"
+                - "208930100008416"
+                - "208930100008417"
+                - "208930100008418"
+                - "208930100008419"
+                - "208930100008420"
+                - "208930100008421"
+                - "208930100008422"
+                - "208930100008423"
+                - "208930100008424"
+                - "208930100008425"
+                - "208930100008426"
+                - "208930100008427"
+                - "208930100008428"
+                - "208930100008429"
+                - "208930100008430"
+                - "208930100008431"
+                - "208930100008432"
+                - "208930100008433"
+                - "208930100008434"
+                - "208930100008435"
+                - "208930100008436"
+                - "208930100008437"
+                - "208930100008438"
+                - "208930100008439"
+                - "208930100008440"
+                - "208930100008441"
+                - "208930100008442"
+                - "208930100008443"
+                - "208930100008444"
+                - "208930100008445"
+                - "208930100008446"
+                - "208930100008447"
+                - "208930100008448"
+                - "208930100008449"
+                - "208930100008450"
+                - "208930100008451"
+                - "208930100008452"
+                - "208930100008453"
+                - "208930100008454"
+                - "208930100008455"
+                - "208930100008456"
+                - "208930100008457"
+                - "208930100008458"
+                - "208930100008459"
+                - "208930100008460"
+                - "208930100008461"
+                - "208930100008462"
+                - "208930100008463"
+                - "208930100008464"
+                - "208930100008465"
+                - "208930100008466"
+                - "208930100008467"
+                - "208930100008468"
+                - "208930100008469"
+                - "208930100008470"
+                - "208930100008471"
+                - "208930100008472"
+                - "208930100008473"
+                - "208930100008474"
+                - "208930100008475"
+                - "208930100008476"
+                - "208930100008477"
+                - "208930100008478"
+                - "208930100008479"
+                - "208930100008480"
+                - "208930100008481"
+                - "208930100008482"
+                - "208930100008483"
+                - "208930100008484"
+                - "208930100008485"
+                - "208930100008486"
+                - "208930100008487"
+                - "208930100008488"
+                - "208930100008489"
+                - "208930100008490"
+                - "208930100008491"
+                - "208930100008492"
+                - "208930100008493"
+                - "208930100008494"
+                - "208930100008495"
+                - "208930100008496"
+                - "208930100008497"
+                - "208930100008498"
+                - "208930100008499"
+              ip-domain-name: "pool1"
+              ip-domain-expanded:
+                dnn: internet
+                dns-primary: "8.8.8.8"
+                mtu: 1460
+                ue-ip-pool: {{ core.upf.default_upf.ue_ip_pool }}
+                ue-dnn-qos:
+                  dnn-mbr-downlink: 1000
+                  dnn-mbr-uplink:   1000
+                  bitrate-unit: Mbps
+                  traffic-class:
                     name: "platinum"
                     qci: 9
                     arp: 6
@@ -593,11 +1313,12 @@ omec-sub-provision:
             # Configure Network Slices (ignored if provision-network-slice is disabled)
             network-slices:
             - name: "default"      # can be any unique slice name
-              slice-id:        # must match with slice configured in gNB, UE
+              slice-id:            # must match with slice configured in gNB, UE
                 sd: "010203"
                 sst: 1
               site-device-group:
-              - "gnbsim-user-group1"   # All UEs in this device-group are assigned to this slice
+              - "test5g-gnbsim-user-group1"   # All UEs in this device-group are assigned to this slice
+              - "test5g-gnbsim-user-group2"   # Added second group with 500 UEs
               # Applicaiton filters control what each user can access.
               # Default, allow access to all applications
               application-filtering-rules:
@@ -632,17 +1353,16 @@ omec-sub-provision:
 # Override values for omec-user-plane Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/bess-upf/values.yaml
 omec-user-plane:
-  enable: true
+  enable: false
   nodeSelectors:
     enabled: true
   resources:
     enabled: false
   images:
-    # repository: "registry.aetherproject.org/proxy/"
     repository: "192.168.12.15:8082/"
     # tags:
-       #bess: omecproject/upf-epc-bess:v1.2.1-new-dev
-       #pfcpiface: omecproject/upf-epc-pfcpiface:v1.2.1-new-dev
+      # bess: <bess image tag>
+      # pfcpiface: <pfcp image tag>
       # tools: omecproject/busybox:stable
   config:
     upf:
@@ -652,30 +1372,28 @@ omec-user-plane:
       hugepage:
         enabled: false    # Should be enabled if DPDK is enabled
       routes:
-        - to: 192.168.12.11
+        - to: {{ ansible_default_ipv4.address }}
           via: 169.254.1.1
-        - to: 192.168.97.0/24
-          via: 192.168.252.1
       enb:
-        subnet: 192.168.8.0/21 # Subnet for the gNB network
+        subnet: {{ ran_subnet }} # Subnet for the gNB network
       access:
         ipam: static
         cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
-        iface: eth0
-        gateway: 192.168.252.1
-        ip: 192.168.252.3/24
+        iface: {{ core.data_iface }}
+        gateway: {{ access_gw }}
+        ip: {{ access_ip }}
       core:
         ipam: static
         cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
-        iface: eth0
-        gateway: 192.168.250.1
-        ip: 192.168.250.3/24
+        iface: {{ core.data_iface }}
+        gateway: {{ core_gw }}
+        ip: {{ core_ip }}
+      closedLoop: {{ core.closed_loop | default('false') | lower }}
       cfgFiles:
         upf.jsonc:
-          mode: af_packet
+          mode: {{ core.upf.mode }}
           hwcksum: true
           log_level: "info"
-          workers: 1
           measure_upf: true
           measure_flow: true
           gtppsc: true                   # Extension header enabled in 5G.
@@ -683,8 +1401,8 @@ omec-user-plane:
             dnn: "internet"              # Must match Slice dnn
             hostname: "upf"
             #http_port: "8080"
-            enable_ue_ip_alloc: false    # If true, UPF allocates address from following pool
-            ue_ip_pool: 192.168.100.0/24 # IP pool used UEs if enable_ue_ip_alloc=true
+            enable_ue_ip_alloc: true    # If true, UPF allocates address from following pool
+            ue_ip_pool: {{ core.upf.default_upf.ue_ip_pool }} # IP pool used UEs if enable_ue_ip_alloc=true
           slice_rate_limit_config:       # Slice-level rate limiting (also controlled by ROC)
             # Uplink
             n6_bps: 10000000000          # 10Gbps
