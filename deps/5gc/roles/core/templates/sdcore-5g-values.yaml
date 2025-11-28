@@ -16,7 +16,7 @@ omec-control-plane:
 5g-control-plane:
   enable5G: true
   images:
-    repository: "ghcr.io/networkgcorefullcode/"
+    repository: "192.168.12.15:8083/"
     tags:
       amf: omecproject/5gc-amf:2.0.5-dev
       ausf: omecproject/5gc-ausf:2.0.5-dev
@@ -69,11 +69,11 @@ omec-control-plane:
       deploy: true
       urlport:
         port: 5000
-        
+
         nodePort: 30001
       rest:
         port: 5001
-        
+
         nodePort: 30002
       ingress:
         enabled: false
@@ -90,8 +90,8 @@ omec-control-plane:
             description: WebUI initial local configuration
           configuration:
             # 5G mode
-            spec-compliant-sdf: false
             enableAuthentication: false
+            spec-compliant-sdf: false
             send-pebble-notifications: false
             # MongoDB configuration
             mongodb:
@@ -102,8 +102,6 @@ omec-control-plane:
               webuiDbName: aether
               webuiDbUrl: "mongodb://mongodb-arbiter-headless"
               checkReplica: false
-            enableAuthentication: false
-            spec-compliant-sdf: false
             webui-tls:
               pem: /var/run/certs/tls.crt
               key: /var/run/certs/tls.key
@@ -288,7 +286,7 @@ omec-control-plane:
                   - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
                     nsiId: 22
             metricsPort: ":8080"
-          
+
     amf:
       deploy: true
       # serviceAnnotations:
@@ -425,7 +423,7 @@ omec-control-plane:
               - nnrf-nfm
               - nnrf-disc
             metricsPort: ":8080"
-            
+
     smf:
       deploy: true
       podAnnotations:
@@ -480,8 +478,8 @@ omec-control-plane:
               - nsmf-pdusession
               - nsmf-event-exposure
             metricsPort: ":8080"
-            
-            
+
+
     ausf:
       deploy: true
       #podAnnotations:
@@ -612,14 +610,14 @@ omec-control-plane:
               brokerUri: "kafka-headless"
               brokerPort: 9092
               topicName: "sdcore-data-source-smf"
-    
+
 # Override values for omec-sub-provision (subscriber) Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml
 # ***Note: Most of these values can (and should) be set via ROC API***
 omec-sub-provision:
   enable: true
   images:
-    repository: "ghcr.io/networkgcorefullcode/"
+    repository: "192.168.12.15:8083/"
     tags:
       simapp: omecproject/simapp:1.6.11-dev
       init: omecproject/pod-init:rel-1.1.3
@@ -641,31 +639,31 @@ omec-sub-provision:
             # You can have any number of subscriber ranges
             # This block is always necessary to establish range(s) of valid IMSIs
             subscribers:
-            - ueId-start: "208930100007487"
-              ueId-end: "208930100007500"
-              plmnId: "20893"
-              opc: "981d464c7c52eb6e5036234984ad0bcf"
-              op: ""
-              key: "5122250214c33e723a5dd523fc145fc0"
-              sequenceNumber: "16f3b3f70fc2"
-            - ueId-start: "208930100007501"
-              ueId-end: "208930100007586"
-              plmnId: "20893"
-              opc: "981d464c7c52eb6e5036234984ad0bcf"
-              op: ""
-              key: "5122250214c33e723a5dd523fc145fc0"
-              sequenceNumber: "16f3b3f70fc2"
-            - ueId-start: "208930100008000"
-              ueId-end: "208930100008499"
-              plmnId: "20893"
-              opc: "981d464c7c52eb6e5036234984ad0bcf"
-              op: ""
-              key: "5122250214c33e723a5dd523fc145fc0"
-              sequenceNumber: "16f3b3f70fc2"
+              - ueId-start: "208930100007487"
+                ueId-end: "208930100007500"
+                plmnId: "20893"
+                opc: "981d464c7c52eb6e5036234984ad0bcf"
+                op: ""
+                key: "5122250214c33e723a5dd523fc145fc0"
+                sequenceNumber: "16f3b3f70fc2"
+              - ueId-start: "208930100007501"
+                ueId-end: "208930100007586"
+                plmnId: "20893"
+                opc: "981d464c7c52eb6e5036234984ad0bcf"
+                op: ""
+                key: "5122250214c33e723a5dd523fc145fc0"
+                sequenceNumber: "16f3b3f70fc2"
+              - ueId-start: "208930100008000"
+                ueId-end: "208930100008499"
+                plmnId: "20893"
+                opc: "981d464c7c52eb6e5036234984ad0bcf"
+                op: ""
+                key: "5122250214c33e723a5dd523fc145fc0"
+                sequenceNumber: "16f3b3f70fc2"
 
             # Configure Device Groups (ignored if provision-network-slice is disabled)
             device-groups:
-            - name:  "test5g-gnbsim-user-group1"
+              - name: "test5g-gnbsim-user-group1"
               imsis:
                 - "208930100007487"
                 - "208930100007488"
@@ -779,7 +777,7 @@ omec-sub-provision:
                 ue-ip-pool: {{ core.upf.default_upf.ue_ip_pool }}  # IP address pool for subscribers
                 ue-dnn-qos:
                   dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
-                  dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
+                  dnn-mbr-uplink: 1000      # UE level uplink QoS (Maximum bit rate per UE)
                   bitrate-unit: Mbps          # Unit for above QoS rates
                   traffic-class:              # Default bearer QCI/ARP (not used in 5G)
                     name: "platinum"
@@ -788,8 +786,8 @@ omec-sub-provision:
                     pdb: 300
                     pelr: 6
               site-info: "enterprise"
-            - name:  "test5g-gnbsim-user-group2"
-              imsis:
+              - name: "test5g-gnbsim-user-group2"
+                imsis:
                 - "208930100008000"
                 - "208930100008001"
                 - "208930100008002"
@@ -1298,7 +1296,7 @@ omec-sub-provision:
                 ue-ip-pool: {{ core.upf.default_upf.ue_ip_pool }}
                 ue-dnn-qos:
                   dnn-mbr-downlink: 1000
-                  dnn-mbr-uplink:   1000
+                  dnn-mbr-uplink: 1000
                   bitrate-unit: Mbps
                   traffic-class:
                     name: "platinum"
@@ -1312,33 +1310,33 @@ omec-sub-provision:
 
             # Configure Network Slices (ignored if provision-network-slice is disabled)
             network-slices:
-            - name: "default"      # can be any unique slice name
-              slice-id:            # must match with slice configured in gNB, UE
-                sd: "010203"
-                sst: 1
-              site-device-group:
-              - "test5g-gnbsim-user-group1"   # All UEs in this device-group are assigned to this slice
-              - "test5g-gnbsim-user-group2"   # Added second group with 500 UEs
-              # Applicaiton filters control what each user can access.
-              # Default, allow access to all applications
-              application-filtering-rules:
-              - rule-name: "ALLOW-ALL"
-                priority: 250
-                action: "permit"
-                endpoint: "0.0.0.0/0"
-                app-mbr-uplink: 1 #1Mbps
-                app-mbr-downlink: 5 #5Mbps
-                bitrate-unit: Mbps
-                traffic-class : #if same as APN-AMBR then its default bearer rule
-                  name: "silver"
-                  qci: 9
-                  arp: 6
-                  pdb: 300
-                  pelr: 6
-              site-info:
-                # Provide gNBs and UPF details and also PLMN for the site
-                gNodeBs:
-                - name: "gnb1"
+              - name: "default"      # can be any unique slice name
+                slice-id:            # must match with slice configured in gNB, UE
+                  sd: "010203"
+                  sst: 1
+                site-device-group:
+                  - "test5g-gnbsim-user-group1"   # All UEs in this device-group are assigned to this slice
+                  - "test5g-gnbsim-user-group2"   # Added second group with 500 UEs
+                # Applicaiton filters control what each user can access.
+                # Default, allow access to all applications
+                application-filtering-rules:
+                  - rule-name: "ALLOW-ALL"
+                    priority: 250
+                    action: "permit"
+                    endpoint: "0.0.0.0/0"
+                    app-mbr-uplink: 1 #1Mbps
+                    app-mbr-downlink: 5 #5Mbps
+                    bitrate-unit: Mbps
+                    traffic-class: #if same as APN-AMBR then its default bearer rule
+                      name: "silver"
+                      qci: 9
+                      arp: 6
+                      pdb: 300
+                      pelr: 6
+                site-info:
+                  # Provide gNBs and UPF details and also PLMN for the site
+                  gNodeBs:
+                    - name: "gnb1"
                   tac: 1
                 - name: "gnb2"
                   tac: 2
