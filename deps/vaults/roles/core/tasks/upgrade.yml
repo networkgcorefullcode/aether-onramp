@@ -1,0 +1,61 @@
+---
+- name: remove /tmp/sdcore-5g-values.yaml
+  file:
+    path: "/tmp/sdcore-5g-values.yaml"
+    state: absent
+  when: inventory_hostname in groups['master_nodes']
+
+- set_fact:
+    ran_subnet: "{{ result.stdout if (core.ran_subnet == '') else core.ran_subnet }}"
+    access_gw: "{{ core.upf.access_subnet[:-3] }}"
+    access_ip: "{{ core.upf.default_upf.ip.access + '/24' }}"
+    core_gw: "{{ core.upf.core_subnet[:-3] }}"
+    core_ip: "{{ core.upf.default_upf.ip.core + '/24' }}"
+  when: inventory_hostname in groups['master_nodes']
+
+- name: copy {{ ROOT_DIR }}/{{ core.values_file }} to /tmp/sdcore-5g-values.yaml
+  template:
+    src: "{{ ROOT_DIR }}/{{ core.values_file }}"
+    dest: "/tmp/sdcore-5g-values.yaml"
+  when: inventory_hostname in groups['master_nodes']
+
+- name: deploy aether 5gc
+  block:
+    - name: deploy aether 5gc
+      kubernetes.core.helm:
+        update_repo_cache: false
+        name: sd-core
+        release_namespace: aether-5gc
+        create_namespace: true
+        chart_ref: "/tmp/sdcore-helm-charts"
+        chart_version: "{{ core.helm.chart_version }}"
+        values_files:
+          - /tmp/sdcore-5g-values.yaml
+        wait: true
+        wait_timeout: "2m30s"
+        force: false
+      when: inventory_hostname in groups['master_nodes']
+
+  rescue:
+    - name: Get Pods Status
+      shell: kubectl get po -n aether-5gc
+      register: pod_status
+      changed_when: false
+      when: inventory_hostname in groups['master_nodes']
+
+    - name: restart Pods if not running
+      shell: |
+        while IFS= read -r line; do
+          name=$(echo "$line" | awk '{print $1}')
+          status=$(echo "$line" | awk '{print $3}')
+
+          if [[ "$status" != "Running" ]]; then
+            kubectl delete pod "$name" -n aether-5gc
+          fi
+        done <<< "{{ pod_status.stdout }}"
+      args:
+        executable: /bin/bash
+      when: inventory_hostname in groups['master_nodes']
+  always:
+    - pause:
+        seconds: 60
