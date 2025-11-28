@@ -23,7 +23,7 @@ spec:
       # El repositorio público que contiene los VALUES.YAML
     - repoURL: https://github.com/networkgcorefullcode/aether-onramp.git
       # La rama que debe observar en el repo PÚBLICO
-      targetRevision: dev
+      targetRevision: feature/checkconfig
       ref: values-from-git
 
   destination:
