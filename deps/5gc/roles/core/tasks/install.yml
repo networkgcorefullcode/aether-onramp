@@ -74,7 +74,7 @@
   block:
     - name: deploy aether 5gc
       kubernetes.core.helm:
-        update_repo_cache: false
+        update_repo_cache: true
         name: sd-core
         release_namespace: aether-5gc
         create_namespace: true
