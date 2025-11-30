@@ -27,21 +27,25 @@ cat QUICKSTART.md
 ## 📋 Características Implementadas
 
 ✅ **Instalación automatizada**
+
 - Creación de usuario y grupo dedicado `vault`
 - Descarga e instalación del binario de Vault
 - Configuración de capacidades del sistema (mlock)
 
 ✅ **Configuración segura**
+
 - Backend de almacenamiento en archivo
 - Servicio systemd para gestión persistente
 - Permisos y ownership correctos
 
 ✅ **Inicialización automática**
+
 - Generación de 5 unseal keys (threshold: 3)
 - Almacenamiento seguro local de keys y root token
 - Unsealing automático post-inicialización
 
 ✅ **Operaciones**
+
 - Deploy completo con un comando
 - Unseal manual cuando sea necesario
 - Backup y restore de claves
@@ -49,7 +53,7 @@ cat QUICKSTART.md
 
 ## 📁 Estructura del Proyecto
 
-```
+```bash
 vaults/
 ├── README.md                   # Este archivo
 ├── README_VAULT.md            # Documentación detallada
@@ -143,7 +147,7 @@ make uninstall
 
 Después del deployment, las claves se guardan en:
 
-```
+```bash
 vault_keys/
 ├── unseal_keys/
 │   ├── unseal_key_0
@@ -155,7 +159,8 @@ vault_keys/
     └── rootkey
 ```
 
-⚠️ **CRÍTICO**: 
+⚠️ **CRÍTICO**:
+
 - **NO** commitear estas claves a git (ya están en .gitignore)
 - Guardar en un password manager seguro
 - Considerar backup encriptado
@@ -215,7 +220,7 @@ chmod +x scripts/populate_vault.sh
 
 ### Flujo de Deployment
 
-```
+```bash
 1. Crear usuario/grupo vault
 2. Descargar e instalar binario
 3. Configurar capacidades (mlock)
@@ -281,6 +286,7 @@ vault status
 ## 🤝 Contribución
 
 Este proyecto está basado en:
+
 - [Setup HashiCorp Vault Using Ansible - Medium](https://medium.com/@mitesh_shamra/setup-hashicorp-vault-using-ansible-fa8073a70a56)
 - [AnsibleVaultRole - GitHub](https://github.com/MiteshSharma/AnsibleVaultRole)
 

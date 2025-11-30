@@ -13,7 +13,7 @@ Este proyecto despliega HashiCorp Vault en modo desarrollo usando Ansible, basad
 
 ## Estructura del Proyecto
 
-```
+``` bash
 vaults/
 ├── Makefile                    # Comandos make para deployment
 ├── hosts.ini                   # Inventario de Ansible
@@ -76,6 +76,7 @@ make deploy-dev
 ```
 
 Este comando:
+
 1. Crea el usuario y grupo vault
 2. Descarga e instala el binario de Vault
 3. Configura el servicio systemd
@@ -109,21 +110,25 @@ Después del deployment, las claves se almacenan en:
 - **Root Token**: `vault_keys/root_token/rootkey`
 
 ⚠️ **IMPORTANTE**: Guarda estas claves de forma segura. Son necesarias para:
+
 - Unseal del vault después de reinicios
 - Operaciones administrativas (root token)
 
 ## Arquitectura de Seguridad
 
 ### Usuario Dedicado
+
 - Usuario `vault` sin shell (`/sbin/nologin`)
 - Sin directorio home
 - Permisos mínimos necesarios
 
 ### Capacidades del Sistema
+
 - `cap_ipc_lock+ep` habilitado para usar mlock sin root
 - Previene swap de secretos a disco
 
 ### Almacenamiento
+
 - Backend de archivo en `/opt/vault/data`
 - Encriptación automática de datos en reposo
 
