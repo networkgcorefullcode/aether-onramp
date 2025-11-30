@@ -3,22 +3,26 @@
 ## Comandos Principales
 
 ### 1. Desplegar Vault
+
 ```bash
 cd deps/vaults
 make deploy-dev
 ```
 
 ### 2. Ver Estado
+
 ```bash
 make status
 ```
 
 ### 3. Unseal después de reinicio
+
 ```bash
 make unseal
 ```
 
 ### 4. Desinstalar
+
 ```bash
 make uninstall
 ```
@@ -26,12 +30,14 @@ make uninstall
 ## Acceso a Vault
 
 ### Variables de Entorno
+
 ```bash
 export VAULT_ADDR='http://127.0.0.1:8200'
 export VAULT_TOKEN=$(cat vault_keys/root_token/rootkey)
 ```
 
 ### Comandos Básicos
+
 ```bash
 # Ver estado
 vault status
@@ -57,7 +63,7 @@ vault kv get kv/myapp/config
 
 ## Estructura de Archivos Generados
 
-```
+``` bash
 vault_keys/
 ├── unseal_keys/
 │   ├── unseal_key_0
@@ -71,8 +77,8 @@ vault_keys/
 
 ## URLs Útiles
 
-- **API**: http://localhost:8200
-- **UI**: http://localhost:8200/ui (si está habilitada)
+- **API**: <http://localhost:8200>
+- **UI**: <http://localhost:8200/ui> (si está habilitada)
 
 ## Unseal Manual
 
@@ -100,16 +106,21 @@ sudo journalctl -u vault -f --no-pager
 ## Troubleshooting
 
 ### Problema: Vault está sellado
+
 **Solución**: `make unseal`
 
 ### Problema: No se puede conectar
-**Solución**: 
+
+**Solución**:
+
 1. Verificar servicio: `sudo systemctl status vault`
 2. Ver logs: `sudo journalctl -u vault -n 50`
 3. Verificar puerto: `sudo netstat -tulpn | grep 8200`
 
 ### Problema: Permisos denegados
+
 **Solución**: Verificar que estés usando el root token correcto
+
 ```bash
 export VAULT_TOKEN=$(cat vault_keys/root_token/rootkey)
 ```

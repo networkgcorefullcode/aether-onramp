@@ -12,7 +12,7 @@ export EXTRA_VARS ?= "@$(VAULT_ROOT_DIR)/vars/main.yml"
 deploy-dev:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(VAULT_ROOT_DIR)/deploy.yml \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS) \
-		--tags install
+		--tags install_dev
 
 unseal:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(VAULT_ROOT_DIR)/deploy.yml \

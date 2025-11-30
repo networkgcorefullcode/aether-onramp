@@ -13,6 +13,7 @@ export SRSRAN_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/srsran
 export UERANSIM_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/ueransim
 export K8S_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/k8s
 export ARGOCD_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/argocd
+export VAULT_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/vault
 
 export ANSIBLE_NAME ?= ansible-aether
 export ANSIBLE_CONFIG ?= $(AETHER_ROOT_DIR)/ansible.cfg
@@ -70,6 +71,12 @@ aether-ueransim-run: ueransim-run
 #### Provision ArgoCD ####
 aether-argocd-install: argocd-install
 aether-argocd-uninstall: argocd-uninstall
+
+#### Provision Vault ####
+aether-vault-install: vault-install
+aether-vault-uninstall: vault-uninstall
+aether-vault-unseal: vault-unseal
+aether-vault-status: vault-status
 
 # Rules:
 #	amp-install: roc-install roc-load monitor-install monitor-load
@@ -139,3 +146,4 @@ include $(AMP_ROOT_DIR)/Makefile
 include $(SDRAN_ROOT_DIR)/Makefile
 include $(UERANSIM_ROOT_DIR)/Makefile
 include $(ARGOCD_ROOT_DIR)/Makefile
+include $(VAULT_ROOT_DIR)/Makefile

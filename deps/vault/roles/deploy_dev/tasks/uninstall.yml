@@ -33,32 +33,32 @@
 
 - name: Remove vault config file
   file:
-    path: "{{ vault_config_path }}"
+    path: "{{ vault.config_path }}"
     state: absent
   become: yes
 
 - name: Remove vault data directory
   file:
-    path: "{{ vault_data_path }}"
+    path: "{{ vault.data_path }}"
     state: absent
   become: yes
 
 - name: Remove vault user
   user:
-    name: "{{ vault_user }}"
+    name: "{{ vault.user }}"
     state: absent
     remove: yes
   become: yes
 
 - name: Remove vault group
   group:
-    name: "{{ vault_group }}"
+    name: "{{ vault.group }}"
     state: absent
   become: yes
 
 - name: Remove downloaded vault archive
   file:
-    path: "/tmp/vault_{{ vault_version }}_linux_amd64.zip"
+    path: "/tmp/vault_{{ vault.version }}_linux_amd64.zip"
     state: absent
   become: yes
   ignore_errors: yes

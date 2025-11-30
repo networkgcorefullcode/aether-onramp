@@ -1,10 +1,10 @@
 ---
 - name: Deploy HashiCorp Vault in Dev Mode
-  hosts: master_nodes
+  hosts: vault_dev_nodes
   gather_facts: yes
   vars_files:
     - "{{ ROOT_DIR }}/vars/main.yml"
   
   roles:
     - role: deploy_dev
-      tags: ['vault', 'deploy']
+      tags: ['vault_dev', 'deploy_dev', 'install_dev']

@@ -3,13 +3,13 @@
 # Create vault user and group
 - name: Creating vault user group
   group:
-    name: "{{ vault_group }}"
+    name: "{{ vault.group }}"
   become: true
 
 - name: Creating vault user
   user:
-    name: "{{ vault_user }}"
-    group: "{{ vault_group }}"
+    name: "{{ vault.user }}"
+    group: "{{ vault.group }}"
     system: yes
     shell: "/sbin/nologin"
     comment: "vault nologin User"
@@ -22,18 +22,18 @@
   package:
     name: "{{ item }}"
     update_cache: yes
-  with_items: "{{ vault_install_prerequisites }}"
+  with_items: "{{ vault.install_prerequisites }}"
   become: yes
 
 # Download and install Vault binary
 - name: Download vault binary
   get_url:
-    url: "https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip"
-    dest: "/tmp/vault_{{ vault_version }}_linux_amd64.zip"
-    owner: "{{ vault_user }}"
-    group: "{{ vault_group }}"
+    url: "https://releases.hashicorp.com/vault/{{ vault.version }}/vault_{{ vault.version }}_linux_amd64.zip"
+    dest: "/tmp/vault_{{ vault.version }}_linux_amd64.zip"
+    owner: "{{ vault.user }}"
+    group: "{{ vault.group }}"
     mode: 0755
-    checksum: "{{ vault_checksum }}"
+    checksum: "{{ vault.checksum }}"
   register: vault_download
   become: yes
 
@@ -42,8 +42,8 @@
     src: "{{ vault_download.dest }}"
     dest: /usr/local/bin
     copy: no
-    owner: "{{ vault_user }}"
-    group: "{{ vault_group }}"
+    owner: "{{ vault.user }}"
+    group: "{{ vault.group }}"
     mode: 0755
     remote_src: yes
   become: yes
@@ -58,10 +58,10 @@
 # Create vault data directory
 - name: Create vault data directory
   file:
-    path: "{{ vault_data_path }}"
+    path: "{{ vault.data_path }}"
     state: directory
-    owner: "{{ vault_user }}"
-    group: "{{ vault_group }}"
+    owner: "{{ vault.user }}"
+    group: "{{ vault.group }}"
     mode: 0755
   become: yes
 
@@ -69,9 +69,9 @@
 - name: Copy vault config file
   template:
     src: vault.hcl.j2
-    dest: "{{ vault_config_path }}"
-    owner: "{{ vault_user }}"
-    group: "{{ vault_group }}"
+    dest: "{{ vault.config_path }}"
+    owner: "{{ vault.user }}"
+    group: "{{ vault.group }}"
     mode: 0640
   become: yes
 
@@ -109,14 +109,14 @@
 - name: Check if vault is already initialized
   shell: vault status -format=json
   environment:
-    VAULT_ADDR: "{{ vault_address }}"
+    VAULT_ADDR: "http://{{ vault.address }}"
   register: vault_status
   ignore_errors: yes
   changed_when: false
 
 - name: Create unseal directories
   file:
-    path: "{{ unseal_keys_dir_output }}"
+    path: "{{ vault.unseal_keys_dir_output }}"
     state: directory
     mode: 0700
   delegate_to: localhost
@@ -125,7 +125,7 @@
 
 - name: Create root token directories
   file:
-    path: "{{ root_token_dir_output }}"
+    path: "{{ vault.root_token_dir_output }}"
     state: directory
     mode: 0700
   delegate_to: localhost
@@ -135,7 +135,7 @@
 - name: Initialize Vault operator
   shell: vault operator init -key-shares=5 -key-threshold=3 -format json
   environment:
-    VAULT_ADDR: "{{ vault_address }}"
+    VAULT_ADDR: "http://{{ vault.address }}"
   register: vault_init_results
   when: vault_status.rc != 0 or (vault_status.stdout | from_json).initialized == false
 
@@ -146,7 +146,7 @@
 
 - name: Write unseal keys to files
   copy:
-    dest: "{{ unseal_keys_dir_output }}/unseal_key_{{ item.0 }}"
+    dest: "{{ vault.unseal_keys_dir_output }}/unseal_key_{{ item.0 }}"
     content: "{{ item.1 }}"
     mode: 0600
   with_indexed_items: "{{ vault_init_parsed.unseal_keys_b64 }}"
@@ -157,7 +157,7 @@
 - name: Write root token to file
   copy:
     content: "{{ vault_init_parsed.root_token }}"
-    dest: "{{ root_token_dir_output }}/rootkey"
+    dest: "{{ vault.root_token_dir_output }}/rootkey"
     mode: 0600
   delegate_to: localhost
   become: no
@@ -167,7 +167,7 @@
 - name: Reading unseal key contents
   command: cat {{ item }}
   register: unseal_keys
-  with_fileglob: "{{ unseal_keys_dir_output }}/*"
+  with_fileglob: "{{ vault.unseal_keys_dir_output }}/*"
   delegate_to: localhost
   become: no
   changed_when: false
@@ -176,7 +176,7 @@
   shell: |
     vault operator unseal {{ item.stdout }}
   environment:
-    VAULT_ADDR: "{{ vault_address }}"
+    VAULT_ADDR: "http://{{ vault.address }}"
   with_items: "{{ unseal_keys.results }}"
   when: unseal_keys.results | length > 0
   no_log: true
@@ -184,7 +184,7 @@
 - name: Verify vault is unsealed
   shell: vault status
   environment:
-    VAULT_ADDR: "{{ vault_address }}"
+    VAULT_ADDR: "http://{{ vault.address }}"
   register: vault_final_status
   changed_when: false
 

@@ -85,3 +85,23 @@ amp:
     helm:
       chart_ref: rancher/rancher-monitoring-crd
       chart_version: 101.0.0+up19.0.3
+
+vault:
+  version: "1.15.0"
+  # Get checksum with: ./deps/vault/scripts/get_vault_checksum.sh 1.15.0
+  checksum: "sha256:45cf99a6118edf4b8cf72fa95db8b70b4c6c09129c74fce4df0b62c4a03f4df6"
+  user: "vault"
+  group: "vault"
+  install_prerequisites:
+    - unzip
+    - curl
+  config_path: "/etc/vault.hcl"
+  data_path: "/opt/vault/data"
+  
+  # Dev mode configuration
+  dev_mode: true
+  address: "0.0.0.0:8200"
+  
+  # Unseal configuration
+  unseal_keys_dir_output: "{{ playbook_dir }}/vault_keys/unseal_keys"
+  root_token_dir_output: "{{ playbook_dir }}/vault_keys/root_token"
