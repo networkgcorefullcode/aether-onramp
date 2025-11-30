@@ -1,56 +1,30 @@
 #### Variables ####
 
 export ROOT_DIR ?= $(PWD)
-export 5GC_ROOT_DIR ?= $(ROOT_DIR)
+export VAULT_ROOT_DIR ?= $(ROOT_DIR)
 
-export HOSTS_INI_FILE ?= $(5GC_ROOT_DIR)/hosts.ini
+export HOSTS_INI_FILE ?= $(VAULT_ROOT_DIR)/hosts.ini
 
-export EXTRA_VARS ?= "@$(5GC_ROOT_DIR)/vars/main.yml"
+export EXTRA_VARS ?= "@$(VAULT_ROOT_DIR)/vars/main.yml"
 
-#### a. Debugging ####
+#### Vault Deployment ####
 
-5gc-debug:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/debug.yml \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+deploy-dev:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(VAULT_ROOT_DIR)/deploy.yml \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS) \
+		--tags install
 
-5gc-pingall:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/pingall.yml \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+unseal:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(VAULT_ROOT_DIR)/deploy.yml \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS) \
+		--tags unseal
 
-#### b. Provision k8s ####
-5gc-install: 5gc-router-install 5gc-sriov-install 5gc-core-install
-5gc-uninstall: 5gc-core-uninstall 5gc-router-uninstall
+uninstall:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(VAULT_ROOT_DIR)/deploy.yml \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS) \
+		--tags uninstall
 
-#### c. Provision router ####
-5gc-router-install:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/router.yml --tags install \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
-5gc-router-uninstall:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/router.yml --tags uninstall \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
-
-#### d. Provision sriov ####
-5gc-sriov-install:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/sriov.yml --tags install \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
-
-#### e. Provision core ####
-5gc-core-install:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/core.yml --tags install \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
-5gc-core-uninstall:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/core.yml --tags uninstall \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
-5gc-core-reset: 5gc-core-uninstall 5gc-core-install
-5gc-core-upgrade:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/core.yml --tags upgrade \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
-
-
-#### f. Provision Multiple UPF ###
-5gc-upf-install:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/upf.yml --tags install \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
-5gc-upf-uninstall:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(5GC_ROOT_DIR)/upf.yml --tags uninstall \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+status:
+	ansible -i $(HOSTS_INI_FILE) master_nodes -m shell \
+		-a "VAULT_ADDR=http://127.0.0.1:8200 vault status" \
+		--become

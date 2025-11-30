@@ -1,0 +1,13 @@
+ui = true
+
+storage "file" {
+  path = "{{ vault_data_path }}"
+}
+
+listener "tcp" {
+  address     = "{{ vault_address.split('//')[1] }}"
+  tls_disable = 1
+}
+
+api_addr = "{{ vault_address }}"
+cluster_addr = "https://127.0.0.1:8201"

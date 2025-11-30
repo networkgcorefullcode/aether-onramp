@@ -1,0 +1,40 @@
+---
+
+- name: Reading unseal key contents
+  command: cat {{ item }}
+  register: unseal_keys
+  with_fileglob: "{{ unseal_keys_dir_output }}/*"
+  delegate_to: localhost
+  become: no
+  changed_when: false
+
+- name: Check vault status
+  shell: vault status -format=json
+  environment:
+    VAULT_ADDR: "{{ vault_address }}"
+  register: vault_status
+  ignore_errors: yes
+  changed_when: false
+
+- name: Unseal vault with unseal keys
+  shell: |
+    vault operator unseal {{ item.stdout }}
+  environment:
+    VAULT_ADDR: "{{ vault_address }}"
+  with_items: "{{ unseal_keys.results }}"
+  when: 
+    - unseal_keys.results | length > 0
+    - vault_status.rc == 0
+    - (vault_status.stdout | from_json).sealed == true
+  no_log: true
+
+- name: Verify vault is unsealed
+  shell: vault status
+  environment:
+    VAULT_ADDR: "{{ vault_address }}"
+  register: vault_final_status
+  changed_when: false
+
+- name: Display vault status
+  debug:
+    var: vault_final_status.stdout_lines

@@ -1,0 +1,65 @@
+---
+
+- name: Stop vault service
+  service:
+    name: vault
+    state: stopped
+  become: yes
+  ignore_errors: yes
+
+- name: Disable vault service
+  service:
+    name: vault
+    enabled: no
+  become: yes
+  ignore_errors: yes
+
+- name: Remove vault systemd service file
+  file:
+    path: /etc/systemd/system/vault.service
+    state: absent
+  become: yes
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: yes
+
+- name: Remove vault binary
+  file:
+    path: /usr/local/bin/vault
+    state: absent
+  become: yes
+
+- name: Remove vault config file
+  file:
+    path: "{{ vault_config_path }}"
+    state: absent
+  become: yes
+
+- name: Remove vault data directory
+  file:
+    path: "{{ vault_data_path }}"
+    state: absent
+  become: yes
+
+- name: Remove vault user
+  user:
+    name: "{{ vault_user }}"
+    state: absent
+    remove: yes
+  become: yes
+
+- name: Remove vault group
+  group:
+    name: "{{ vault_group }}"
+    state: absent
+  become: yes
+
+- name: Remove downloaded vault archive
+  file:
+    path: "/tmp/vault_{{ vault_version }}_linux_amd64.zip"
+    state: absent
+  become: yes
+  ignore_errors: yes
+
