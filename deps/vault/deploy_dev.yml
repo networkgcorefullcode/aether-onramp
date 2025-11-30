@@ -7,4 +7,3 @@
   
   roles:
     - role: deploy_dev
-      tags: ['vault_dev', 'deploy_dev', 'install_dev']

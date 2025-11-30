@@ -73,10 +73,10 @@ aether-argocd-install: argocd-install
 aether-argocd-uninstall: argocd-uninstall
 
 #### Provision Vault ####
-aether-vault-install: vault-install
-aether-vault-uninstall: vault-uninstall
-aether-vault-unseal: vault-unseal
-aether-vault-status: vault-status
+aether-vault-install: vault-install-dev
+aether-vault-uninstall: vault-uninstall-dev
+aether-vault-unseal: vault-unseal-dev
+aether-vault-status: vault-status-dev
 
 # Rules:
 #	amp-install: roc-install roc-load monitor-install monitor-load
