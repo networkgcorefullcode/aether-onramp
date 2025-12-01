@@ -2,47 +2,31 @@
 
 export ROOT_DIR ?= $(PWD)
 export KUBEADMIN_ROOT_DIR ?= $(ROOT_DIR)
-export HOSTS_INI_FILE ?= $(ROOT_DIR)/hosts.ini
+export 5GC_ROOT_DIR ?= $(ROOT_DIR)
 
-#### Default target ####
-.PHONY: help
-help:
-	@echo "Kubernetes cluster management with kubeadm"
-	@echo ""
-	@echo "Available targets:"
-	@echo "  install         - Install complete Kubernetes cluster"
-	@echo "  config          - Configure containerd on all nodes"
-	@echo "  health          - Check health of all nodes"
-	@echo "  health-master   - Check health of master nodes"
-	@echo "  health-worker   - Check health of worker nodes"
-	@echo "  uninstall       - Remove Kubernetes cluster (WIP)"
-	@echo ""
+export HOSTS_INI_FILE ?= $(5GC_ROOT_DIR)/hosts.ini
 
-#### a. Installation ####
-.PHONY: install
-install:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/install.yml
+export EXTRA_VARS ?= "@$(5GC_ROOT_DIR)/vars/main.yml"
+kubeadmin-install:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/install.yml \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-#### b. Configuration ####
-.PHONY: config
-config:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/config.yml
+kubeadmin-config:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/config.yml \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-#### c. Health checks ####
-.PHONY: health
-health:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/health.yml
+kubeadmin-health:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/health.yml \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-.PHONY: health-master
-health-master:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/health.yml --tags master
+kubeadmin-health-master:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/health.yml --tags master \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-.PHONY: health-worker
-health-worker:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/health.yml --tags worker
+kubeadmin-health-worker:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/health.yml --tags worker \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-#### d. Uninstall (TODO) ####
-.PHONY: uninstall
-uninstall:
+kubeadmin-uninstall:
 	@echo "Uninstall functionality not yet implemented"
 	@echo "Manual steps required to remove Kubernetes cluster"

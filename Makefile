@@ -12,6 +12,7 @@ export OAI_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/oai
 export SRSRAN_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/srsran
 export UERANSIM_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/ueransim
 export K8S_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/k8s
+export KUBEADMIN_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/kubeadmin
 export ARGOCD_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/argocd
 export VAULT_ROOT_DIR ?= $(AETHER_ROOT_DIR)/deps/vault
 
@@ -77,6 +78,15 @@ aether-vault-install-dev: vault-install-dev
 aether-vault-uninstall-dev: vault-uninstall-dev
 aether-vault-unseal-dev: vault-unseal-dev
 aether-vault-status-dev: vault-status-dev
+
+#### Manage cluster with kubeadmin ####
+aether-kubeadmin-install: kubeadmin-install
+aether-kubeadmin-uninstall: kubeadmin-uninstall
+aether-kubeadmin-config: kubeadmin-config
+aether-kubeadmin-health: kubeadmin-health
+aether-kubeadmin-health-master: kubeadmin-health-master
+aether-kubeadmin-health-worker: kubeadmin-health-worker
+# ####  Makefile
 
 # Rules:
 #	amp-install: roc-install roc-load monitor-install monitor-load
