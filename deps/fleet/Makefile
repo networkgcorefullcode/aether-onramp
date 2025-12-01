@@ -9,10 +9,10 @@ export EXTRA_VARS ?= "@$(5GC_ROOT_DIR)/vars/main.yml"
 
 
 ### Provision ArgoCD ###
-fleet-install:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(ARGOCD_ROOT_DIR)/fleet_ansible.yml --tags install \
+argocd-install:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(ARGOCD_ROOT_DIR)/argocd.yml --tags install \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-fleet-uninstall:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(ARGOCD_ROOT_DIR)/fleet_ansible.yml --tags uninstall \
+argocd-uninstall:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(ARGOCD_ROOT_DIR)/argocd.yml --tags uninstall \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
