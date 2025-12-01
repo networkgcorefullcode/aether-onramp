@@ -2,10 +2,10 @@
 
 - name: CIS MODE
   become: true
-  when: >-
-    (cluster_rke2_config.profile | default("") | regex_search('^cis(-\\d+.\\d+)?$') | default(false, true) | bool) or
-    (group_rke2_config.profile | default("") | regex_search('^cis(-\\d+.\\d+)?$') | default(false, true) | bool) or
-    (host_rke2_config.profile | default("") | regex_search('^cis(-\\d+.\\d+)?$') | default(false, true) | bool)
+  when:
+    - (cluster_rke2_config is defined and (cluster_rke2_config.profile | default("") | regex_search('^cis(-\d+.\d+)?$'))) or
+      (group_rke2_config is defined and (group_rke2_config.profile | default("") | regex_search('^cis(-\d+.\d+)?$'))) or
+      (host_rke2_config is defined and (host_rke2_config.profile | default("") | regex_search('^cis(-\d+.\d+)?$')))
   block:
     - name: Create etcd group
       ansible.builtin.group:
