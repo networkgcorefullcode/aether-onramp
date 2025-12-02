@@ -1,5 +1,5 @@
-handlers:
-  - name: restart containerd
-    systemd:
-      name: containerd
-      state: restarted
+---
+- name: restart containerd
+  systemd:
+    name: containerd
+    state: restarted
