@@ -28,7 +28,7 @@ kubeadmin:
     version: "2.2.0"
     config_path: "/etc/containerd/config.toml"
     cri_plugin: "io.containerd.grpc.v1.cri"
-    url_targz: "https://github.com/containerd/containerd/releases/download/v2.2.0/containerd-2.2.0-linux-arm64.tar.gz"
+    url_targz: "https://github.com/containerd/containerd/releases/download/v2.2.0/containerd-2.2.0-linux-amd64.tar.gz"
   
   runc:
     version: "v1.4.0"
