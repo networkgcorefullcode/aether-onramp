@@ -130,20 +130,6 @@
     dest: /tmp/cni-plugins.tar.gz
     mode: '0644'
 
-- name: Verify CNI plugins checksum (optional)
-  get_url:
-    url: "{{ kubeadmin.cni_plugins.url_checksum }}"
-    dest: /tmp/cni-plugins.tar.gz.sha256sum
-    mode: '0644'
-  when: kubeadmin.cni_plugins.url_checksum is defined
-
-- name: Validate CNI plugins checksum
-  shell: |
-    cd /tmp
-    sha256sum -c cni-plugins.tar.gz.sha256sum
-  when: kubeadmin.cni_plugins.url_checksum is defined
-  changed_when: false
-
 - name: Extract CNI plugins to /opt/cni/bin
   unarchive:
     src: /tmp/cni-plugins.tar.gz
