@@ -1,5 +1,5 @@
 ---
-- name: Uninstall Ansible Install Playbook
+- name: Uninstall Ansible Playbook
   hosts: 
     - master_nodes
     - worker_nodes
