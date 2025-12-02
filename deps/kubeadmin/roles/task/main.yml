@@ -3,5 +3,5 @@
 # This file orchestrates the execution of different tasks based on tags
 
 - name: Init install
-  include_tasks: install.yml
+  include_tasks: manage_deps.yml
   tags: install
