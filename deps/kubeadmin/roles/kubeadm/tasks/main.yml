@@ -3,11 +3,11 @@
 # This file orchestrates the execution of different tasks based on tags
 
 - name: Init install
-  include_tasks: manage_deps.yml
+  include_tasks: install.yml
   tags: install
 
 - name: Init uninstall
-  include_tasks: manage_deps.yml
+  include_tasks: uninstall.yml
   tags: 
     - uninstall
     - restore-swap
