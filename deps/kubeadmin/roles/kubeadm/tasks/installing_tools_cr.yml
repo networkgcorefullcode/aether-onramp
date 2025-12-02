@@ -99,20 +99,6 @@
     dest: /tmp/runc.amd64
     mode: '0755'
 
-- name: Verify runc checksum (optional)
-  get_url:
-    url: "{{ kubeadmin.runc.url_checksum }}"
-    dest: /tmp/runc.amd64.sha256sum
-    mode: '0644'
-  when: kubeadmin.runc.url_checksum is defined
-
-- name: Validate runc checksum
-  shell: |
-    cd /tmp
-    sha256sum -c runc.amd64.sha256sum
-  when: kubeadmin.runc.url_checksum is defined
-  changed_when: false
-
 - name: Install runc binary
   copy:
     src: /tmp/runc.amd64
