@@ -1,6 +1,8 @@
 ---
 - name: Despliegue con role de Ansible
-  hosts: "all"
+  hosts: 
+    - master_nodes
+    - worker_nodes
   become: true
   roles:
     - role: task
