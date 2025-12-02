@@ -6,5 +6,3 @@
   become: true
   roles:
     - role: kubeadm
-      tags:
-        - install

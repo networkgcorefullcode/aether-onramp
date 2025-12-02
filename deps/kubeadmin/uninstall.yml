@@ -5,6 +5,3 @@
   become: true
   roles:
     - role: kubeadm
-      tags:
-        - uninstall
-        - restore-swap
