@@ -161,14 +161,22 @@
   args:
     creates: /etc/containerd/config.toml
 
-- name: Check containerd version to determine config format
-  shell: "containerd --version | awk -F 'v|\\.' '{print $2}'"
-  register: containerd_major_version
+- name: Get containerd version raw
+  command: containerd --version
+  register: containerd_version_raw
   changed_when: false
 
-- name: Display containerd version
+- name: Display containerd raw version
   debug:
-    msg: "Containerd major version: {{ containerd_major_version.stdout }}"
+    msg: "containerd --version: {{ containerd_version_raw.stdout }}"
+
+- name: Parse containerd major version
+  set_fact:
+    containerd_major_version: "{{ (containerd_version_raw.stdout | regex_search('([0-9]+)\\.([0-9]+)\\.([0-9]+)', '\\1') | default('1')) }}"
+
+- name: Display containerd major version
+  debug:
+    msg: "Containerd major version: {{ containerd_major_version }}"
 
 # ============================================
 # 5. CONFIGURE SYSTEMD CGROUP DRIVER
@@ -180,7 +188,7 @@
     line: '            SystemdCgroup = true'
     insertafter: '^\s*\[plugins\."io\.containerd\.grpc\.v1\.cri"\.containerd\.runtimes\.runc\.options\]'
     backup: yes
-  when: containerd_major_version.stdout == "1"
+  when: containerd_major_version == "1"
   notify: restart containerd
 
 - name: Configure systemd cgroup driver (containerd 2.x)
@@ -190,7 +198,7 @@
     line: '            SystemdCgroup = true'
     insertafter: '^\s*\[plugins\.''io\.containerd\.cri\.v1\.runtime''\.containerd\.runtimes\.runc\.options\]'
     backup: yes
-  when: containerd_major_version.stdout != "1"
+  when: containerd_major_version != "1"
   notify: restart containerd
 
 # ============================================
@@ -213,10 +221,31 @@
     name: containerd
     enabled: yes
 
-- name: Start containerd service
-  systemd:
-    name: containerd
-    state: started
+- block:
+    - name: Start containerd service
+      systemd:
+        name: containerd
+        state: started
+  rescue:
+    - name: Get containerd service status
+      command: systemctl status containerd --no-pager
+      register: containerd_status_failed
+      changed_when: false
+
+    - name: Get containerd journal logs
+      command: journalctl -xeu containerd --no-pager --since "-10min"
+      register: containerd_journal_failed
+      changed_when: false
+
+    - name: Show containerd failure diagnostics
+      debug:
+        msg: |
+          Service start failed. Status:
+          {{ containerd_status_failed.stdout }}
+          ----
+          Journal:
+          {{ containerd_journal_failed.stdout }}
+      failed_when: true
 
 - name: Wait for containerd socket
   wait_for:
