@@ -1,0 +1,16 @@
+---
+- name: Include task to check requirements in the nodes
+  include_tasks: task_modules/check_nodes.yml
+  tags: install
+
+- name: Include Task for swap config
+  include_tasks: task_modules/config_nodes_swap.yml
+  tags: install
+
+- name: Include kubeadmin installation tasks for kubeadm, kubelet, and kubectl
+  include_tasks: task_modules/installing_tools_kkk.yml
+  tags: install
+
+- name: Include kubeadmin installation tasks 
+  include_tasks: task_modules/installing_tools_cr.yml
+  tags: install
