@@ -3,9 +3,9 @@
 # This file orchestrates the execution of different tasks based on tags
 
 - name: Init install
-  include_tasks: roles/kubeadm/tasks/install.yml
+  import_tasks: roles/kubeadm/tasks/install.yml
   tags: install
 
 - name: Init uninstall
-  include_tasks: roles/kubeadm/tasks/uninstall.yml
+  import_tasks: roles/kubeadm/tasks/uninstall.yml
   tags: uninstall
