@@ -5,3 +5,9 @@
 - name: Init install
   include_tasks: manage_deps.yml
   tags: install
+
+- name: Init uninstall
+  include_tasks: manage_deps.yml
+  tags: 
+    - uninstall
+    - restore-swap
