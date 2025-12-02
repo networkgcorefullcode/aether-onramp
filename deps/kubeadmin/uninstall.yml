@@ -1,5 +1,4 @@
----
-- name: Deploy Ansible Install Playbook
+- name: Uninstall Ansible Install Playbook
   hosts: 
     - master_nodes
     - worker_nodes
@@ -7,4 +6,5 @@
   roles:
     - role: kubeadm
       tags:
-        - install
+        - uninstall
+        - restore-swap
