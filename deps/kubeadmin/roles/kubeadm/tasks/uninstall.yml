@@ -1,3 +1,4 @@
+---
 # ============================================
 # UNINSTALLATION TASKS
 # ============================================
@@ -9,3 +10,4 @@
 
 - name: Include Task to restore swap (optional)
   include_tasks: restore_swap.yml
+  tags: restore-swap
