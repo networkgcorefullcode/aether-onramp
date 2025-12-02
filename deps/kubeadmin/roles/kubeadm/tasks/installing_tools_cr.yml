@@ -288,7 +288,7 @@
       ╠══════════════════════════════════════════════════════════════════╣
       ║ Status: {{ ('SUCCESSFUL ✓' if containerd_active.stdout == 'active' else 'FAILED ⚠️') | center(55) }} ║
       ╠══════════════════════════════════════════════════════════════════╣
-      ║ Containerd Version: {{ containerd_major_version.stdout | center(42) }} ║
+      ║ Containerd Version: {{ containerd_major_version | center(42) }} ║
       ║ Service Status: {{ containerd_active.stdout | center(47) }} ║
       ║ CRI Socket: {{ ('/run/containerd/containerd.sock EXISTS' if containerd_socket.stat.exists else 'NOT FOUND') | center(47) }} ║
       ╠══════════════════════════════════════════════════════════════════╣
