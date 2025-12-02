@@ -6,5 +6,3 @@
     - role: task
       tags:
         - install
-      handlers:
-        - 

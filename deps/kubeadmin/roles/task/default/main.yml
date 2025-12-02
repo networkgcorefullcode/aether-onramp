@@ -21,6 +21,9 @@ kubeadmin:
     - RedHat
     - Rocky
 
+  kubernetes:
+    version: "v1.34.0"
+    
   containerd:
     version: "2.2.0"
     config_path: "/etc/containerd/config.toml"

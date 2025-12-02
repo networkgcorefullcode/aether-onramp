@@ -7,20 +7,27 @@
 
 - name: Get latest Kubernetes release version
   ansible.builtin.uri:
-    url: https://dl.k8s.io/release/stable.txt
+    url: https://dl.k8s.io/release/{{stable.txt}}
     return_content: yes
   register: k8s_release
+  when: kubeadmin.kubernetes.version is not defined
 
 - name: Download kubeadm binary
   ansible.builtin.get_url:
-    url: "https://dl.k8s.io/release/{{ k8s_release.content | trim }}/bin/linux/amd64/kubeadm"
-    dest: /usr/local"bin/kubeadm
-    mode: '075"'
+    url: "https://dl.k8s.io/release/{{ k8s_release.content | trim | default(kubeadmin.kubernetes.version) }}/bin/linux/amd64/kubeadm"
+    dest: /usr/local/bin/kubeadm
+    mode: '0755'
 
 - name: Download kubelet binary
   ansible.builtin.get_url:
-    url: "https://dl.k8s.io/release/{{ k8s_release.content | trim }}/bin/linux/amd64/kubelet"
+    url: "https://dl.k8s.io/release/{{ k8s_release.content | trim | default(kubeadmin.kubernetes.version) }}/bin/linux/amd64/kubelet"
     dest: /usr/local/bin/kubelet
+    mode: '0755'
+
+- name: Download kubectl binary
+  ansible.builtin.get_url:
+    url: "https://dl.k8s.io/release/{{ k8s_release.content | trim | default(kubeadmin.kubernetes.version) }}/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
     mode: '0755'
 
 - name: Download kubelet systemd service file
