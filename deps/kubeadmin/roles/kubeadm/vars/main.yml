@@ -28,17 +28,15 @@ kubeadmin:
     version: "2.2.0"
     config_path: "/etc/containerd/config.toml"
     cri_plugin: "io.containerd.grpc.v1.cri"
-    url_targz: "https://github.com/containerd/containerd/releases/download/v2.2.0/containerd-2.2.0-linux-arm64.tar.gz"
+    url_targz: "https://github.com/containerd/containerd/releases/download/v2.2.0/containerd-2.2.0-linux-amd64.tar.gz"
   
   runc:
     version: "v1.4.0"
     url_binary: "https://github.com/opencontainers/runc/releases/download/v1.4.0/runc.amd64"
-    url_checksum: "sha256:c5d4995c5aec204d7e1827d9d9a6b45042602736f7f415f484252e576dcdac28"
 
   cni_plugins:
     version: "v1.8.0"
     url_targz: "https://github.com/containernetworking/plugins/releases/download/v1.8.0/cni-plugins-linux-amd64-v1.8.0.tgz"
-    url_checksum: "https://github.com/containernetworking/plugins/releases/download/v1.8.0/cni-plugins-linux-amd64-v1.8.0.tgz.sha256"
 
   crictl:
     version: "v1.34.0"
