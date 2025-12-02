@@ -162,7 +162,7 @@
     creates: /etc/containerd/config.toml
 
 - name: Check containerd version to determine config format
-  shell: containerd --version | grep -oP 'v\K\d+' | head -1
+  shell: "containerd --version | awk -F 'v|\\.' '{print $2}'"
   register: containerd_major_version
   changed_when: false
 
