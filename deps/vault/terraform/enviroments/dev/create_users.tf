@@ -18,8 +18,7 @@ resource "random_password" "user_passwords" {
 module "vault_users" {
   for_each = { for user in local.users : user.username => user }
   source   = "../../modules/vault_generic_endpoint"
-  sensitive_data = true
-
+  
   path      = "auth/userpass/users/${each.value.username}"
   data_json = jsonencode({
     password = random_password.user_passwords[each.key].result
