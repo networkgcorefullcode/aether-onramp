@@ -1,7 +1,7 @@
 # Load users directly from the YAML file
 
 data "local_file" "users_yaml" {
-  filename = "${path.module}/util_files/users.yml"
+  filename = "${path.module}/configs/users.yml"
 }
 
 locals {

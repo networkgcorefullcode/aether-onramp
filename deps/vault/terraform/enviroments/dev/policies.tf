@@ -1,7 +1,7 @@
 # Load policies directly from the YAML file
 
 data "local_file" "policies_yaml" {
-  filename = "${path.module}/util_files/policies.yml"
+  filename = "${path.module}/configs/policies.yml"
 }
 
 locals {
