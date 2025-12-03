@@ -77,11 +77,18 @@ Instalación: <https://kubernetes.io/docs/setup/production-environment/tools/kub
 
 <https://gateway-api.sigs.k8s.io/guides/>
 
-
 ### Configurar Gateway API
 
 Instalar los CRDs para Gateway API
 
 ```bash
 kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
+```
+
+### Apply
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset.yml
+kubectl get crd network-attachment-definitions.k8s.cni.cncf.io
+kubectl label node <node_name> node-role.aetherproject.org=omec-upf
 ```
