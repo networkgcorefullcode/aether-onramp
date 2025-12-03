@@ -8,20 +8,13 @@ locals {
   users = yamldecode(data.local_file.users_yaml.content).users
 }
 
-resource "random_password" "user_passwords" {
-  for_each = { for user in local.users : user.username => user }
-  length   = 16
-  special  = true
-  override_special = "@#$%"
-}
-
 module "vault_users" {
   for_each = { for user in local.users : user.username => user }
   source   = "../../modules/vault_generic_endpoint"
   
   path      = "auth/${module.auth_backend.path}/users/${each.value.username}"
   data_json = {
-    password = random_password.user_passwords[each.key].result
+    password = each.value.password
     policies = each.value.policies
   }
   

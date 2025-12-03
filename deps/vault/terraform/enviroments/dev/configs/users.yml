@@ -1,29 +1,36 @@
 users:
   - username: dev_user
+    password: 12345678
     policies:
       - default
       - dev_policy
   - username: test_user
+    password: 12345678
     policies:
       - default
       - test_policy
   - username: fernando_pizarro
+    password: 12345678
     policies:
       - default
       - audit_policy
   - username: abel
+    password: 12345678
     policies:
       - default
       - management_policy
   - username: pedro_valdes
+    password: 12345678
     policies:
       - default
       - admin_policy
   - username: camila
+    password: 12345678
     policies:
       - default
       - management_policy
   - username: admin_user
+    password: 12345678
     policies:
       - default
       - admin_policy
