@@ -72,3 +72,16 @@ Instalación: <https://kubernetes.io/docs/setup/production-environment/tools/kub
 ### Validar configuración de Nodos
 
 <https://kubernetes.io/docs/setup/best-practices/node-conformance/>
+
+### Gateway API
+
+<https://gateway-api.sigs.k8s.io/guides/>
+
+
+### Configurar Gateway API
+
+Instalar los CRDs para Gateway API
+
+```bash
+kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
+```
