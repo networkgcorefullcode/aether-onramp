@@ -19,7 +19,7 @@ module "vault_users" {
   for_each = { for user in local.users : user.username => user }
   source   = "../../modules/vault_generic_endpoint"
   
-  path      = "auth/userpass/users/${each.value.username}"
+  path      = "auth/dev/userpass/users/${each.value.username}"
   data_json = {
     password = random_password.user_passwords[each.key].result
     policies = each.value.policies
