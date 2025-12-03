@@ -8,5 +8,7 @@ resource "vault_transit_secret_backend_key" "key" {
   exportable              = var.exportable
   convergent_encryption   = var.convergent_encryption
   type                    = var.type
-  min_available_version   = var.min_available_version
+
+  min_decryption_version = var.min_decryption_version
+  min_encryption_version = var.min_encryption_version
 }

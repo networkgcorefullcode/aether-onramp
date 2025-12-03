@@ -52,8 +52,14 @@ variable "type" {
   default     = "aes256-gcm96"
 }
 
-variable "min_available_version" {
-  description = "The minimum key version available for use."
+variable "min_decryption_version" {
+  description = "The minimum key version that can be used for decryption."
+  type        = number
+  default     = null
+}
+
+variable "min_encryption_version" {
+  description = "The minimum key version that can be used for encryption."
   type        = number
   default     = null
 }
