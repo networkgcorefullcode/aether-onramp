@@ -5,7 +5,7 @@ resource "vault_auth_backend" "this" {
   description = var.description
   path        = var.path
   tune {
-    default_lease_ttl = tostring(var.default_lease_ttl)
-    max_lease_ttl     = tostring(var.max_lease_ttl)
+    default_lease_ttl = var.default_lease_ttl
+    max_lease_ttl     = var.max_lease_ttl
   }
 }

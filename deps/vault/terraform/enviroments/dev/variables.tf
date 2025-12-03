@@ -23,12 +23,12 @@ variable "auth_path" {
 
 variable "auth_default_lease_ttl" {
   description = "The default lease TTL for tokens issued by this auth backend."
-  type        = number
-  default     = 3600
+  type        = string
+  default     = null
 }
 
 variable "auth_max_lease_ttl" {
   description = "The maximum lease TTL for tokens issued by this auth backend."
-  type        = number
-  default     = 7200
+  type        = string
+  default     = null
 }

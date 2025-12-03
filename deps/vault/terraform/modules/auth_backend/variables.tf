@@ -18,12 +18,12 @@ variable "path" {
 
 variable "default_lease_ttl" {
   description = "The default lease TTL for tokens issued by this auth backend."
-  type        = number
+  type        = string
   default     = null
 }
 
 variable "max_lease_ttl" {
   description = "The maximum lease TTL for tokens issued by this auth backend."
-  type        = number
+  type        = string
   default     = null
 }
