@@ -25,6 +25,6 @@ vault-uninstall-dev:
 		--tags uninstall
 
 vault-status-dev:
-	ansible -i $(HOSTS_INI_FILE) master_nodes -m shell \
+	ansible -i $(HOSTS_INI_FILE) vault_dev_nodes -m shell \
 		-a "VAULT_ADDR=http://127.0.0.1:8200 vault status" \
 		--become
