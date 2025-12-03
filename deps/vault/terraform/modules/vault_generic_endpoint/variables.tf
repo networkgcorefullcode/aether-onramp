@@ -10,3 +10,9 @@ variable "data_json" {
   default     = {}
   sensitive = true
 }
+
+variable "ignore_absent_fields" {
+  default = false
+  type = bool
+  description = "Whether to ignore absent fields when writing to the endpoint."
+}

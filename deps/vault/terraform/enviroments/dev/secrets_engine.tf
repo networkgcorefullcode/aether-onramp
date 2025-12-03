@@ -16,7 +16,7 @@ module "transit_secret_engine_dev" {
     source      = "../../modules/vault_mount"
     path        = "transit-dev"
     type        = "transit"
-    description = "This is an example transit secret engine mount"
+    description = "Transit dev secret engine"
 
     default_lease_ttl_seconds = 3600
     max_lease_ttl_seconds     = 7200
