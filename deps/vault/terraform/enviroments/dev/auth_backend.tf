@@ -3,9 +3,9 @@
 module "auth_backend" {
   source = "../../modules/auth_backend"
 
-  type              = var.auth_type
-  description       = var.auth_description
-  path              = var.auth_path
-  default_lease_ttl = var.auth_default_lease_ttl
-  max_lease_ttl     = var.auth_max_lease_ttl
+  type              = "userpass"
+  description       = "Development environment auth backend"
+  path              = "auth-dev"
+  default_lease_ttl = "3600s"
+  max_lease_ttl     = "7200s"
 }

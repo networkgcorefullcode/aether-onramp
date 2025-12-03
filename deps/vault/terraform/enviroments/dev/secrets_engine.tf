@@ -1,6 +1,6 @@
 module "rest_secret_engine_dev" {
     source                    = "../../modules/vault_mount"
-    path                      = "dev"
+    path                      = "kv-dev"
     type                      = "kv-v2"
     description               = "KV secrets engine for development environment"
     default_lease_ttl_seconds = 3600
@@ -14,7 +14,7 @@ module "rest_secret_engine_dev" {
 
 module "transit_secret_engine_dev" {
     source      = "../../modules/vault_mount"
-    path        = "dev"
+    path        = "transit-dev"
     type        = "transit"
     description = "This is an example transit secret engine mount"
 
