@@ -1,7 +1,7 @@
 # Main Terraform configuration for the dev environment
 
 module "auth_backend" {
-  source = "../modules/auth_backend"
+  source = "../../modules/auth_backend"
 
   type              = var.auth_type
   description       = var.auth_description

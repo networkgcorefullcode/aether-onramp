@@ -10,7 +10,7 @@ locals {
 
 module "policies" {
   for_each = { for policy in local.policies : policy.name => policy }
-  source   = "../modules/policies"
+  source   = "../../modules/policies"
 
   name     = each.value.name
   policy   = each.value.policy
