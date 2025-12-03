@@ -18,7 +18,7 @@ variable "auth_description" {
 variable "auth_path" {
   description = "The path where the auth backend will be mounted."
   type        = string
-  default     = "auth/dev"
+  default     = "dev"
 }
 
 variable "auth_default_lease_ttl" {
