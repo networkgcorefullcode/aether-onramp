@@ -1,0 +1,29 @@
+users:
+  - username: dev_user
+    policies:
+      - default
+      - dev_policy
+  - username: test_user
+    policies:
+      - default
+      - test_policy
+  - username: fernando_pizarro
+    policies:
+      - default
+      - audit_policy
+  - username: abel
+    policies:
+      - default
+      - management_policy
+  - username: pedro_valdes
+    policies:
+      - default
+      - admin_policy
+  - username: camila
+    policies:
+      - default
+      - management_policy
+  - username: admin_user
+    policies:
+      - default
+      - admin_policy

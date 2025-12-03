@@ -5,26 +5,26 @@
 ### 1. Desplegar Vault
 
 ```bash
-cd deps/vaults
-make deploy-dev
+cd deps/vault
+make vault-deploy-dev
 ```
 
 ### 2. Ver Estado
 
 ```bash
-make status
+make vault-status-dev
 ```
 
 ### 3. Unseal después de reinicio
 
 ```bash
-make unseal
+make vault-unseal-dev
 ```
 
 ### 4. Desinstalar
 
 ```bash
-make uninstall
+make vault-uninstall-dev
 ```
 
 ## Acceso a Vault

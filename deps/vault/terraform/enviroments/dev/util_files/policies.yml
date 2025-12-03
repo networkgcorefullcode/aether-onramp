@@ -1,0 +1,31 @@
+policies:
+  - name: default
+    policy: |
+      path "secret/data/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+  - name: dev_policy
+    policy: |
+      path "secret/data/dev/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+  - name: test_policy
+    policy: |
+      path "secret/data/test/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+  - name: audit_policy
+    policy: |
+      path "audit/logs/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+  - name: management_policy
+    policy: |
+      path "sys/*" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+      }
+  - name: admin_policy
+    policy: |
+      path "*" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+      }
