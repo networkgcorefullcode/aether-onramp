@@ -40,11 +40,10 @@
   unarchive:
     src: "{{ vault_download.dest }}"
     dest: /usr/local/bin
-    copy: no
+    remote_src: yes
     owner: "{{ vault.user }}"
     group: "{{ vault.group }}"
     mode: 0755
-    remote_src: yes
   become: yes
 
 - name: Set vault binary capabilities
