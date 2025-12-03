@@ -1,7 +1,5 @@
 vault:
-  version: "1.15.0"
-  # Get checksum with: ./scripts/get_vault_checksum.sh 1.15.0
-  checksum: "sha256:45cf99a6118edf4b8cf72fa95db8b70b4c6c09129c74fce4df0b62c4a03f4df6"
+  version: "1.21.1"
   user: "vault"
   group: "vault"
   install_prerequisites:

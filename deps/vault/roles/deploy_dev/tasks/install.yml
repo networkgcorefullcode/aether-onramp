@@ -33,7 +33,6 @@
     owner: "{{ vault.user }}"
     group: "{{ vault.group }}"
     mode: 0755
-    checksum: "{{ vault.checksum }}"
   register: vault_download
   become: yes
 
