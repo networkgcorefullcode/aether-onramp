@@ -20,8 +20,8 @@ module "vault_users" {
   source   = "../../modules/vault_generic_endpoint"
   
   path      = "auth/userpass/users/${each.value.username}"
-  data_json = jsonencode({
+  data_json = {
     password = random_password.user_passwords[each.key].result
     policies = each.value.policies
-  })
+  }
 }
