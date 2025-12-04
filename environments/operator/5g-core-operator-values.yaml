@@ -259,7 +259,7 @@ omec-control-plane:
               - nudm-ee
               - nudm-pp
             ssm:
-              enable: true
+              enable: false
               host: https://192.168.12.16:9000
               tls_insecure: true
           info:
@@ -659,6 +659,8 @@ omec-user-plane:
       routes:
         - to: 192.168.10.50
           via: 169.254.1.1
+        - to: 192.168.100.0/24
+          via: 192.168.252.1
       enb:
         subnet: 192.168.10.0/24 # Subnet for the gNB network
       access:

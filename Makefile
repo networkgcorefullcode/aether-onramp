@@ -18,8 +18,9 @@ export ANSIBLE_NAME ?= ansible-aether
 export ANSIBLE_CONFIG ?= $(AETHER_ROOT_DIR)/ansible.cfg
 export HOSTS_INI_FILE ?= $(AETHER_ROOT_DIR)/hosts.ini
 
-export EXTRA_VARS ?= "@$(AETHER_ROOT_DIR)/vars/main.yml"
-
+#export EXTRA_VARS ?= "@$(AETHER_ROOT_DIR)/vars/main.yml"
+# este es especifico para FAPG, cuando se quiera volver a usar los datos de avangenio usar el de arriba
+export EXTRA_VARS ?= "@$(AETHER_ROOT_DIR)/vars/main-FAPG.yml"
 
 #### Validate Ansible Configuration ####
 aether-pingall:
@@ -33,6 +34,8 @@ aether-k8s-uninstall: k8s-uninstall
 aether-5gc-install: 5gc-install
 aether-5gc-provision: 5gc-provision
 aether-5gc-uninstall: 5gc-uninstall
+aether-5gc-router-install: 5gc-router-install
+aether-5gc-router-uninstall: 5gc-router-uninstall
 aether-gnbsim-install: gnbsim-install
 aether-gnbsim-uninstall: gnbsim-uninstall
 aether-amp-install: amp-install
