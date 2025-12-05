@@ -8,13 +8,7 @@ output "approle_role_name" {
 
 output "approle_role_id" {
   description = "The Role ID for AppRole authentication."
-  value       = vault_approle_auth_backend_role_id.app_role_id.role_id
-  sensitive   = true
-}
-
-output "approle_secret_id" {
-  description = "The Secret ID for AppRole authentication."
-  value       = vault_approle_auth_backend_secret_id.app_secret_id.secret_id
+  value       = vault_approle_auth_backend_role.app_role.role_id
   sensitive   = true
 }
 

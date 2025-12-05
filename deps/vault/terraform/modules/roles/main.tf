@@ -9,16 +9,6 @@ resource "vault_approle_auth_backend_role" "app_role" {
   token_max_ttl  = var.approle_token_max_ttl
 }
 
-resource "vault_approle_auth_backend_role_id" "app_role_id" {
-  backend   = var.approle_backend
-  role_name = vault_approle_auth_backend_role.app_role.role_name
-}
-
-resource "vault_approle_auth_backend_secret_id" "app_secret_id" {
-  backend   = var.approle_backend
-  role_name = vault_approle_auth_backend_role.app_role.role_name
-}
-
 resource "vault_kubernetes_auth_backend_role" "k8s_role" {
   backend                          = var.k8s_backend
   role_name                        = var.k8s_role_name
