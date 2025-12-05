@@ -33,4 +33,12 @@ module "pki_secret_engine_dev" {
   crl_distribution_points = [
     "http://vault.dev.example.com:8200/v1/pki/crl"
   ]
+
+  # Intermediate Certificate Configuration
+  intermediate_pki_path             = "pki_int"
+  intermediate_cert_type            = "internal"
+  intermediate_common_name          = "dev.example.com Intermediate Authority"
+  intermediate_issuer_common_name   = "dev-intermediate"
+  intermediate_cert_format          = "pem_bundle"
+  intermediate_cert_ttl             = 15480000  # Approximately 180 days
 }

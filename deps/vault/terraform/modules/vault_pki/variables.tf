@@ -114,3 +114,40 @@ variable "crl_distribution_points" {
     type        = list(string)
     default     = []
 }
+
+# Intermediate Certificate Configuration
+variable "intermediate_pki_path" {
+    description = "Path where the intermediate PKI secrets engine is mounted"
+    type        = string
+    default     = "pki_int"
+}
+
+variable "intermediate_cert_type" {
+    description = "Type of intermediate certificate (internal or exported)"
+    type        = string
+    default     = "internal"
+}
+
+variable "intermediate_common_name" {
+    description = "Common name for the intermediate certificate"
+    type        = string
+    default     = "Intermediate Authority"
+}
+
+variable "intermediate_issuer_common_name" {
+    description = "Common name for the intermediate issuer"
+    type        = string
+    default     = "Intermediate CA"
+}
+
+variable "intermediate_cert_format" {
+    description = "Format for the intermediate certificate (pem_bundle, pem, der)"
+    type        = string
+    default     = "pem_bundle"
+}
+
+variable "intermediate_cert_ttl" {
+    description = "TTL for the intermediate certificate in seconds"
+    type        = number
+    default     = 15480000  # Approximately 180 days
+}

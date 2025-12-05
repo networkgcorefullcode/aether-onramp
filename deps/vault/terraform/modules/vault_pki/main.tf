@@ -41,3 +41,23 @@ resource "vault_pki_secret_backend_config_urls" "config_urls" {
     issuing_certificates    = var.issuing_certificates
     crl_distribution_points = var.crl_distribution_points
 }
+
+resource "vault_pki_secret_backend_intermediate_cert_request" "csr-request" {
+   backend     = var.intermediate_pki_path
+   type        = var.intermediate_cert_type
+   common_name = var.intermediate_common_name
+}
+
+resource "vault_pki_secret_backend_root_sign_intermediate" "intermediate" {
+   backend     = module.pki_secret_engine_dev.path
+   common_name = var.intermediate_issuer_common_name
+   csr         = vault_pki_secret_backend_intermediate_cert_request.csr-request.csr
+   format      = var.intermediate_cert_format
+   ttl         = var.intermediate_cert_ttl
+   issuer_ref  = vault_pki_secret_backend_root_cert.root_2023.issuer_id
+}
+
+resource "vault_pki_secret_backend_intermediate_set_signed" "intermediate" {
+   backend     = var.intermediate_pki_path
+   certificate = vault_pki_secret_backend_root_sign_intermediate.intermediate.certificate
+}
