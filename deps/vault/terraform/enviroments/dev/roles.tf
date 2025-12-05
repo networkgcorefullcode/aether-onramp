@@ -29,7 +29,7 @@ module "approle" {
   jwt_user_claim      = "sub"
   jwt_token_policies  = [module.policies["dev_policy"].name]
   jwt_token_ttl       = 3600
-
+  
   # Cert Auth configuration 
   cert_backend           = module.auth_backend_cert.path
   cert_role_name         = "dev-cert-role"
