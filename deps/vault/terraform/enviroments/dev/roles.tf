@@ -60,7 +60,7 @@ module "roles_dev" {
   depends_on = [module.policies]
 }
 
-module "approles_dev" {
+module "approles_dev_udm" {
   source = "../../modules/roles/approle"
 
   # AppRole configuration
@@ -71,7 +71,7 @@ module "approles_dev" {
   approle_token_max_ttl    = 7200
 }
 
-module "approles_dev" {
+module "approles_dev_webconsole" {
   source = "../../modules/roles/approle"
 
   # AppRole configuration
