@@ -7,11 +7,11 @@ output "approle_role_name" {
 
 output "approle_role_id" {
   description = "The role ID of the AppRole."
-  value       = vault_approle_auth_backend_role.app_role.role_name
+  value       = vault_approle_auth_backend_role.app_role.role_id
   sensitive   = true
 }
 
 output "approle_backend" {
   description = "The backend of the AppRole."
-  value       = vault_approle_auth_backend_role.app_role.role_name
+  value       = vault_approle_auth_backend_role.app_role.backend
 }
