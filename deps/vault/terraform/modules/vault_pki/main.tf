@@ -1,6 +1,6 @@
 
 module "pki_secret_engine_dev" {
-    source      = "../modules/vault_mount"
+    source      = "../vault_mount"
 
     path        = var.pki_path
     type        = "pki"
