@@ -1,5 +1,5 @@
 module "auth_backend_k8s" {
-    source = "../modules/auth_backend"
+    source = "../auth_backend"
 
     type              = var.auth_type
     description       = var.auth_description
