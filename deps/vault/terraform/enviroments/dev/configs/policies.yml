@@ -1,4 +1,9 @@
 policies:
+  - name: default
+    policy: |
+      path "secret/data/*" {
+        capabilities = ["read", "list"]
+      }
   - name: dev_policy
     policy: |
       path "secret/data/dev/*" {
