@@ -9,3 +9,24 @@ module "auth_backend" {
   default_lease_ttl = "3600s"
   max_lease_ttl     = "7200s"
 }
+
+module "auth_backend_k8s" {
+  source = "../../modules/auth_backend"
+
+  type              = "kubernetes"
+  description       = "Development environment auth backend for kubernetes"
+  path              = "auth-dev-k8s"
+  default_lease_ttl = "3600s"
+  max_lease_ttl     = "7200s"
+}
+
+module "auth_backend_approle" {
+  source = "../../modules/auth_backend"
+
+  type              = "approle"
+  description       = "Development environment auth backend for approle"
+  path              = "auth-dev-approle"
+  default_lease_ttl = "3600s"
+  max_lease_ttl     = "7200s"
+}
+
