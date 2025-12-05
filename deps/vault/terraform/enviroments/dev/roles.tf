@@ -59,3 +59,25 @@ module "roles_dev" {
 
   depends_on = [module.policies]
 }
+
+module "approles_dev" {
+  source = "../../modules/roles/approle"
+
+  # AppRole configuration
+  approle_backend          = module.auth_backend_approle.path
+  approle_role_name        = "udm"
+  approle_token_policies   = [module.policies["dev_policy"].name]
+  approle_token_ttl        = 3600
+  approle_token_max_ttl    = 7200
+}
+
+module "approles_dev" {
+  source = "../../modules/roles/approle"
+
+  # AppRole configuration
+  approle_backend          = module.auth_backend_approle.path
+  approle_role_name        = "webconsole"
+  approle_token_policies   = [module.policies["dev_policy"].name]
+  approle_token_ttl        = 3600
+  approle_token_max_ttl    = 7200
+}
