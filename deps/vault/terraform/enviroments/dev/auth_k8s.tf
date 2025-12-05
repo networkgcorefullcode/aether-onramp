@@ -3,11 +3,11 @@ module "k8s_auth_dev" {
   source = "../../modules/vault_k8s"
 
   # Auth Backend Configuration
-  auth_type        = "kubernetes"
-  auth_description = "Kubernetes authentication backend for Dev environment"
-  auth_path        = "kubernetes"
-  default_lease_ttl = 3600   # 1 hour
-  max_lease_ttl     = 86400  # 24 hours
+  auth_type         = "kubernetes"
+  auth_description  = "Kubernetes authentication backend for Dev environment"
+  auth_path         = "kubernetes"
+  default_lease_ttl = "3600s"  # 1 hour
+  max_lease_ttl     = "86400s" # 24 hours
 
   # Kubernetes Configuration
   kubernetes_host        = "https://192.168.12.17:6443"
