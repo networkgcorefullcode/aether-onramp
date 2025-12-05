@@ -13,8 +13,13 @@
   environment:
     VAULT_ADDR: "http://{{ vault.address }}"
   register: vault_status
-  ignore_errors: yes
+  failed_when: false
   changed_when: false
+
+- name: Parse vault status
+  set_fact:
+    vault_sealed: "{{ (vault_status.stdout | from_json).sealed }}"
+    vault_initialized: "{{ (vault_status.stdout | from_json).initialized }}"
 
 - name: Unseal vault with unseal keys
   shell: |
@@ -24,8 +29,8 @@
   with_items: "{{ unseal_keys.results }}"
   when: 
     - unseal_keys.results | length > 0
-    - vault_status.rc == 0
-    - (vault_status.stdout | from_json).sealed == true
+    - vault_initialized | bool
+    - vault_sealed | bool
   no_log: true
 
 - name: Verify vault is unsealed
@@ -33,6 +38,7 @@
   environment:
     VAULT_ADDR: "http://{{ vault.address }}"
   register: vault_final_status
+  failed_when: false
   changed_when: false
 
 - name: Display vault status
