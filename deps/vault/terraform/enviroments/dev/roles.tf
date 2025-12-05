@@ -3,7 +3,7 @@
 # Data source to get JWT auth backend configuration
 
 # AppRole for application access
-module "approle" {
+module "roles_dev" {
   source = "../../modules/roles"
 
   # Flags de habilitación
@@ -37,25 +37,25 @@ module "approle" {
   jwt_token_policies  = [module.policies["dev_policy"].name]
   jwt_token_ttl       = 3600
   
-  # Cert Auth configuration 
-  cert_backend           = module.auth_backend_cert.path
-  cert_role_name         = "dev-cert-role"
-  cert_allowed_domains   = ["dev.example.com", "*.dev.example.com"]
-  cert_allow_subdomains  = true
-  cert_certificate       = file("${path.module}/certs/ca.crt")
-  cert_token_ttl         = 3600
-  cert_token_max_ttl     = 7200
-  cert_token_policies    = [module.policies["dev_policy"].name]
+#   # Cert Auth configuration 
+#   cert_backend           = module.auth_backend_cert.path
+#   cert_role_name         = "dev-cert-role"
+#   cert_allowed_domains   = ["dev.example.com", "*.dev.example.com"]
+#   cert_allow_subdomains  = true
+#   cert_certificate       = file("${path.module}/certs/ca.crt")
+#   cert_token_ttl         = 3600
+#   cert_token_max_ttl     = 7200
+#   cert_token_policies    = [module.policies["dev_policy"].name]
   
-  # PKI Role configuration
-  pki_mount_path       = module.secrets_engine_pki.path
-  pki_role_name        = "dev-pki-role"
-  pki_ttl              = 86400
-  pki_allow_ip_sans    = true
-  pki_key_type         = "rsa"
-  pki_key_bits         = 2048
-  pki_allowed_domains  = ["dev.example.com", "*.dev.example.com"]
-  pki_allow_subdomains = true
+#   # PKI Role configuration
+#   pki_mount_path       = module.secrets_engine_pki.path
+#   pki_role_name        = "dev-pki-role"
+#   pki_ttl              = 86400
+#   pki_allow_ip_sans    = true
+#   pki_key_type         = "rsa"
+#   pki_key_bits         = 2048
+#   pki_allowed_domains  = ["dev.example.com", "*.dev.example.com"]
+#   pki_allow_subdomains = true
 
   depends_on = [module.policies]
 }
