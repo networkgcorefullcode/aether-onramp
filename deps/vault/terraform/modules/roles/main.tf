@@ -62,6 +62,7 @@ resource "vault_pki_secret_backend_role" "pki_role" {
   key_type         = var.pki_key_type
   key_bits         = var.pki_key_bits
   allowed_domains  = var.pki_allowed_domains
+  
   allow_subdomains = var.pki_allow_subdomains
   
   count = local.enabled_pki ? 1 : 0

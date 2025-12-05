@@ -6,6 +6,13 @@
 module "approle" {
   source = "../../modules/roles"
 
+  # Flags de habilitación
+  enabled_approle = true
+  enabled_k8s     = true
+  enabled_jwt     = true
+  enabled_cert    = false  # Deshabilitado hasta que exista el certificado
+  enabled_pki     = false  # Deshabilitado hasta que exista el módulo PKI
+
   # AppRole configuration
   approle_backend          = module.auth_backend_approle.path
   approle_role_name        = "dev-app"
