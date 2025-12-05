@@ -35,10 +35,13 @@ module "pki_secret_engine_dev" {
   ]
 
   # Intermediate Certificate Configuration
-  intermediate_pki_path             = "pki_int"
-  intermediate_cert_type            = "internal"
-  intermediate_common_name          = "dev.example.com Intermediate Authority"
-  intermediate_issuer_common_name   = "dev-intermediate"
-  intermediate_cert_format          = "pem_bundle"
-  intermediate_cert_ttl             = 15480000  # Approximately 180 days
+  intermediate_pki_path                    = "pki_int"
+  intermediate_pki_description             = "Intermediate PKI secrets engine for Dev environment"
+  intermediate_default_lease_ttl_seconds   = 3600
+  intermediate_max_lease_ttl_seconds       = 43800  # 12 hours
+  intermediate_cert_type                   = "internal"
+  intermediate_common_name                 = "dev.example.com Intermediate Authority"
+  intermediate_issuer_common_name          = "dev-intermediate"
+  intermediate_cert_format                 = "pem_bundle"
+  intermediate_cert_ttl                    = 15480000  # Approximately 180 days
 }

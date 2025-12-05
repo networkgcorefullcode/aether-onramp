@@ -122,6 +122,24 @@ variable "intermediate_pki_path" {
     default     = "pki_int"
 }
 
+variable "intermediate_pki_description" {
+    description = "Description for the intermediate PKI secrets engine"
+    type        = string
+    default     = "Intermediate PKI secrets engine"
+}
+
+variable "intermediate_default_lease_ttl_seconds" {
+    description = "Default lease TTL in seconds for intermediate PKI"
+    type        = number
+    default     = 3600
+}
+
+variable "intermediate_max_lease_ttl_seconds" {
+    description = "Maximum lease TTL in seconds for intermediate PKI"
+    type        = number
+    default     = 86400
+}
+
 variable "intermediate_cert_type" {
     description = "Type of intermediate certificate (internal or exported)"
     type        = string

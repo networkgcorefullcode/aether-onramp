@@ -10,6 +10,17 @@ module "pki_secret_engine_dev" {
     max_lease_ttl_seconds     = var.max_lease_ttl_seconds
 }
 
+module "pki_intermediate_secret_engine" {
+    source      = "../vault_mount"
+
+    path        = var.intermediate_pki_path
+    type        = "pki"
+    description = var.intermediate_pki_description
+
+    default_lease_ttl_seconds = var.intermediate_default_lease_ttl_seconds
+    max_lease_ttl_seconds     = var.intermediate_max_lease_ttl_seconds
+}
+
 resource "vault_pki_secret_backend_root_cert" "root_2023" {
     backend     = module.pki_secret_engine_dev.path
     type        = var.root_cert_config_type
@@ -43,7 +54,7 @@ resource "vault_pki_secret_backend_config_urls" "config_urls" {
 }
 
 resource "vault_pki_secret_backend_intermediate_cert_request" "csr-request" {
-   backend     = var.intermediate_pki_path
+   backend     = module.pki_intermediate_secret_engine.path
    type        = var.intermediate_cert_type
    common_name = var.intermediate_common_name
 }
@@ -58,6 +69,6 @@ resource "vault_pki_secret_backend_root_sign_intermediate" "intermediate" {
 }
 
 resource "vault_pki_secret_backend_intermediate_set_signed" "intermediate" {
-   backend     = var.intermediate_pki_path
+   backend     = module.pki_intermediate_secret_engine.path
    certificate = vault_pki_secret_backend_root_sign_intermediate.intermediate.certificate
 }
