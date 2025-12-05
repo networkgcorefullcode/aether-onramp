@@ -24,3 +24,14 @@ module "transit_secret_engine_dev" {
         convergent_encryption = false
     }
 }
+
+module "pki_secret_engine_dev" {
+  source      = "../../modules/vault_mount"
+
+  path        = "pki-dev"
+  type        = "pki"
+  description = "This is an example PKI mount dev"
+
+  default_lease_ttl_seconds = 3600
+  max_lease_ttl_seconds     = 86400
+}
