@@ -461,6 +461,13 @@ omec-sub-provision:
               op: ""
               key: "5122250214c33e723a5dd523fc145fc0"
               sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930000000001"
+              ueId-end: "208930000000005"
+              plmnId: "20893"
+              opc: "b5a3105ad5a3188cc59cb46690a4df298339213d16b24c73f52c654fb0367cf6"
+              op: ""
+              key: "aff1951a2a5149caf59d9e5fc5c5995473536ba65a41f744010e8fc1fa11fe4d"
+              sequenceNumber: "16f3b3f70fc2"
 
             # Configure Device Groups (ignored if provision-network-slice is disabled)
             device-groups:
@@ -570,6 +577,11 @@ omec-sub-provision:
                 - "208931100007489"
                 - "208931100007490"
                 - "208931100007491"
+                - "208930000000001"
+                - "208930000000002"
+                - "208930000000003"
+                - "208930000000004"
+                - "208930000000005"
               ip-domain-name: "pool1"
               ip-domain-expanded:
                 dnn: internet
