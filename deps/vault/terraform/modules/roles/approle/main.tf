@@ -11,5 +11,5 @@ resource "vault_approle_auth_backend_role_secret_id" "secret_id" {
   backend   = var.approle_backend
   role_name = vault_approle_auth_backend_role.app_role.role_name
 
-  metadata = jsondecode(var.approle_secret_id_metadata)
+  metadata = jsonencode(var.approle_secret_id_metadata)
 }
