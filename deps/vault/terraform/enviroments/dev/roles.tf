@@ -7,7 +7,7 @@ module "approle" {
   # AppRole configuration
   approle_backend          = "approle"
   approle_role_name        = "dev-app"
-  approle_token_policies   = [module.policies["dev_policy"].name, module.policies["default"].name]
+  approle_token_policies   = [module.policies["dev_policy"].name]
   approle_token_ttl        = 3600
   approle_token_max_ttl    = 7200
 
@@ -16,7 +16,7 @@ module "approle" {
   k8s_role_name                        = "dev-k8s-role"
   k8s_bound_service_account_names      = ["vault-client", "app-service-account"]
   k8s_bound_service_account_namespaces = ["default", "dev"]
-  k8s_token_policies                   = [module.policies["dev_policy"].name, module.policies["default"].name]
+  k8s_token_policies                   = [module.policies["dev_policy"].name]
   k8s_token_ttl                        = 3600
 
   # JWT Auth configuration
@@ -25,7 +25,7 @@ module "approle" {
   jwt_role_type       = "jwt"
   jwt_bound_audiences = ["dev-app", "dev-service"]
   jwt_user_claim      = "sub"
-  jwt_token_policies  = [module.policies["dev_policy"].name, module.policies["default"].name]
+  jwt_token_policies  = [module.policies["dev_policy"].name]
   jwt_token_ttl       = 3600
 
   # PKI Role configuration
@@ -45,7 +45,7 @@ module "test_approle" {
   # AppRole configuration
   approle_backend          = "approle"
   approle_role_name        = "test-app"
-  approle_token_policies   = [module.policies["test_policy"].name, module.policies["default"].name]
+  approle_token_policies   = [module.policies["test_policy"].name]
   approle_token_ttl        = 3600
   approle_token_max_ttl    = 7200
 
@@ -54,7 +54,7 @@ module "test_approle" {
   k8s_role_name                        = "test-k8s-role"
   k8s_bound_service_account_names      = ["vault-client"]
   k8s_bound_service_account_namespaces = ["test"]
-  k8s_token_policies                   = [module.policies["test_policy"].name, module.policies["default"].name]
+  k8s_token_policies                   = [module.policies["test_policy"].name]
   k8s_token_ttl                        = 3600
 
   # JWT Auth configuration
@@ -63,7 +63,7 @@ module "test_approle" {
   jwt_role_type       = "jwt"
   jwt_bound_audiences = ["test-app"]
   jwt_user_claim      = "sub"
-  jwt_token_policies  = [module.policies["test_policy"].name, module.policies["default"].name]
+  jwt_token_policies  = [module.policies["test_policy"].name]
   jwt_token_ttl       = 3600
 
   # PKI Role configuration
