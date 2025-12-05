@@ -182,12 +182,6 @@ variable "cert_token_policies" {
   default     = []
 }
 
-variable "cert_allow_subdomains" {
-    default = true
-    type = bool
-    description = "Whether to allow subdomains in certificate authentication."
-}
-
 # PKI Role variables
 variable "enabled_pki" {
   description = "Enable or disable PKI role."
