@@ -302,6 +302,12 @@ omec-control-plane:
                 snssai:
                   sd: "010203"
                   sst: 1
+                  sd: "000001"
+                  sst: 1
+                  sd: "000002"
+                  sst: 2
+                  sd: "000003"
+                  sst: 3
             nssfName: NSSF
             sbi:
               bindingIPv4: 0.0.0.0
