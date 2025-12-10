@@ -461,6 +461,27 @@ omec-sub-provision:
               op: ""
               key: "5122250214c33e723a5dd523fc145fc0"
               sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930000007501" #eMBB
+              ueId-end: "208930000007509"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930000007601" #URLLC
+              ueId-end: "208930000007609"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930000007701" #mMTC
+              ueId-end: "208930000007709"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
 
             # Configure Device Groups (ignored if provision-network-slice is disabled)
             device-groups:
@@ -590,6 +611,103 @@ omec-sub-provision:
             # UPF allocates IP address if there is only 1 device-group
             # SMF allocates IP address if there is >1 device-group
 
+            - name:  "eMBB"
+              imsis:
+                - "208930000007500"
+                - "208930000007501"
+                - "208930000007502"
+                - "208930000007503"
+                - "208930000007504"
+                - "208930000007505"
+                - "208930000007506"
+                - "208930000007507"
+                - "208930000007508"
+                - "208930000007509"
+              ip-domain-name: "pool2"
+              ip-domain-expanded:
+                dnn: internet
+                dns-primary: "8.8.8.8"        # Value is sent to UE
+                mtu: 1460                     # Value is sent to UE when PDU Session Established
+                ue-ip-pool: 192.168.101.0/24 # IP address pool for subscribers
+                ue-dnn-qos:
+                  dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
+                  dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
+                  bitrate-unit: Mbps          # Unit for above QoS rates
+                  traffic-class:              # Default bearer QCI/ARP (not used in 5G)
+                    name: "platinum"
+                    qci: 9
+                    arp: 6
+                    pdb: 300
+                    pelr: 6
+              site-info: "enterprise"
+            # UPF allocates IP address if there is only 1 device-group
+            # SMF allocates IP address if there is >1 device-group
+
+            - name:  "URLLC"
+              imsis:
+                - "208930000007600"
+                - "208930000007601"
+                - "208930000007602"
+                - "208930000007603"
+                - "208930000007604"
+                - "208930000007605"
+                - "208930000007606"
+                - "208930000007607"
+                - "208930000007608"
+                - "208930000007609"
+              ip-domain-name: "pool3"
+              ip-domain-expanded:
+                dnn: internet
+                dns-primary: "8.8.8.8"        # Value is sent to UE
+                mtu: 1460                     # Value is sent to UE when PDU Session Established
+                ue-ip-pool: 192.168.102.0/24 # IP address pool for subscribers
+                ue-dnn-qos:
+                  dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
+                  dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
+                  bitrate-unit: Mbps          # Unit for above QoS rates
+                  traffic-class:              # Default bearer QCI/ARP (not used in 5G)
+                    name: "platinum"
+                    qci: 9
+                    arp: 6
+                    pdb: 300
+                    pelr: 6
+              site-info: "enterprise"
+            # UPF allocates IP address if there is only 1 device-group
+            # SMF allocates IP address if there is >1 device-group
+
+            - name:  "mMTC"
+              imsis:
+                - "208930000007700"
+                - "208930000007701"
+                - "208930000007702"
+                - "208930000007703"
+                - "208930000007704"
+                - "208930000007705"
+                - "208930000007706"
+                - "208930000007707"
+                - "208930000007708"
+                - "208930000007709"
+              ip-domain-name: "pool4"
+              ip-domain-expanded:
+                dnn: internet
+                dns-primary: "8.8.8.8"        # Value is sent to UE
+                mtu: 1460                     # Value is sent to UE when PDU Session Established
+                ue-ip-pool: 192.168.103.0/24 # IP address pool for subscribers
+                ue-dnn-qos:
+                  dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
+                  dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
+                  bitrate-unit: Mbps          # Unit for above QoS rates
+                  traffic-class:              # Default bearer QCI/ARP (not used in 5G)
+                    name: "platinum"
+                    qci: 9
+                    arp: 6
+                    pdb: 300
+                    pelr: 6
+              site-info: "enterprise"
+            # UPF allocates IP address if there is only 1 device-group
+            # SMF allocates IP address if there is >1 device-group
+
+
             # Configure Network Slices (ignored if provision-network-slice is disabled)
             network-slices:
             - name: "default"      # can be any unique slice name
@@ -628,6 +746,118 @@ omec-sub-provision:
                 upf:
                   upf-name: "upf"  # associated UPF for this slice. One UPF per Slice.
                   upf-port: 8805
+
+            - name: "eMBB"      # can be any unique slice name
+              slice-id:        # must match with slice configured in gNB, UE
+                sd: "000001"
+                sst: 1
+              site-device-group:
+              - "eMBB"   # All UEs in this device-group are assigned to this slice
+              # Applicaiton filters control what each user can access.
+              # Default, allow access to all applications
+              application-filtering-rules:
+              - rule-name: "ALLOW-ALL"
+                priority: 250
+                action: "permit"
+                endpoint: "0.0.0.0/0"
+                app-mbr-uplink: 1 #1Mbps
+                app-mbr-downlink: 5 #5Mbps
+                bitrate-unit: Mbps
+                traffic-class : #if same as APN-AMBR then its default bearer rule
+                  name: "silver"
+                  qci: 9
+                  arp: 6
+                  pdb: 300
+                  pelr: 6
+              site-info:
+                # Provide gNBs and UPF details and also PLMN for the site
+                gNodeBs:
+                - name: "gnb1"
+                  tac: 1
+                - name: "gnb2"
+                  tac: 2
+                plmn:
+                  mcc: "208"
+                  mnc: "93"
+                site-name: "enterprise"
+                upf:
+                  upf-name: "upf.aether-5gc-upf-1.svc.cluster.local"  # associated UPF for this slice. One UPF per Slice. el upf de los slices estan en otro namespace
+                  upf-port: 8805
+
+            - name: "URLLC"      # can be any unique slice name
+              slice-id:        # must match with slice configured in gNB, UE
+                sd: "000002"
+                sst: 2
+              site-device-group:
+              - "URLLC"   # All UEs in this device-group are assigned to this slice
+              # Applicaiton filters control what each user can access.
+              # Default, allow access to all applications
+              application-filtering-rules:
+              - rule-name: "ALLOW-ALL"
+                priority: 250
+                action: "permit"
+                endpoint: "0.0.0.0/0"
+                app-mbr-uplink: 1 #1Mbps
+                app-mbr-downlink: 5 #5Mbps
+                bitrate-unit: Mbps
+                traffic-class : #if same as APN-AMBR then its default bearer rule
+                  name: "silver"
+                  qci: 9
+                  arp: 6
+                  pdb: 300
+                  pelr: 6
+              site-info:
+                # Provide gNBs and UPF details and also PLMN for the site
+                gNodeBs:
+                - name: "gnb1"
+                  tac: 1
+                - name: "gnb2"
+                  tac: 2
+                plmn:
+                  mcc: "208"
+                  mnc: "93"
+                site-name: "enterprise"
+                upf:
+                  upf-name: "upf.aether-5gc-upf-2.svc.cluster.local"  # associated UPF for this slice. One UPF per Slice.
+                  upf-port: 8805
+
+            - name: "mMTC"      # can be any unique slice name
+              slice-id:        # must match with slice configured in gNB, UE
+                sd: "000003"
+                sst: 3
+              site-device-group:
+              - "mMTC"   # All UEs in this device-group are assigned to this slice
+              # Applicaiton filters control what each user can access.
+              # Default, allow access to all applications
+              application-filtering-rules:
+              - rule-name: "ALLOW-ALL"
+                priority: 250
+                action: "permit"
+                endpoint: "0.0.0.0/0"
+                app-mbr-uplink: 1 #1Mbps
+                app-mbr-downlink: 5 #5Mbps
+                bitrate-unit: Mbps
+                traffic-class : #if same as APN-AMBR then its default bearer rule
+                  name: "silver"
+                  qci: 9
+                  arp: 6
+                  pdb: 300
+                  pelr: 6
+              site-info:
+                # Provide gNBs and UPF details and also PLMN for the site
+                gNodeBs:
+                - name: "gnb1"
+                  tac: 1
+                - name: "gnb2"
+                  tac: 2
+                plmn:
+                  mcc: "208"
+                  mnc: "93"
+                site-name: "enterprise"
+                upf:
+                  upf-name: "upf.aether-5gc-upf-3.svc.cluster.local"  # associated UPF for this slice. One UPF per Slice.
+                  upf-port: 8805
+
 
 # Override values for omec-user-plane Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/bess-upf/values.yaml

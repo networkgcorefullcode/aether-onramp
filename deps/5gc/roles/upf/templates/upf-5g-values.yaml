@@ -17,6 +17,7 @@ images:
   #  pfcpiface: <pfcp image tag>
 config:
   upf:
+    privileged: true
     name: "oaisim"
     sriov:
       enabled: false    # SRIOV is disabled by default
@@ -49,9 +50,9 @@ config:
         gtppsc: true        # Extension header enabled in 5G.
         cpiface:
           dnn: "internet"              # Must match Slice dnn
-          hostname: "upf"
+          hostname: {{ upf_hostname }} # hay que cambiar esto para que cada upf escriba su propio hostname
           #http_port: "8080"
-          enable_ue_ip_alloc: false    # If true, UPF allocates address from following pool
+          enable_ue_ip_alloc: true    # If true, UPF allocates address from following pool
           ue_ip_pool: {{ upf_ue_ip_pool }} # IP pool used UEs if enable_ue_ip_alloc=true
         slice_rate_limit_config:       # Slice-level rate limiting (also controlled by ROC)
           # Uplink
