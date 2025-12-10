@@ -461,6 +461,7 @@ omec-sub-provision:
               op: ""
               key: "5122250214c33e723a5dd523fc145fc0"
               sequenceNumber: "16f3b3f70fc2"
+<<<<<<< HEAD
             - ueId-start: "208930000007501" #eMBB
               ueId-end: "208930000007509"
               plmnId: "20893"
@@ -481,13 +482,14 @@ omec-sub-provision:
               opc: "981d464c7c52eb6e5036234984ad0bcf"
               op: ""
               key: "5122250214c33e723a5dd523fc145fc0"
-              sequenceNumber: "16f3b3f70fc2"
-            - ueId-start: "208930000000001" #test-milenage256
+=======
+            - ueId-start: "208930000000001"
               ueId-end: "208930000000005"
               plmnId: "20893"
               opc: "b5a3105ad5a3188cc59cb46690a4df298339213d16b24c73f52c654fb0367cf6"
               op: ""
               key: "aff1951a2a5149caf59d9e5fc5c5995473536ba65a41f744010e8fc1fa11fe4d"
+>>>>>>> b135784c815f4962d2254df663cb85298a869bab
               sequenceNumber: "16f3b3f70fc2"
 
             # Configure Device Groups (ignored if provision-network-slice is disabled)
