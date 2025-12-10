@@ -300,14 +300,26 @@ omec-control-plane:
                   - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
                     nsiId: 22
                 snssai:
-                  - sd: "010203"
-                    sst: 1
-                  - sd: "000001"
-                    sst: 1
-                  - sd: "000002"
-                    sst: 2
-                  - sd: "000003"
-                    sst: 3
+                  sd: "010203"
+                  sst: 1
+              - nsiInformationList:
+                  - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+                    nsiId: 23
+                snssai:
+                  sd: "000001"
+                  sst: 1
+              - nsiInformationList:
+                  - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+                    nsiId: 24
+                snssai:
+                  sd: "000002"
+                  sst: 2
+              - nsiInformationList:
+                  - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+                    nsiId: 25
+                snssai:
+                  sd: "000003"
+                  sst: 3
             nssfName: NSSF
             sbi:
               bindingIPv4: 0.0.0.0
