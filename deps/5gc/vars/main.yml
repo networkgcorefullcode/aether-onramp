@@ -43,3 +43,5 @@ core:
           core:   "192.168.250.9"
         ue_ip_pool: "192.168.103.0/24"
         cpiface_hostname: "upf.aether-5gc-upf-3.svc.cluster.local"
+  amf:
+    ip: "192.168.10.50"

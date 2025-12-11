@@ -16,17 +16,17 @@ omec-control-plane:
 5g-control-plane:
   enable5G: true
   images:
+    # repository: "ghcr.io/networkgcorefullcode/"
     repository: "ghcr.io/networkgcorefullcode/"
-    # repository: "192.168.12.15:8083/"
     tags:
       amf: omecproject/5gc-amf:2.0.1-dev
       ausf: omecproject/5gc-ausf:2.0.3-dev
       smf: omecproject/5gc-smf:3.0.0-dev
-      udm: omecproject/5gc-udm:2.3.1-dev
+      udm: omecproject/5gc-udm:3.0.2-dev
       udr: omecproject/5gc-udr:2.1.5-dev
       pcf: omecproject/5gc-pcf:2.0.1-dev
-      nrf: omecproject/5gc-nrf:2.0.6-dev
-      webui: omecproject/5gc-webui:1.14.1-dev
+      nrf: omecproject/5gc-nrf:2.0.5-dev
+      webui: omecproject/5gc-webui:1.14.0-dev
       sctplb: omecproject/sctplb:1.6.6-dev
       nssf: omecproject/5gc-nssf:1.7.0-dev
       upfadapter: omecproject/upfadapter:2.0.6-dev
@@ -48,7 +48,7 @@ omec-control-plane:
       NRF:
         debugLevel: debug
       WEBUI:
-        debugLevel: info
+        debugLevel: debug
 
     mongodb:
       name: aether
@@ -117,7 +117,7 @@ omec-control-plane:
         port: 9000
         #nodePort: 30088
       ngapp:
-        externalIp: 192.168.12.11
+        externalIp: 192.168.10.50
         port: 38412
         #nodePort: 30071
       cfgFiles:
@@ -146,7 +146,7 @@ omec-control-plane:
       deploy: true
       serviceType: ClusterIP
       #ngapp:
-      # nodePort: 30071
+       # nodePort: 30071
       cfgFiles:
         amfcfg.yaml:
           configuration:
@@ -157,7 +157,7 @@ omec-control-plane:
               integrityOrder:
                 - NIA3
                 - NIA2
-              #     - NIA0
+            #     - NIA0
               cipheringOrder:
                 - NEA3
                 - NEA2
@@ -165,7 +165,7 @@ omec-control-plane:
             sbi: # Service-based interface information
               scheme: http # the protocol for sbi (http or https)
               registerIPv4: amf # IP used to register to NRF
-              bindingIPv4: 0.0.0.0 # IP used to bind the service
+              bindingIPv4: 0.0.0.0  # IP used to bind the service
               port: 29518 # port used to bind the service
               tls: # the local path of TLS key
                 key: /var/run/certs/tls.key # AMF TLS Private key
@@ -197,6 +197,7 @@ omec-control-plane:
               debugLevel: debug
               ReportCaller: false
 
+
     udr:
       deploy: true
       cfgFiles:
@@ -212,14 +213,15 @@ omec-control-plane:
                 key: /var/run/certs/tls.key # UDR TLS Private key
                 pem: /var/run/certs/tls.crt # UDR TLS Certificate
             mongodb:
-              name: "aether" # Nombre de la base de datos
-              url: mongodb://mongodb-arbiter-headless # URL de conexión con credenciales y host:puerto
+              name: "aether"                      # Nombre de la base de datos
+              url: mongodb://mongodb-arbiter-headless  # URL de conexión con credenciales y host:puerto
             nrfUri: "http://nrf:29510"
             webuiUri: "http://webui:5001"
           logger:
             UDR:
               debugLevel: debug
               ReportCaller: false
+
 
     udm:
       deploy: true
@@ -268,17 +270,18 @@ omec-control-plane:
               debugLevel: debug
               ReportCaller: false
 
+
     # SMF config override. Refer to Helm Charts values for more options
     smf:
       deploy: true
       cfgFiles:
         smfcfg.yaml:
           configuration:
-            enableDBStore: true # Store SMF subscribers in the datastore
+            enableDBStore: true  # Store SMF subscribers in the datastore
             sbi: # Service-based interface information
               scheme: http # the protocol for sbi (http or https)
               registerIPv4: smf # IP used to register to NRF
-              bindingIPv4: 0.0.0.0 # IP used to bind the service
+              bindingIPv4: 0.0.0.0  # IP used to bind the service
               port: 29502 # Port used to bind the service
               tls: # the local path of TLS key
                 key: /var/run/certs/tls.key # SMF TLS Private key
@@ -299,6 +302,24 @@ omec-control-plane:
                 snssai:
                   sd: "010203"
                   sst: 1
+              - nsiInformationList:
+                  - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+                    nsiId: 23
+                snssai:
+                  sd: "000001"
+                  sst: 1
+              - nsiInformationList:
+                  - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+                    nsiId: 24
+                snssai:
+                  sd: "000002"
+                  sst: 2
+              - nsiInformationList:
+                  - nrfId: http://nrf:29510/nnrf-nfm/v1/nf-instances
+                    nsiId: 25
+                snssai:
+                  sd: "000003"
+                  sst: 3
             nssfName: NSSF
             sbi:
               bindingIPv4: 0.0.0.0
@@ -350,15 +371,15 @@ omec-control-plane:
       cfgFiles:
         nrfcfg.yaml:
           configuration:
-            mongoDBStreamEnable: false # enable/disable MongoDB stream in NRF
-            nfProfileExpiryEnable: true # If enabled, remove NF profile if no keepalive received
-            nfKeepAliveTime: 60 # default timeout for NF profiles
+            mongoDBStreamEnable: false    # enable/disable MongoDB stream in NRF
+            nfProfileExpiryEnable: true   # If enabled, remove NF profile if no keepalive received
+            nfKeepAliveTime: 60           # default timeout for NF profiles
             MongoDBName: aether # database name in MongoDB
             MongoDBUrl: "mongodb://mongodb-arbiter-headless" # a valid URL of the mongodb
             sbi: # Service-based interface information
               scheme: http # the protocol for sbi (http or https)
               registerIPv4: nrf # IP used to serve NFs or register to another NRF
-              bindingIPv4: 0.0.0.0 # IP used to bind the service
+              bindingIPv4: 0.0.0.0  # IP used to bind the service
               port: 29510 # port used to bind the service
               tls: # the local path of TLS key
                 pem: /var/run/certs/tls.crt # NRF TLS Certificate
@@ -377,11 +398,11 @@ omec-control-plane:
       urlport:
         port: 5000
         # Provide nodePort when serviceType is NodePort
-        nodePort: 35000
+        nodePort: 31000
       rest:
         port: 5001
         # Provide nodePort when serviceType is NodePort
-        nodePort: 35001
+        nodePort: 31001
       grpc:
         port: 9876
       ingress:
@@ -390,8 +411,8 @@ omec-control-plane:
         path: /
         pathType: Prefix
         # extraHosts:
-        # - host: aether.local
-        #   path: /
+          # - host: aether.local
+          #   path: /
       cfgFiles:
         webuicfg.yaml:
           info:
@@ -400,10 +421,10 @@ omec-control-plane:
           configuration:
             enableAuthentication: false
             spec-compliant-sdf: false
-            mongodb: # Configuración de la base de datos MongoDB
-              name: "aether" # (string) Nombre de la base de datos principal
+            mongodb:                    # Configuración de la base de datos MongoDB
+              name: "aether"              # (string) Nombre de la base de datos principal
               url: "mongodb://mongodb-arbiter-headless" # (string) URL de conexión a MongoDB
-              authKeysDbName: "authentication" # (string) Nombre de la base de datos de llaves de autenticación
+              authKeysDbName: "authentication"   # (string) Nombre de la base de datos de llaves de autenticación
               authUrl: "mongodb://mongodb-arbiter-headless" # (string) URL de autenticación
               checkReplica: true
             ssm:
@@ -422,8 +443,8 @@ omec-control-plane:
 omec-sub-provision:
   enable: true
   images:
+    # repository: "ghcr.io/networkgcorefullcode/"
     repository: "ghcr.io/networkgcorefullcode/"
-    # repository: "192.168.12.15:8083/"
     tags:
       simapp: omecproject/simapp:1.6.8-dev
 
@@ -433,7 +454,7 @@ omec-sub-provision:
         simapp.yaml:
           configuration:
             max-time-interval: 35
-            provision-network-slice: { { core.standalone | string } } # if enabled, Device Groups & Slices configure by simapp
+            provision-network-slice: true # if enabled, Device Groups & Slices configure by simapp
             sub-provision-endpt:
               addr: webui # subscriber configuation endpoint.
             # sub-proxy-endpt: # used if subscriber proxy is enabled in the ROC.
@@ -444,187 +465,429 @@ omec-sub-provision:
             # You can have any number of subscriber ranges
             # This block is always necessary to establish range(s) of valid IMSIs
             subscribers:
-              - ueId-start: "208930100007487"
-                ueId-end: "208930100007500"
-                plmnId: "20893"
-                opc: "981d464c7c52eb6e5036234984ad0bcf"
-                op: ""
-                key: "5122250214c33e723a5dd523fc145fc0"
-                sequenceNumber: "16f3b3f70fc2"
-              - ueId-start: "208930100007501"
-                ueId-end: "208930100007586"
-                plmnId: "20893"
-                opc: "981d464c7c52eb6e5036234984ad0bcf"
-                op: ""
-                key: "5122250214c33e723a5dd523fc145fc0"
-                sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930100007487"
+              ueId-end: "208930100007500"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930100007501"
+              ueId-end: "208930100007586"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930000007501" #eMBB
+              ueId-end: "208930000007509"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930000007601" #URLLC
+              ueId-end: "208930000007609"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930000007701" #mMTC
+              ueId-end: "208930000007709"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930000000001" #test-milenage256
+              ueId-end: "208930000000005"
+              plmnId: "20893"
+              opc: "b5a3105ad5a3188cc59cb46690a4df298339213d16b24c73f52c654fb0367cf6"
+              op: ""
+              key: "aff1951a2a5149caf59d9e5fc5c5995473536ba65a41f744010e8fc1fa11fe4d"
+              sequenceNumber: "16f3b3f70fc2"
 
             # Configure Device Groups (ignored if provision-network-slice is disabled)
             device-groups:
-              - name: "gnbsim-user-group1"
-                imsis:
-                  - "208930100007487"
-                  - "208930100007488"
-                  - "208930100007489"
-                  - "208930100007490"
-                  - "208930100007491"
-                  - "208930100007492"
-                  - "208930100007493"
-                  - "208930100007494"
-                  - "208930100007495"
-                  - "208930100007496"
-                  - "208930100007497"
-                  - "208930100007498"
-                  - "208930100007499"
-                  - "208930100007500"
-                  - "208930100007501"
-                  - "208930100007502"
-                  - "208930100007503"
-                  - "208930100007504"
-                  - "208930100007505"
-                  - "208930100007506"
-                  - "208930100007507"
-                  - "208930100007508"
-                  - "208930100007509"
-                  - "208930100007510"
-                  - "208930100007511"
-                  - "208930100007512"
-                  - "208930100007513"
-                  - "208930100007514"
-                  - "208930100007515"
-                  - "208930100007516"
-                  - "208930100007517"
-                  - "208930100007518"
-                  - "208930100007519"
-                  - "208930100007520"
-                  - "208930100007521"
-                  - "208930100007522"
-                  - "208930100007523"
-                  - "208930100007524"
-                  - "208930100007525"
-                  - "208930100007526"
-                  - "208930100007527"
-                  - "208930100007528"
-                  - "208930100007529"
-                  - "208930100007530"
-                  - "208930100007531"
-                  - "208930100007532"
-                  - "208930100007533"
-                  - "208930100007534"
-                  - "208930100007535"
-                  - "208930100007536"
-                  - "208930100007537"
-                  - "208930100007538"
-                  - "208930100007539"
-                  - "208930100007540"
-                  - "208930100007541"
-                  - "208930100007542"
-                  - "208930100007543"
-                  - "208930100007544"
-                  - "208930100007545"
-                  - "208930100007546"
-                  - "208930100007547"
-                  - "208930100007548"
-                  - "208930100007549"
-                  - "208930100007550"
-                  - "208930100007551"
-                  - "208930100007552"
-                  - "208930100007553"
-                  - "208930100007554"
-                  - "208930100007555"
-                  - "208930100007556"
-                  - "208930100007557"
-                  - "208930100007558"
-                  - "208930100007559"
-                  - "208930100007560"
-                  - "208930100007561"
-                  - "208930100007562"
-                  - "208930100007563"
-                  - "208930100007564"
-                  - "208930100007565"
-                  - "208930100007566"
-                  - "208930100007567"
-                  - "208930100007568"
-                  - "208930100007569"
-                  - "208930100007570"
-                  - "208930100007571"
-                  - "208930100007572"
-                  - "208930100007573"
-                  - "208930100007574"
-                  - "208930100007575"
-                  - "208930100007576"
-                  - "208930100007577"
-                  - "208930100007578"
-                  - "208930100007579"
-                  - "208930100007580"
-                  - "208930100007581"
-                  - "208930100007582"
-                  - "208930100007583"
-                  - "208930100007584"
-                  - "208930100007585"
-                  - "208930100007586"
-                  - "208931100007488"
-                  - "208931100007489"
-                  - "208931100007490"
-                  - "208931100007491"
-                ip-domain-name: "pool1"
-                ip-domain-expanded:
-                  dnn: internet
-                  dns-primary: "8.8.8.8" # Value is sent to UE
-                  mtu: 1460 # Value is sent to UE when PDU Session Established
-                  ue-ip-pool: { { core.upf.default_upf.ue_ip_pool } } # IP address pool for subscribers
-                  ue-dnn-qos:
-                    dnn-mbr-downlink: 1000 # UE level downlink QoS (Maximum bit rate per UE)
-                    dnn-mbr-uplink: 1000 # UE level uplink QoS (Maximum bit rate per UE)
-                    bitrate-unit: Mbps # Unit for above QoS rates
-                    traffic-class: # Default bearer QCI/ARP (not used in 5G)
-                      name: "platinum"
-                      qci: 9
-                      arp: 6
-                      pdb: 300
-                      pelr: 6
-                site-info: "enterprise"
+            - name:  "gnbsim-user-group1"
+              imsis:
+                - "208930100007487"
+                - "208930100007488"
+                - "208930100007489"
+                - "208930100007490"
+                - "208930100007491"
+                - "208930100007492"
+                - "208930100007493"
+                - "208930100007494"
+                - "208930100007495"
+                - "208930100007496"
+                - "208930100007497"
+                - "208930100007498"
+                - "208930100007499"
+                - "208930100007500"
+                - "208930100007501"
+                - "208930100007502"
+                - "208930100007503"
+                - "208930100007504"
+                - "208930100007505"
+                - "208930100007506"
+                - "208930100007507"
+                - "208930100007508"
+                - "208930100007509"
+                - "208930100007510"
+                - "208930100007511"
+                - "208930100007512"
+                - "208930100007513"
+                - "208930100007514"
+                - "208930100007515"
+                - "208930100007516"
+                - "208930100007517"
+                - "208930100007518"
+                - "208930100007519"
+                - "208930100007520"
+                - "208930100007521"
+                - "208930100007522"
+                - "208930100007523"
+                - "208930100007524"
+                - "208930100007525"
+                - "208930100007526"
+                - "208930100007527"
+                - "208930100007528"
+                - "208930100007529"
+                - "208930100007530"
+                - "208930100007531"
+                - "208930100007532"
+                - "208930100007533"
+                - "208930100007534"
+                - "208930100007535"
+                - "208930100007536"
+                - "208930100007537"
+                - "208930100007538"
+                - "208930100007539"
+                - "208930100007540"
+                - "208930100007541"
+                - "208930100007542"
+                - "208930100007543"
+                - "208930100007544"
+                - "208930100007545"
+                - "208930100007546"
+                - "208930100007547"
+                - "208930100007548"
+                - "208930100007549"
+                - "208930100007550"
+                - "208930100007551"
+                - "208930100007552"
+                - "208930100007553"
+                - "208930100007554"
+                - "208930100007555"
+                - "208930100007556"
+                - "208930100007557"
+                - "208930100007558"
+                - "208930100007559"
+                - "208930100007560"
+                - "208930100007561"
+                - "208930100007562"
+                - "208930100007563"
+                - "208930100007564"
+                - "208930100007565"
+                - "208930100007566"
+                - "208930100007567"
+                - "208930100007568"
+                - "208930100007569"
+                - "208930100007570"
+                - "208930100007571"
+                - "208930100007572"
+                - "208930100007573"
+                - "208930100007574"
+                - "208930100007575"
+                - "208930100007576"
+                - "208930100007577"
+                - "208930100007578"
+                - "208930100007579"
+                - "208930100007580"
+                - "208930100007581"
+                - "208930100007582"
+                - "208930100007583"
+                - "208930100007584"
+                - "208930100007585"
+                - "208930100007586"
+                - "208931100007488"
+                - "208931100007489"
+                - "208931100007490"
+                - "208931100007491"
+                - "208930000000001"
+                - "208930000000002"
+                - "208930000000003"
+                - "208930000000004"
+                - "208930000000005"
+              ip-domain-name: "pool1"
+              ip-domain-expanded:
+                dnn: internet
+                dns-primary: "8.8.8.8"        # Value is sent to UE
+                mtu: 1460                     # Value is sent to UE when PDU Session Established
+                ue-ip-pool: 192.168.100.0/24 # IP address pool for subscribers
+                ue-dnn-qos:
+                  dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
+                  dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
+                  bitrate-unit: Mbps          # Unit for above QoS rates
+                  traffic-class:              # Default bearer QCI/ARP (not used in 5G)
+                    name: "platinum"
+                    qci: 9
+                    arp: 6
+                    pdb: 300
+                    pelr: 6
+              site-info: "enterprise"
             # UPF allocates IP address if there is only 1 device-group
             # SMF allocates IP address if there is >1 device-group
 
+            - name:  "eMBB"
+              imsis:
+                - "208930000007500"
+                - "208930000007501"
+                - "208930000007502"
+                - "208930000007503"
+                - "208930000007504"
+                - "208930000007505"
+                - "208930000007506"
+                - "208930000007507"
+                - "208930000007508"
+                - "208930000007509"
+              ip-domain-name: "pool2"
+              ip-domain-expanded:
+                dnn: internet
+                dns-primary: "8.8.8.8"        # Value is sent to UE
+                mtu: 1460                     # Value is sent to UE when PDU Session Established
+                ue-ip-pool: 192.168.101.0/24 # IP address pool for subscribers
+                ue-dnn-qos:
+                  dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
+                  dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
+                  bitrate-unit: Mbps          # Unit for above QoS rates
+                  traffic-class:              # Default bearer QCI/ARP (not used in 5G)
+                    name: "platinum"
+                    qci: 9
+                    arp: 6
+                    pdb: 300
+                    pelr: 6
+              site-info: "enterprise"
+            # UPF allocates IP address if there is only 1 device-group
+            # SMF allocates IP address if there is >1 device-group
+
+            - name:  "URLLC"
+              imsis:
+                - "208930000007600"
+                - "208930000007601"
+                - "208930000007602"
+                - "208930000007603"
+                - "208930000007604"
+                - "208930000007605"
+                - "208930000007606"
+                - "208930000007607"
+                - "208930000007608"
+                - "208930000007609"
+              ip-domain-name: "pool3"
+              ip-domain-expanded:
+                dnn: internet
+                dns-primary: "8.8.8.8"        # Value is sent to UE
+                mtu: 1460                     # Value is sent to UE when PDU Session Established
+                ue-ip-pool: 192.168.102.0/24 # IP address pool for subscribers
+                ue-dnn-qos:
+                  dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
+                  dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
+                  bitrate-unit: Mbps          # Unit for above QoS rates
+                  traffic-class:              # Default bearer QCI/ARP (not used in 5G)
+                    name: "platinum"
+                    qci: 9
+                    arp: 6
+                    pdb: 300
+                    pelr: 6
+              site-info: "enterprise"
+            # UPF allocates IP address if there is only 1 device-group
+            # SMF allocates IP address if there is >1 device-group
+
+            - name:  "mMTC"
+              imsis:
+                - "208930000007700"
+                - "208930000007701"
+                - "208930000007702"
+                - "208930000007703"
+                - "208930000007704"
+                - "208930000007705"
+                - "208930000007706"
+                - "208930000007707"
+                - "208930000007708"
+                - "208930000007709"
+              ip-domain-name: "pool4"
+              ip-domain-expanded:
+                dnn: internet
+                dns-primary: "8.8.8.8"        # Value is sent to UE
+                mtu: 1460                     # Value is sent to UE when PDU Session Established
+                ue-ip-pool: 192.168.103.0/24 # IP address pool for subscribers
+                ue-dnn-qos:
+                  dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
+                  dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
+                  bitrate-unit: Mbps          # Unit for above QoS rates
+                  traffic-class:              # Default bearer QCI/ARP (not used in 5G)
+                    name: "platinum"
+                    qci: 9
+                    arp: 6
+                    pdb: 300
+                    pelr: 6
+              site-info: "enterprise"
+            # UPF allocates IP address if there is only 1 device-group
+            # SMF allocates IP address if there is >1 device-group
+
+
             # Configure Network Slices (ignored if provision-network-slice is disabled)
             network-slices:
-              - name: "default" # can be any unique slice name
-                slice-id: # must match with slice configured in gNB, UE
-                  sd: "010203"
-                  sst: 1
-                site-device-group:
-                  - "gnbsim-user-group1" # All UEs in this device-group are assigned to this slice
-                # Applicaiton filters control what each user can access.
-                # Default, allow access to all applications
-                application-filtering-rules:
-                  - rule-name: "ALLOW-ALL"
-                    priority: 250
-                    action: "permit"
-                    endpoint: "0.0.0.0/0"
-                    app-mbr-uplink: 1 #1Mbps
-                    app-mbr-downlink: 5 #5Mbps
-                    bitrate-unit: Mbps
-                    traffic-class: #if same as APN-AMBR then its default bearer rule
-                      name: "silver"
-                      qci: 9
-                      arp: 6
-                      pdb: 300
-                      pelr: 6
-                site-info:
-                  # Provide gNBs and UPF details and also PLMN for the site
-                  gNodeBs:
-                    - name: "gnb1"
-                      tac: 1
-                    - name: "gnb2"
-                      tac: 2
-                  plmn:
-                    mcc: "208"
-                    mnc: "93"
-                  site-name: "enterprise"
-                  upf:
-                    upf-name: "upf" # associated UPF for this slice. One UPF per Slice.
-                    upf-port: 8805
+            - name: "default"      # can be any unique slice name
+              slice-id:        # must match with slice configured in gNB, UE
+                sd: "010203"
+                sst: 1
+              site-device-group:
+              - "gnbsim-user-group1"   # All UEs in this device-group are assigned to this slice
+              # Applicaiton filters control what each user can access.
+              # Default, allow access to all applications
+              application-filtering-rules:
+              - rule-name: "ALLOW-ALL"
+                priority: 250
+                action: "permit"
+                endpoint: "0.0.0.0/0"
+                app-mbr-uplink: 1 #1Mbps
+                app-mbr-downlink: 5 #5Mbps
+                bitrate-unit: Mbps
+                traffic-class : #if same as APN-AMBR then its default bearer rule
+                  name: "silver"
+                  qci: 9
+                  arp: 6
+                  pdb: 300
+                  pelr: 6
+              site-info:
+                # Provide gNBs and UPF details and also PLMN for the site
+                gNodeBs:
+                - name: "gnb1"
+                  tac: 1
+                - name: "gnb2"
+                  tac: 2
+                plmn:
+                  mcc: "208"
+                  mnc: "93"
+                site-name: "enterprise"
+                upf:
+                  upf-name: "upf"  # associated UPF for this slice. One UPF per Slice.
+                  upf-port: 8805
+
+            - name: "eMBB"      # can be any unique slice name
+              slice-id:        # must match with slice configured in gNB, UE
+                sd: "000001"
+                sst: 1
+              site-device-group:
+              - "eMBB"   # All UEs in this device-group are assigned to this slice
+              # Applicaiton filters control what each user can access.
+              # Default, allow access to all applications
+              application-filtering-rules:
+              - rule-name: "ALLOW-ALL"
+                priority: 250
+                action: "permit"
+                endpoint: "0.0.0.0/0"
+                app-mbr-uplink: 1 #1Mbps
+                app-mbr-downlink: 5 #5Mbps
+                bitrate-unit: Mbps
+                traffic-class : #if same as APN-AMBR then its default bearer rule
+                  name: "silver"
+                  qci: 9
+                  arp: 6
+                  pdb: 300
+                  pelr: 6
+              site-info:
+                # Provide gNBs and UPF details and also PLMN for the site
+                gNodeBs:
+                - name: "gnb1"
+                  tac: 1
+                - name: "gnb2"
+                  tac: 2
+                plmn:
+                  mcc: "208"
+                  mnc: "93"
+                site-name: "enterprise"
+                upf:
+                  upf-name: "upf.aether-5gc-upf-1.svc.cluster.local"  # associated UPF for this slice. One UPF per Slice. el upf de los slices estan en otro namespace
+                  upf-port: 8805
+
+            - name: "URLLC"      # can be any unique slice name
+              slice-id:        # must match with slice configured in gNB, UE
+                sd: "000002"
+                sst: 2
+              site-device-group:
+              - "URLLC"   # All UEs in this device-group are assigned to this slice
+              # Applicaiton filters control what each user can access.
+              # Default, allow access to all applications
+              application-filtering-rules:
+              - rule-name: "ALLOW-ALL"
+                priority: 250
+                action: "permit"
+                endpoint: "0.0.0.0/0"
+                app-mbr-uplink: 1 #1Mbps
+                app-mbr-downlink: 5 #5Mbps
+                bitrate-unit: Mbps
+                traffic-class : #if same as APN-AMBR then its default bearer rule
+                  name: "silver"
+                  qci: 9
+                  arp: 6
+                  pdb: 300
+                  pelr: 6
+              site-info:
+                # Provide gNBs and UPF details and also PLMN for the site
+                gNodeBs:
+                - name: "gnb1"
+                  tac: 1
+                - name: "gnb2"
+                  tac: 2
+                plmn:
+                  mcc: "208"
+                  mnc: "93"
+                site-name: "enterprise"
+                upf:
+                  upf-name: "upf.aether-5gc-upf-2.svc.cluster.local"  # associated UPF for this slice. One UPF per Slice.
+                  upf-port: 8805
+
+            - name: "mMTC"      # can be any unique slice name
+              slice-id:        # must match with slice configured in gNB, UE
+                sd: "000003"
+                sst: 3
+              site-device-group:
+              - "mMTC"   # All UEs in this device-group are assigned to this slice
+              # Applicaiton filters control what each user can access.
+              # Default, allow access to all applications
+              application-filtering-rules:
+              - rule-name: "ALLOW-ALL"
+                priority: 250
+                action: "permit"
+                endpoint: "0.0.0.0/0"
+                app-mbr-uplink: 1 #1Mbps
+                app-mbr-downlink: 5 #5Mbps
+                bitrate-unit: Mbps
+                traffic-class : #if same as APN-AMBR then its default bearer rule
+                  name: "silver"
+                  qci: 9
+                  arp: 6
+                  pdb: 300
+                  pelr: 6
+              site-info:
+                # Provide gNBs and UPF details and also PLMN for the site
+                gNodeBs:
+                - name: "gnb1"
+                  tac: 1
+                - name: "gnb2"
+                  tac: 2
+                plmn:
+                  mcc: "208"
+                  mnc: "93"
+                site-name: "enterprise"
+                upf:
+                  upf-name: "upf.aether-5gc-upf-3.svc.cluster.local"  # associated UPF for this slice. One UPF per Slice.
+                  upf-port: 8805
+
 
 # Override values for omec-user-plane Helm Chart
 # https://github.com/omec-project/sdcore-helm-charts/blob/main/bess-upf/values.yaml
@@ -636,57 +899,60 @@ omec-user-plane:
     enabled: false
   images:
     # repository: "registry.aetherproject.org/proxy/"
-    # repository: "192.168.12.15:8082/"
     repository: "ghcr.io/networkgcorefullcode/"
-    tags:
-      bess: omecproject/upf-epc-bess:rel-2.1.1
-      pfcpiface: omecproject/upf-epc-pfcpiface:rel-2.1.1
-    # tools: omecproject/busybox:stable
+    pullSecrets: []
+    # tags:
+       #bess: omecproject/upf-epc-bess:v1.2.1-new-dev
+       #pfcpiface: omecproject/upf-epc-pfcpiface:v1.2.1-new-dev
+      # tools: omecproject/busybox:stable
+  bessd:
+    args:
+      - bessd -m 0 -f --grpc_url=0.0.0.0:10514
   config:
     upf:
+      privileged: true
       name: "oaisim"
       sriov:
-        enabled: false # SRIOV is disabled by default
+        enabled: false    # SRIOV is disabled by default
       hugepage:
-        enabled: false # Should be enabled if DPDK is enabled
+        enabled: false    # Should be enabled if DPDK is enabled
       routes:
-        - to: { { core.amf.ip } }
+        - to: 192.168.10.50
           via: 169.254.1.1
-        - to: 192.168.58.0/24
+        - to: 192.168.100.0/24
           via: 192.168.252.1
       enb:
-        subnet: { { ran_subnet } } # Subnet for the gNB network
+        subnet: 192.168.10.0/24 # Subnet for the gNB network
       access:
         ipam: static
-        cniPlugin: macvlan # Can be any other plugin. Dictates how IP address are assigned
-        iface: { { core.data_iface } }
-        gateway: { { access_gw } }
-        ip: { { access_ip } }
+        cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
+        iface: ens160
+        gateway: 192.168.252.1
+        ip: 192.168.252.3/24
       core:
         ipam: static
-        cniPlugin: macvlan # Can be any other plugin. Dictates how IP address are assigned
-        iface: { { core.data_iface } }
-        gateway: { { core_gw } }
-        ip: { { core_ip } }
+        cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
+        iface: ens160
+        gateway: 192.168.250.1
+        ip: 192.168.250.3/24
       cfgFiles:
         upf.jsonc:
-          mode: { { core.upf.mode } }
+          mode: af_packet
           hwcksum: true
           log_level: "info"
-          workers: 1
           measure_upf: true
           measure_flow: true
-          gtppsc: true # Extension header enabled in 5G.
+          gtppsc: true                   # Extension header enabled in 5G.
           cpiface:
-            dnn: "internet" # Must match Slice dnn
+            dnn: "internet"              # Must match Slice dnn
             hostname: "upf"
             #http_port: "8080"
-            enable_ue_ip_alloc: false # If true, UPF allocates address from following pool
-            ue_ip_pool: { { core.upf.default_upf.ue_ip_pool } } # IP pool used UEs if enable_ue_ip_alloc=true
-          slice_rate_limit_config: # Slice-level rate limiting (also controlled by ROC)
+            enable_ue_ip_alloc: false    # If true, UPF allocates address from following pool
+            ue_ip_pool: 192.168.100.0/24 # IP pool used UEs if enable_ue_ip_alloc=true
+          slice_rate_limit_config:       # Slice-level rate limiting (also controlled by ROC)
             # Uplink
-            n6_bps: 10000000000 # 10Gbps
-            n6_burst_bytes: 12500000 # 10ms * 10Gbps
+            n6_bps: 10000000000          # 10Gbps
+            n6_burst_bytes: 12500000     # 10ms * 10Gbps
             # Downlink
-            n3_bps: 10000000000 # 10Gbps
-            n3_burst_bytes: 12500000 # 10ms * 10Gbps
+            n3_bps: 10000000000          # 10Gbps
+            n3_burst_bytes: 12500000     # 10ms * 10Gbps
