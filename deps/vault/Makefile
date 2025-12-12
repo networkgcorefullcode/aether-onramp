@@ -48,3 +48,11 @@ ansible-install:
 	sudo add-apt-repository --yes --update ppa:ansible/ansible; \
 	sudo apt-get install -y ansible; \
 	ansible --version
+
+apply-terraform-dev:
+	cd $(VAULT_ROOT_DIR)/terraform/enviroments/dev && terraform init && terraform apply --auto-approve
+	cd $(VAULT_ROOT_DIR)
+
+destroy-terraform-dev:
+	cd $(VAULT_ROOT_DIR)/terraform/enviroments/dev && terraform destroy --auto-approve
+	cd $(VAULT_ROOT_DIR)
