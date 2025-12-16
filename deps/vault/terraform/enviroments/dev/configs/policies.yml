@@ -9,18 +9,31 @@ policies:
       path "secret/data/dev/*" {
         capabilities = ["create", "read", "update", "delete", "list"]
       }
-      # Enable transit secrets engine
+      path "kv-dev/metadata/k4keys" {
+        capabilities = ["list", "read"]
+      }
+      path "kv-dev/data/k4keys/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
       path "sys/mounts/transit" {
         capabilities = [ "create", "read", "update", "delete", "list" ]
       }
-      # To read enabled secrets engines
       path "sys/mounts" {
         capabilities = [ "read" ]
       }
-      # Manage the transit secrets engine
       path "transit/*" {
         capabilities = [ "create", "read", "update", "delete", "list" ]
       }
+      path "transit-dev/keys" {
+        capabilities = ["list", "read"]
+      }
+      path "transit-dev/keys/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      path "transit-dev/keys/*/rotate" {
+        capabilities = ["create", "update"]
+      }
+
   - name: test_policy
     policy: |
       path "secret/data/test/*" {
