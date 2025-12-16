@@ -30,6 +30,12 @@ policies:
       path "transit-dev/keys/*" {
         capabilities = ["create", "read", "update", "delete", "list"]
       }
+      path "transit-dev/encrypt/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      path "transit-dev/rewrap/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
       path "transit-dev/keys/*/rotate" {
         capabilities = ["create", "update"]
       }
