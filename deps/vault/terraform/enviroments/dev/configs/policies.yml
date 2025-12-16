@@ -25,7 +25,7 @@ policies:
         capabilities = [ "create", "read", "update", "delete", "list" ]
       }
       path "transit-dev/keys" {
-        capabilities = ["list", "read"]
+        capabilities = ["list", "read", "delete"]
       }
       path "transit-dev/keys/*" {
         capabilities = ["create", "read", "update", "delete", "list"]
