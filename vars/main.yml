@@ -56,7 +56,7 @@ core:
         cpiface_hostname: "upf.aether-5gc-upf-3.svc.cluster.local"
 
   amf:
-    ip: "10.76.28.113"
+    ip: "192.168.10.50"
 
 gnbsim:
   docker:
@@ -69,9 +69,9 @@ gnbsim:
         name: gnbnet
 
   router:
-    data_iface: ens18
+    data_iface: ens160
     macvlan:
-      subnet_prefix: "172.20"
+      subnet_prefix: "192.168"
 
   servers:
     0:
