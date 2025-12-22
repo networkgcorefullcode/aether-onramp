@@ -43,7 +43,7 @@ omec-control-plane:
       image:
         registry: docker.io
         repository: bitnamilegacy/zookeeper
-        tag: 3.8.0-debian-11-r74      
+        tag: 3.8.0-debian-11-r74
     persistence:
       enabled: false
     image:
@@ -161,8 +161,6 @@ omec-control-plane:
             ngapIpList:
               - 0.0.0.0
 
-    upfadapter:
-      deploy: false # If enabled then deploy upf adapter pod
 
     # Change AMF config here if rquired
     # Most of the AMF config comes from Slice APIs but some of the config is
