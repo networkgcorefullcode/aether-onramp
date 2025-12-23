@@ -1,0 +1,41 @@
+# Vault sensitive data
+vault_keys/
+*.key
+*.token
+rootkey
+
+# Backup files
+vault_backups/
+*.backup
+
+# Ansible retry files
+*.retry
+
+# Temporary files
+*.tmp
+*.log
+.vault-token
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Terraform (if used with terraform subfolder)
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform.lock.hcl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

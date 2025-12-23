@@ -1,0 +1,29 @@
+users:
+  - username: dev_user
+    password: 12345678
+    policies:
+      - dev_policy
+  - username: test_user
+    password: 12345678
+    policies:
+      - test_policy
+  - username: fernando_pizarro
+    password: 12345678
+    policies:
+      - audit_policy
+  - username: abel
+    password: 12345678
+    policies:
+      - management_policy
+  - username: pedro_valdes
+    password: 12345678
+    policies:
+      - admin_policy
+  - username: camila
+    password: 12345678
+    policies:
+      - management_policy
+  - username: admin_user
+    password: 12345678
+    policies:
+      - admin_policy

@@ -1,0 +1,17 @@
+vault:
+  version: "1.21.1"
+  user: "vault"
+  group: "vault"
+  install_prerequisites:
+    - unzip
+    - curl
+  config_path: "/etc/vault.hcl"
+  data_path: "/opt/vault/data"
+  
+  # Dev mode configuration
+  dev_mode: true
+  address: "0.0.0.0:8200"
+  
+  # Unseal configuration
+  unseal_keys_dir_output: "{{ playbook_dir }}/vault_keys/unseal_keys"
+  root_token_dir_output: "{{ playbook_dir }}/vault_keys/root_token"

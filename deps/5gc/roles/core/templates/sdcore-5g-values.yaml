@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SPDX-FileCopyrightText: 2022-present Intel Corporation
 # Copyright 2019-present Open Networking Foundation
 # SPDX-License-Identifier: Apache-2.0
@@ -691,3 +692,893 @@ omec-user-plane:
             # Downlink
             n3_bps: 10000000000          # 10Gbps
             n3_burst_bytes: 12500000     # 10ms * 10Gbps
+=======
+# SPDX-FileCopyrightText: 2022-present Intel Corporation
+# Copyright 2019-present Open Networking Foundation
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Disable 4G Control Plane
+omec-control-plane:
+  enable4G: false
+
+# Disable 5G RAN Simulator
+5g-ran-sim:
+  enable: false
+
+# Override values for 5g-control-plane Helm Chart
+# https://github.com/omec-project/sdcore-helm-charts/blob/main/5g-control-plane/values.yaml
+5g-control-plane:
+  enable5G: true
+  images:
+    repository: "ghcr.io/networkgcorefullcode/"
+    tags:
+      amf: omecproject/5gc-amf:2.0.5-dev
+      ausf: omecproject/5gc-ausf:2.0.5-dev
+      smf: omecproject/5gc-smf:3.0.2-dev
+      udm: omecproject/5gc-udm:2.7.1-dev
+      udr: omecproject/5gc-udr:2.1.7-dev
+      pcf: omecproject/5gc-pcf:2.0.3-dev
+      nrf: omecproject/5gc-nrf:2.0.8-dev
+      webui: omecproject/5gc-webui:2.0.1-dev
+      nssf: omecproject/5gc-nssf:1.7.2-dev
+      init: omecproject/pod-init:rel-1.1.3
+      upfadapter: omecproject/upfadapter:2.0.6-dev
+      metricfunc: omecproject/metricfunc:rel-1.6.2
+      sctplb: omecproject/sctplb:1.6.6-dev
+      #sctplb: sctplb:1.6.7-dev
+      #upfadapter: upfadapter:2.0.7-dev
+    pullPolicy: IfNotPresent
+
+  kafka:
+    deploy: true
+
+  mongodb:
+    deploy: true
+    architecture: replicaset
+    replicaCount: 3
+    usePassword: false
+    persistence:
+      enabled: false
+
+  config:
+    mongodb:
+      name: aether
+      url: mongodb://mongodb-arbiter-headless # Enable if cluster deployment required
+      authKeysDbName: authentication
+      authUrl: mongodb://mongodb-arbiter-headless
+
+    webui:
+      tlsSecretName: "webui-tls"
+      tlsSecretKeys:
+        cert: tls.crt
+        key: tls.key
+        ca: ca.crt
+      credentialsSecretName: "webui-credentials"
+      ssm:
+        enable: true
+      credentials:
+        serviceIdKey: service_id
+        passwordKey: password
+      serviceType: NodePort
+      deploy: true
+      urlport:
+        port: 5000
+        
+        nodePort: 30001
+      rest:
+        port: 5001
+        
+        nodePort: 30002
+      ingress:
+        enabled: false
+        hostname: aether.local
+        path: /
+        pathType: Prefix
+        # extraHosts:
+          # - host: aether.local
+          #   path: /
+      cfgFiles:
+        webuicfg.yaml:
+          info:
+            version: 1.0.0
+            description: WebUI initial local configuration
+          configuration:
+            # 5G mode
+            spec-compliant-sdf: false
+            enableAuthentication: false
+            send-pebble-notifications: false
+            # MongoDB configuration
+            mongodb:
+              name: aether
+              url: "mongodb://mongodb-arbiter-headless"
+              authKeysDbName: authentication
+              authUrl: "mongodb://mongodb-arbiter-headless"
+              webuiDbName: aether
+              webuiDbUrl: "mongodb://mongodb-arbiter-headless"
+              checkReplica: false
+            webui-tls:
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
+            nfconfig-tls:
+              pem: /var/run/certs/tls.crt
+              key: /var/run/certs/tls.key
+            managedByConfigPod:
+              syncUrl: http://roc-service:8080/sync
+              enabled: false
+            ssm:
+              ssm-uri: https://192.168.12.16:9000
+              allow-ssm: true
+              tls-insecure: true
+              ssm-synchronize:
+                enable: true
+                interval-minute: 30
+                max-keys-create: 5
+                delete-missing: true
+                max-sync-keys: 5
+                max-sync-users: 5
+                max-sync-rotations: 5
+              m-tls:
+                crt: /etc/webui/tls/tls.crt
+                key: /etc/webui/tls/tls.key
+                ca: /etc/webui/tls/ca.crt
+              # read in cascade if gcm is false then cbc is used if gcm is true cbc is ignored, both is false no encryption is used (disabled SSM jjjj)
+              is-encrypt-aes-gcm: true
+              is-encrypt-aes-cbc: false
+            metricsPort: ":8080"
+
+    udm:
+      deploy: true
+      serviceType: ClusterIP
+      credentialsSecretName: "udm-credentials"
+      tlsSecretName: "udm-tls"
+      tlsSecretKeys:
+        cert: tls.crt
+        key: tls.key
+        ca: ca.crt
+      ssm:
+        enable: true
+      credentials:
+        serviceIdKey: service_id
+        passwordKey: password
+      sbi:
+        port: 29503
+      cfgFiles:
+        udmcfg.yaml:
+          info:
+            version: 1.0.0
+            description: UDM initial local configuration
+          configuration:
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            enableNrfCaching: true
+            nrfCacheEvictionInterval: 900
+            serviceList:
+              - nudm-sdm
+              - nudm-uecm
+              - nudm-ueau
+              - nudm-ee
+              - nudm-pp
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: udm
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            keys:
+              udmProfileAHNPublicKey: 5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650
+              udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
+              udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
+              udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
+            ssm:
+              enable: true
+              host: https://192.168.12.16:9000
+              tls_insecure: true
+              m-tls:
+                crt: /etc/udm/tls/tls.crt
+                key: /etc/udm/tls/tls.key
+                ca: /etc/udm/tls/ca.crt
+            metricsPort: ":8080"
+
+    udr:
+      deploy: true
+      #podAnnotations:
+      serviceType: ClusterIP
+      sbi:
+        port: 29504
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30074
+      cfgFiles:
+        # https://github.com/omec-project/udr/blob/main/factory/udr_config.yaml
+        udrcfg.yaml:
+          info:
+            version: 1.0.0
+            description: UDR initial local configuration
+          configuration:
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: udr
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            metricsPort: ":8080"
+
+    pcf:
+      deploy: true
+      #podAnnotations:
+      serviceType: ClusterIP
+      sbi:
+        port: 29507
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30077
+      cfgFiles:
+        # https://github.com/omec-project/pcf/blob/main/factory/pcfcfg.yaml
+        pcfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: PCF initial local configuration
+          configuration:
+            pcfName: PCF
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: pcf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            defaultBdtRefId: BdtPolicyId-
+            enableNrfCaching: true
+            nrfCacheEvictionInterval: 900
+            serviceList:
+              - serviceName: npcf-am-policy-control
+              - serviceName: npcf-smpolicycontrol
+                suppFeat: 3fff
+              - serviceName: npcf-bdtpolicycontrol
+              - serviceName: npcf-policyauthorization
+                suppFeat: 3
+              - serviceName: npcf-eventexposure
+              - serviceName: npcf-ue-policy-control
+            metricsPort: ":8080"
+
+    nssf:
+      deploy: true
+      #podAnnotations:
+      serviceType: ClusterIP
+      sbi:
+        port: 29531
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30081
+      cfgFiles:
+        nssfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: NSSF initial local configuration
+          configuration:
+            nssfName: NSSF
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: nssf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            serviceNameList:
+              - nnssf-nsselection
+              - nnssf-nssaiavailability
+            nsiList:
+              - snssai:
+                  sst: 1
+                  sd: "010203"
+                nsiInformationList:
+                  - nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances
+                    nsiId: 22
+            metricsPort: ":8080"
+          
+    amf:
+      deploy: true
+      # serviceAnnotations:
+      #   external-dns.alpha.kubernetes.io/hostname: "aether-amf.tenant-site.company.com"
+      podAnnotations:
+        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+      serviceType: NodePort
+      prometheus:
+        port: 9089
+        # Provide nodePort when serviceType is NodePort
+        # nodePort: 30084
+      sctp_grpc:
+        port: 9000
+        # nodePort: 30088
+      sbi:
+        port: 29518
+        #nodePort: 30088
+      ngapp:
+        #externalIp:
+        port: 38412
+        nodePort: 30071
+      cfgFiles:
+        amfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: AMF initial configuration
+          configuration:
+            amfDBName: sdcore_amf
+            enableDBStore: true
+            enableSctpLb: false
+            enableNrfCaching: true
+            sctpGrpcPort: 9000
+            nrfCacheEvictionInterval: 900
+            debugProfilePort: 5001
+            kafkaInfo:
+              enableKafka: true
+              brokerUri: "kafka-headless"
+              brokerPort: 9092
+              topicName: "sdcore-data-source-amf"
+            ngapIpList:
+              - "0.0.0.0"
+            amfName: AMF
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: amf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            serviceNameList:
+              - namf-comm
+              - namf-evts
+              - namf-mt
+              - namf-loc
+              - namf-oam
+            supportDnnList:
+              - internet
+            security:
+              integrityOrder:
+                - NIA1
+                - NIA2
+              cipheringOrder:
+                - NEA0
+            networkName:
+              full: Aether5G
+              short: Aether
+            networkFeatureSupport5GS: # 5gs Network Feature Support IE, refer to TS 24.501
+              enable: true # append this IE in Registration accept or not
+              imsVoPS: 0 # IMS voice over PS session indicator (uinteger, range: 0~1)
+              emc: 0 # Emergency service support indicator for 3GPP access (uinteger, range: 0~3)
+              emf: 0 # Emergency service fallback indicator for 3GPP access (uinteger, range: 0~3)
+              iwkN26: 0 # Interworking without N26 interface indicator (uinteger, range: 0~1)
+              mpsi: 0 # MPS indicator (uinteger, range: 0~1)
+              emcN3: 0 # Emergency service support indicator for Non-3GPP access (uinteger, range: 0~1)
+              mcsi: 0 # MCS indicator (uinteger, range: 0~1)
+            t3502Value: 720  # timer value (seconds) at UE side
+            t3512Value: 3600 # timer value (seconds) at UE side
+            non3gppDeregistrationTimerValue: 3240 # timer value (seconds) at UE side
+            # retransmission timer for paging message
+            t3513:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Deregistration Request message
+            t3522:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Registration Accept message
+            t3550:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Authentication Request/Security Mode Command message
+            t3560:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            # retransmission timer for NAS Notification message
+            t3565:
+              enable: true     # true or false
+              expireTime: 6s   # default is 6 seconds
+              maxRetryTimes: 4 # the max number of retransmission
+            metricsPort: ":8080"
+
+    nrf:
+      deploy: true
+      #podAnnotations:
+      serviceType: ClusterIP
+      sbi:
+        port: 29510
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30070
+      cfgFiles:
+        nrfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: NRF initial local configuration
+          configuration:
+            mongoDBStreamEnable: true
+            nfProfileExpiryEnable: true
+            nfKeepAliveTime: 60
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: nrf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            serviceNameList:
+              - nnrf-nfm
+              - nnrf-disc
+            metricsPort: ":8080"
+            
+    smf:
+      deploy: true
+      podAnnotations:
+        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+      serviceType: ClusterIP
+      upfPort: 8805
+      n4:
+        port: 8805
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30021
+      prometheus:
+        port: 9089
+        #nodePort: 30084
+      sbi:
+        port: 29502
+        #nodePort: 30080
+      cfgFiles:
+        # https://github.com/omec-project/smf/blob/main/config/uerouting.yaml
+        uerouting.yaml:
+          info:
+            version: 1.0.0
+            description: Routing information for UE
+        # https://github.com/omec-project/smf/blob/main/config/smfcfg.yaml
+        smfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: SMF initial local configuration
+          configuration:
+            smfDBName: sdcore_smf
+            enableDBStore: true
+            enableNrfCaching: true
+            nrfCacheEvictionInterval: 900
+            debugProfilePort: 5001
+            kafkaInfo:
+              enableKafka: true
+              brokerUri: "kafka-headless"
+              brokerPort: 9092
+              topicName: "sdcore-data-source-smf"
+            pfcp:
+              addr: "POD_IP"
+            smfName: SMF
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: smf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            serviceNameList:
+              - nsmf-pdusession
+              - nsmf-event-exposure
+            metricsPort: ":8080"
+            
+            
+    ausf:
+      deploy: true
+      #podAnnotations:
+      serviceType: ClusterIP
+      sbi:
+        port: 29509
+        # Provide nodePort when serviceType is NodePort
+        #nodePort: 30082
+      cfgFiles:
+        # https://github.com/omec-project/ausf/blob/main/factory/ausfcfg.yaml
+        ausfcfg.yaml:
+          info:
+            version: 1.0.0
+            description: AUSF initial local configuration
+          configuration:
+            nrfUri: https://nrf:29510
+            webuiUri: https://webui.aether-5gc:5001
+            enableNrfCaching: true
+            nrfCacheEvictionInterval: 900
+            sbi:
+              scheme: https
+              bindingIPv4: "0.0.0.0"
+              registerIPv4: ausf
+              tls:
+                pem: /var/run/certs/tls.crt
+                key: /var/run/certs/tls.key
+            serviceNameList:
+              - nausf-auth
+            groupId: ausfGroup001
+            metricsPort: ":8080"
+
+
+    metricfunc:
+      deploy: true
+      serviceType: ClusterIP
+      prometheus:
+        port: 9089
+      apiEndpoint:
+        port: 9301
+      cfgFiles:
+        metricscfg.yaml:
+          configuration:
+            controllerFlag: false
+            nfStreams:
+              - topic:
+                  topicGroup: analytics
+                  topicName: sdcore-data-source-amf
+                urls:
+                  - uri: "kafka-headless"
+                    port: 9092
+              - topic:
+                  topicGroup: analytics
+                  topicName: sdcore-data-source-smf
+                urls:
+                  - uri: "kafka-headless"
+                    port: 9092
+            prometheusServer:
+              addr: POD_IP
+              port: 9089
+            apiServer:
+              addr: POD_IP
+              port: 9301
+            debugProfileServer:
+              addr: POD_IP
+              port: 5001
+            userAppApiServer:
+              addr: "userAppapp"
+              port: 9301
+            rocEndPoint:
+              addr: "roc-aether-roc-gui-v2-1-external.aether-roc.svc"
+              port: 80
+            metricFuncEndPoint:
+              addr: "metricfunc.svc"
+              port: 5001
+          info:
+            description: Metrics initial local configuration
+            version: 1.0.0
+          logger:
+            level: info
+
+    sctplb:
+      deploy: false
+      podAnnotations:
+        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+      serviceType: NodePort
+      sctp_grpc:
+        port: 9000
+        nodePort: 30088
+      ngapp:
+        #externalIp:
+        port: 38412
+        nodePort: 30087
+      cfgFiles:
+        sctplb.yaml:
+          info:
+            version: 1.0.0
+            description: SCTPLB initial local configuration
+          logger:
+            sctpLogs: info
+            dispatcherLogs: info
+            clientdiscLogs: info
+          configuration:
+            type: "grpc"
+            services:
+              - uri: "amf-headless"
+            ngapIpList:
+              - 0.0.0.0
+
+    upfadapter:
+      deploy: false
+      serviceType: ClusterIP
+      n4:
+        port: 8805
+        # Provide nodePort when serviceType is NodePort
+        # nodePort: 30021
+      rest:
+        port: 8090
+        #nodePort: 30080
+      cfgFiles:
+        upfadaptercfg.yaml:
+          info:
+            version: 1.0.0
+            description: UPF Adapter initial local configuration
+          logger:
+            level: info
+          configuration:
+            kafkaInfo:
+              brokerUri: "kafka-headless"
+              brokerPort: 9092
+              topicName: "sdcore-data-source-smf"
+    
+# Override values for omec-sub-provision (subscriber) Helm Chart
+# https://github.com/omec-project/sdcore-helm-charts/blob/main/omec-sub-provision/values.yaml
+# ***Note: Most of these values can (and should) be set via ROC API***
+omec-sub-provision:
+  enable: true
+  images:
+    repository: "ghcr.io/networkgcorefullcode/"
+    tags:
+      simapp: omecproject/simapp:1.6.11-dev
+      init: omecproject/pod-init:rel-1.1.3
+
+  config:
+    simapp:
+      cfgFiles:
+        simapp.yaml:
+          configuration:
+            http-timeout: 600 # in seconds
+            provision-network-slice: {{ core.standalone | string }} # if enabled, Device Groups & Slices configure by simapp
+            sub-provision-endpt:
+              addr: webui  # subscriber configuation endpoint.
+            # sub-proxy-endpt: # used if subscriber proxy is enabled in the ROC.
+            #   addr: subscriber-proxy.aether-roc.svc.svc.cluster.local
+            #   port: 5000
+
+            # Configure Subscriber IMSIs and their security details.
+            # You can have any number of subscriber ranges
+            # This block is always necessary to establish range(s) of valid IMSIs
+            subscribers:
+            - ueId-start: "208930100007487"
+              ueId-end: "208930100007500"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930100007501"
+              ueId-end: "208930100007586"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930100008000"
+              ueId-end: "208930100008499"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+
+            # Configure Device Groups (ignored if provision-network-slice is disabled)
+            device-groups:
+            - name:  "test5g-gnbsim-user-group1"
+              imsis:
+                - "208930100007487"
+                - "208930100007488"
+                - "208930100007489"
+                - "208930100007490"
+                - "208930100007491"
+                - "208930100007492"
+                - "208930100007493"
+                - "208930100007494"
+                - "208930100007495"
+                - "208930100007496"
+                - "208930100007497"
+                - "208930100007498"
+                - "208930100007499"
+                - "208930100007500"
+                - "208930100007501"
+                - "208930100007502"
+                - "208930100007503"
+                - "208930100007504"
+                - "208930100007505"
+                - "208930100007506"
+                - "208930100007507"
+                - "208930100007508"
+                - "208930100007509"
+                - "208930100007510"
+                - "208930100007511"
+                - "208930100007512"
+                - "208930100007513"
+                - "208930100007514"
+                - "208930100007515"
+                - "208930100007516"
+                - "208930100007517"
+                - "208930100007518"
+                - "208930100007519"
+                - "208930100007520"
+                - "208930100007521"
+                - "208930100007522"
+                - "208930100007523"
+                - "208930100007524"
+                - "208930100007525"
+                - "208930100007526"
+                - "208930100007527"
+                - "208930100007528"
+                - "208930100007529"
+                - "208930100007530"
+                - "208930100007531"
+                - "208930100007532"
+                - "208930100007533"
+                - "208930100007534"
+                - "208930100007535"
+                - "208930100007536"
+                - "208930100007537"
+                - "208930100007538"
+                - "208930100007539"
+                - "208930100007540"
+                - "208930100007541"
+                - "208930100007542"
+                - "208930100007543"
+                - "208930100007544"
+                - "208930100007545"
+                - "208930100007546"
+                - "208930100007547"
+                - "208930100007548"
+                - "208930100007549"
+                - "208930100007550"
+                - "208930100007551"
+                - "208930100007552"
+                - "208930100007553"
+                - "208930100007554"
+                - "208930100007555"
+                - "208930100007556"
+                - "208930100007557"
+                - "208930100007558"
+                - "208930100007559"
+                - "208930100007560"
+                - "208930100007561"
+                - "208930100007562"
+                - "208930100007563"
+                - "208930100007564"
+                - "208930100007565"
+                - "208930100007566"
+                - "208930100007567"
+                - "208930100007568"
+                - "208930100007569"
+                - "208930100007570"
+                - "208930100007571"
+                - "208930100007572"
+                - "208930100007573"
+                - "208930100007574"
+                - "208930100007575"
+                - "208930100007576"
+                - "208930100007577"
+                - "208930100007578"
+                - "208930100007579"
+                - "208930100007580"
+                - "208930100007581"
+                - "208930100007582"
+                - "208930100007583"
+                - "208930100007584"
+                - "208930100007585"
+                - "208930100007586"
+                - "208931100007488"
+                - "208931100007489"
+                - "208931100007490"
+                - "208931100007491"
+              ip-domain-name: "pool1"
+              ip-domain-expanded:
+                dnn: internet
+                dns-primary: "8.8.8.8"        # Value is sent to UE
+                mtu: 1460                     # Value is sent to UE when PDU Session Established
+                ue-ip-pool: {{ core.upf.default_upf.ue_ip_pool }}  # IP address pool for subscribers
+                ue-dnn-qos:
+                  dnn-mbr-downlink: 1000      # UE level downlink QoS (Maximum bit rate per UE)
+                  dnn-mbr-uplink:   1000      # UE level uplink QoS (Maximum bit rate per UE)
+                  bitrate-unit: Mbps          # Unit for above QoS rates
+                  traffic-class:              # Default bearer QCI/ARP (not used in 5G)
+                    name: "platinum"
+                    qci: 9
+                    arp: 6
+                    pdb: 300
+                    pelr: 6
+              site-info: "enterprise"
+            # Configure Network Slices (ignored if provision-network-slice is disabled)
+            network-slices:
+            - name: "default"      # can be any unique slice name
+              slice-id:            # must match with slice configured in gNB, UE
+                sd: "010203"
+                sst: 1
+              site-device-group:
+              - "test5g-gnbsim-user-group1"   # All UEs in this device-group are assigned to this slice
+              - "test5g-gnbsim-user-group2"   # Added second group with 500 UEs
+              # Applicaiton filters control what each user can access.
+              # Default, allow access to all applications
+              application-filtering-rules:
+              - rule-name: "ALLOW-ALL"
+                priority: 250
+                action: "permit"
+                endpoint: "0.0.0.0/0"
+                app-mbr-uplink: 1 #1Mbps
+                app-mbr-downlink: 5 #5Mbps
+                bitrate-unit: Mbps
+                traffic-class : #if same as APN-AMBR then its default bearer rule
+                  name: "silver"
+                  qci: 9
+                  arp: 6
+                  pdb: 300
+                  pelr: 6
+              site-info:
+                # Provide gNBs and UPF details and also PLMN for the site
+                gNodeBs:
+                - name: "gnb1"
+                  tac: 1
+                - name: "gnb2"
+                  tac: 2
+                plmn:
+                  mcc: "208"
+                  mnc: "93"
+                site-name: "enterprise"
+                upf:
+                  upf-name: "upf"  # associated UPF for this slice. One UPF per Slice.
+                  upf-port: 8805
+
+# Override values for omec-user-plane Helm Chart
+# https://github.com/omec-project/sdcore-helm-charts/blob/main/bess-upf/values.yaml
+omec-user-plane:
+  enable: false
+  nodeSelectors:
+    enabled: true
+  resources:
+    enabled: false
+  images:
+    repository: "ghcr.io/networkgcorefullcode/"
+    # tags:
+      # bess: <bess image tag>
+      # pfcpiface: <pfcp image tag>
+      # tools: omecproject/busybox:stable
+  config:
+    upf:
+      name: "oaisim"
+      sriov:
+        enabled: false    # SRIOV is disabled by default
+      hugepage:
+        enabled: false    # Should be enabled if DPDK is enabled
+      routes:
+        - to: {{ ansible_default_ipv4.address }}
+          via: 169.254.1.1
+      enb:
+        subnet: {{ ran_subnet }} # Subnet for the gNB network
+      access:
+        ipam: static
+        cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
+        iface: {{ core.data_iface }}
+        gateway: {{ access_gw }}
+        ip: {{ access_ip }}
+      core:
+        ipam: static
+        cniPlugin: macvlan  # Can be any other plugin. Dictates how IP address are assigned
+        iface: {{ core.data_iface }}
+        gateway: {{ core_gw }}
+        ip: {{ core_ip }}
+      closedLoop: {{ core.closed_loop | default('false') | lower }}
+      cfgFiles:
+        upf.jsonc:
+          mode: {{ core.upf.mode }}
+          hwcksum: true
+          log_level: "info"
+          measure_upf: true
+          measure_flow: true
+          gtppsc: true                   # Extension header enabled in 5G.
+          cpiface:
+            dnn: "internet"              # Must match Slice dnn
+            hostname: "upf"
+            #http_port: "8080"
+            enable_ue_ip_alloc: true    # If true, UPF allocates address from following pool
+            ue_ip_pool: {{ core.upf.default_upf.ue_ip_pool }} # IP pool used UEs if enable_ue_ip_alloc=true
+          slice_rate_limit_config:       # Slice-level rate limiting (also controlled by ROC)
+            # Uplink
+            n6_bps: 10000000000          # 10Gbps
+            n6_burst_bytes: 12500000     # 10ms * 10Gbps
+            # Downlink
+            n3_bps: 10000000000          # 10Gbps
+            n3_burst_bytes: 12500000     # 10ms * 10Gbps
+>>>>>>> testing-local

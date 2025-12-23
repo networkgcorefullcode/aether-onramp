@@ -1,0 +1,191 @@
+---
+
+# Create vault user and group
+- name: Creating vault user group
+  group:
+    name: "{{ vault.group }}"
+  become: true
+
+- name: Creating vault user
+  user:
+    name: "{{ vault.user }}"
+    group: "{{ vault.group }}"
+    system: yes
+    shell: "/sbin/nologin"
+    comment: "vault nologin User"
+    createhome: "no"
+    state: present
+  become: true
+
+# Install prerequisites
+- name: Install prerequisites
+  package:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items: "{{ vault.install_prerequisites }}"
+  become: yes
+
+# Download and install Vault binary
+- name: Download vault binary
+  get_url:
+    url: "https://releases.hashicorp.com/vault/{{ vault.version }}/vault_{{ vault.version }}_linux_amd64.zip"
+    dest: "/tmp/vault_{{ vault.version }}_linux_amd64.zip"
+    owner: "{{ vault.user }}"
+    group: "{{ vault.group }}"
+    mode: 0755
+  register: vault_download
+  become: yes
+
+- name: Unzip vault archive
+  unarchive:
+    src: "{{ vault_download.dest }}"
+    dest: /usr/local/bin
+    remote_src: yes
+    owner: "{{ vault.user }}"
+    group: "{{ vault.group }}"
+    mode: 0755
+  become: yes
+
+- name: Set vault binary capabilities
+  capabilities:
+    path: /usr/local/bin/vault
+    capability: cap_ipc_lock+ep
+    state: present
+  become: yes
+
+# Create vault data directory
+- name: Create vault data directory
+  file:
+    path: "{{ vault.data_path }}"
+    state: directory
+    owner: "{{ vault.user }}"
+    group: "{{ vault.group }}"
+    mode: 0755
+  become: yes
+
+# Copy vault configuration
+- name: Copy vault config file
+  template:
+    src: vault.hcl.j2
+    dest: "{{ vault.config_path }}"
+    owner: "{{ vault.user }}"
+    group: "{{ vault.group }}"
+    mode: 0640
+  become: yes
+
+# Copy systemd service file
+- name: Copy systemd init file
+  template:
+    src: vault.service.j2
+    dest: /etc/systemd/system/vault.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: systemd_reload
+  become: yes
+
+# Reload systemd and start vault service
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: yes
+
+- name: Start vault service
+  service:
+    name: vault
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Wait for vault to be ready
+  wait_for:
+    port: 8200
+    delay: 5
+    timeout: 60
+
+# Initialize vault
+- name: Check if vault is already initialized
+  shell: vault status -format=json
+  environment:
+    VAULT_ADDR: "http://{{ vault.address }}"
+  register: vault_status
+  ignore_errors: yes
+  changed_when: false
+
+- name: Create unseal directories
+  file:
+    path: "{{ vault.unseal_keys_dir_output }}"
+    state: directory
+    mode: 0700
+  delegate_to: localhost
+  become: no
+  when: vault_status.rc != 0 or (vault_status.stdout | from_json).initialized == false
+
+- name: Create root token directories
+  file:
+    path: "{{ vault.root_token_dir_output }}"
+    state: directory
+    mode: 0700
+  delegate_to: localhost
+  become: no
+  when: vault_status.rc != 0 or (vault_status.stdout | from_json).initialized == false
+
+- name: Initialize Vault operator
+  shell: vault operator init -key-shares=5 -key-threshold=3 -format json
+  environment:
+    VAULT_ADDR: "http://{{ vault.address }}"
+  register: vault_init_results
+  when: vault_status.rc != 0 or (vault_status.stdout | from_json).initialized == false
+
+- name: Parse output of vault init
+  set_fact:
+    vault_init_parsed: "{{ vault_init_results.stdout | from_json }}"
+  when: vault_init_results is defined and vault_init_results.stdout is defined
+
+- name: Write unseal keys to files
+  copy:
+    dest: "{{ vault.unseal_keys_dir_output }}/unseal_key_{{ item.0 }}"
+    content: "{{ item.1 }}"
+    mode: 0600
+  with_indexed_items: "{{ vault_init_parsed.unseal_keys_b64 }}"
+  delegate_to: localhost
+  become: no
+  when: vault_init_parsed is defined
+
+- name: Write root token to file
+  copy:
+    content: "{{ vault_init_parsed.root_token }}"
+    dest: "{{ vault.root_token_dir_output }}/rootkey"
+    mode: 0600
+  delegate_to: localhost
+  become: no
+  when: vault_init_parsed is defined
+
+# Unseal vault
+- name: Reading unseal key contents
+  command: cat {{ item }}
+  register: unseal_keys
+  with_fileglob: "{{ vault.unseal_keys_dir_output }}/*"
+  delegate_to: localhost
+  become: no
+  changed_when: false
+
+- name: Unseal vault with unseal keys
+  shell: |
+    vault operator unseal {{ item.stdout }}
+  environment:
+    VAULT_ADDR: "http://{{ vault.address }}"
+  with_items: "{{ unseal_keys.results }}"
+  when: unseal_keys.results | length > 0
+  no_log: true
+
+- name: Verify vault is unsealed
+  shell: vault status
+  environment:
+    VAULT_ADDR: "http://{{ vault.address }}"
+  register: vault_final_status
+  changed_when: false
+
+- name: Display vault status
+  debug:
+    var: vault_final_status.stdout_lines

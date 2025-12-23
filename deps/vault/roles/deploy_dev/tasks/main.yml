@@ -1,0 +1,13 @@
+---
+
+- name: install vault
+  import_tasks: install.yml
+  tags: install
+
+- name: unseal vault
+  import_tasks: unseal.yml
+  tags: unseal
+
+- name: uninstall vault
+  import_tasks: uninstall.yml
+  tags: uninstall
