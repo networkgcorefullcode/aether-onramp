@@ -230,7 +230,7 @@ omec-control-plane:
       deploy: true
       serviceType: ClusterIP
       sbi:
-      port: 29504
+        port: 29504
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30074
       cfgFiles:
