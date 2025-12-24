@@ -35,7 +35,7 @@ spec:
       ref: values-from-git
 
   destination:
-    # Apunta al clúster donde está instalado Argo CD
+    # Apunta al clúster donde este instalado Argo CD
     server: 'https://kubernetes.default.svc'
     # El namespace donde se despliegan los recursos del 5G Core
     namespace: aether-5gc
