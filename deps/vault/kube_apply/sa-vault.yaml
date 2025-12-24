@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-auth
+  namespace: aether-5gc
+--- 
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-auth-delegator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: vault-auth
+  namespace: aether-5gc
+
+# exec kubectl apply -f deps/vault/kube_apply/sa-vault.yaml
+# after exec kubectl -n aether-5gc create token vault-auth
