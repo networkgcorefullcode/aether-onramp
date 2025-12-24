@@ -11,7 +11,7 @@ module "k8s_auth_dev" {
 
   # Kubernetes Configuration
   kubernetes_host        = "https://192.168.12.16:6443"
-  kubernetes_ca_cert     = file("/etc/kubernetes/pki/ca.crt")
+  kubernetes_ca_cert     = file("~/.kube/certs/ca.crt")
   token_reviewer_jwt     = var.k8s_token_reviewer_jwt
   issuer                 = "https://kubernetes.default.svc.cluster.local"
   disable_iss_validation = false
