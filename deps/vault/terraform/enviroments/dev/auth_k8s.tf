@@ -23,7 +23,7 @@ module "k8s_role_udm" {
 
   k8s_backend                          = module.k8s_auth_dev.auth_backend_path
   k8s_role_name                        = "udm"
-  k8s_bound_service_account_names      = ["udm"]
+  k8s_bound_service_account_names      = ["udm-sa"]
   k8s_bound_service_account_namespaces = ["aether-5gc"]
   k8s_token_policies                   = [module.policies["dev_policy"].name]
   k8s_token_ttl                        = 3600  # 1 hour
@@ -35,7 +35,7 @@ module "k8s_role_webconsole" {
 
   k8s_backend                          = module.k8s_auth_dev.auth_backend_path
   k8s_role_name                        = "webui"
-  k8s_bound_service_account_names      = ["webui"]
+  k8s_bound_service_account_names      = ["webui-sa"]
   k8s_bound_service_account_namespaces = ["aether-5gc"]
   k8s_token_policies                   = [module.policies["dev_policy"].name]
   k8s_token_ttl                        = 3600  # 1 hour
