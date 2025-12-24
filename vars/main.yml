@@ -19,7 +19,7 @@ core:
   helm:
     local_charts: false			# set chart_ref to local path name if true
     repo_url: https://networkgcorefullcode.github.io/helm-charts
-    chart_ref: sd-core
+    chart_ref: aether/sd-core
     chart_version: 3.1.12
   upf:
     access_subnet: "192.168.252.1/24"	# access subnet & gateway
