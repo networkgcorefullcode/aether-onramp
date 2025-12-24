@@ -5,3 +5,4 @@
 # auth_path              = "dev"
 # auth_default_lease_ttl = "3600s"
 # auth_max_lease_ttl     = "7200s"
+k8s_token_reviewer_jwt = "" # update in the host not here
