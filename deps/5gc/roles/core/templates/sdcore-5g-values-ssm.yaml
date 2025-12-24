@@ -21,11 +21,11 @@ omec-control-plane:
       amf: omecproject/5gc-amf:2.0.5-dev
       ausf: omecproject/5gc-ausf:2.0.5-dev
       smf: omecproject/5gc-smf:3.0.2-dev
-      udm: omecproject/5gc-udm:3.0.5-dev
+      udm: omecproject/5gc-udm:2.7.1-dev
       udr: omecproject/5gc-udr:2.1.7-dev
       pcf: omecproject/5gc-pcf:2.0.3-dev
       nrf: omecproject/5gc-nrf:2.0.8-dev
-      webui: omecproject/5gc-webui:2.0.3-dev
+      webui: omecproject/5gc-webui:2.0.1-dev
       nssf: omecproject/5gc-nssf:1.7.2-dev
       init: omecproject/pod-init:rel-1.1.3
       upfadapter: omecproject/upfadapter:2.0.6-dev
@@ -54,6 +54,17 @@ omec-control-plane:
       authUrl: mongodb://mongodb-arbiter-headless
 
     webui:
+      tlsSecretName: "webui-tls"
+      tlsSecretKeys:
+        cert: tls.crt
+        key: tls.key
+        ca: ca.crt
+      credentialsSecretName: "webui-credentials"
+      ssm:
+        enable: true
+      credentials:
+        serviceIdKey: service_id
+        passwordKey: password
       serviceType: NodePort
       deploy: true
       urlport:
@@ -98,40 +109,41 @@ omec-control-plane:
             managedByConfigPod:
               syncUrl: http://roc-service:8080/sync
               enabled: false
-            vault:
-              vault-uri: "http://192.168.12.16:8200"
-              allow-vault: true
+            ssm:
+              ssm-uri: https://192.168.12.16:9000
+              allow-ssm: true
               tls-insecure: true
-              
-              # Kubernetes authentication
-              k8s-role: webui
-              k8s-jwt-path: /var/run/secrets/kubernetes.io/serviceaccount/token
-              
-              k8s-mount-path: "auth-dev-kubernetes"   # Default: "kubernetes"
-
-              key-kv-path: "kv-dev/data/k4keys"
-              key-kv-metadata-path: "kv-dev/metadata/k4keys"
-              transit-keys-list-path: "transit-dev/keys"
-              transit-key-create-fmt: "transit-dev/keys/%s"
-              transit-key-rotate-fmt: "transit-dev/keys/%s/rotate"
-              transit-key-rewrap-fmt: "transit-dev/rewrap/%s"
-              transit-keys-encrypt-path: "transit-dev/encrypt"
-              concurrency-ops: 300
-
               ssm-synchronize:
                 enable: true
-                interval-minute: 180
+                interval-minute: 30
                 max-keys-create: 5
                 delete-missing: true
                 max-sync-keys: 5
                 max-sync-users: 5
                 max-sync-rotations: 5
-
+              m-tls:
+                crt: /etc/webui/tls/tls.crt
+                key: /etc/webui/tls/tls.key
+                ca: /etc/webui/tls/ca.crt
+              # read in cascade if gcm is false then cbc is used if gcm is true cbc is ignored, both is false no encryption is used (disabled SSM jjjj)
+              is-encrypt-aes-gcm: true
+              is-encrypt-aes-cbc: false
             metricsPort: ":8080"
 
     udm:
       deploy: true
       serviceType: ClusterIP
+      credentialsSecretName: "udm-credentials"
+      tlsSecretName: "udm-tls"
+      tlsSecretKeys:
+        cert: tls.crt
+        key: tls.key
+        ca: ca.crt
+      ssm:
+        enable: true
+      credentials:
+        serviceIdKey: service_id
+        passwordKey: password
       sbi:
         port: 29503
       cfgFiles:
@@ -162,18 +174,14 @@ omec-control-plane:
               udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
               udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
               udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
-            vault:
-              vault-uri: "http://192.168.12.16:8200"
+            ssm:
               enable: true
-              tls-insecure: true
-              
-              # Kubernetes authentication
-              k8s-role: webui
-              k8s-jwt-path: /var/run/secrets/kubernetes.io/serviceaccount/token
-              
-              k8s-mount-path: "auth-dev-kubernetes"
-              transit-keys-decrypt-path: "transit-dev/decrypt/%s"
-
+              host: https://192.168.12.16:9000
+              tls_insecure: true
+              m-tls:
+                crt: /etc/udm/tls/tls.crt
+                key: /etc/udm/tls/tls.key
+                ca: /etc/udm/tls/ca.crt
             metricsPort: ":8080"
 
     udr:
@@ -630,6 +638,20 @@ omec-sub-provision:
             subscribers:
             - ueId-start: "208930100007487"
               ueId-end: "208930100007500"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930100007501"
+              ueId-end: "208930100007586"
+              plmnId: "20893"
+              opc: "981d464c7c52eb6e5036234984ad0bcf"
+              op: ""
+              key: "5122250214c33e723a5dd523fc145fc0"
+              sequenceNumber: "16f3b3f70fc2"
+            - ueId-start: "208930100008000"
+              ueId-end: "208930100008499"
               plmnId: "20893"
               opc: "981d464c7c52eb6e5036234984ad0bcf"
               op: ""

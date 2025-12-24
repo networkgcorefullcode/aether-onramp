@@ -5,7 +5,7 @@ module "k8s_auth_dev" {
   # Auth Backend Configuration
   auth_type         = "kubernetes"
   auth_description  = "Kubernetes authentication backend for Dev environment"
-  auth_path         = "kubernetes"
+  auth_path         = "auth-dev-kubernetes"
   default_lease_ttl = "3600s"  # 1 hour
   max_lease_ttl     = "86400s" # 24 hours
 
