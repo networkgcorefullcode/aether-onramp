@@ -629,7 +629,7 @@ omec-sub-provision:
             # This block is always necessary to establish range(s) of valid IMSIs
             subscribers:
             - ueId-start: "208930100007487"
-              ueId-end: "208930100007500"
+              ueId-end: "208930100017487"
               plmnId: "20893"
               opc: "981d464c7c52eb6e5036234984ad0bcf"
               op: ""
@@ -639,6 +639,8 @@ omec-sub-provision:
             # Configure Device Groups (ignored if provision-network-slice is disabled)
             device-groups:
             - name:  "test5g-gnbsim-user-group1"
+              imsi-start: "208930100007487"
+              imsi-end: "208930100017487"
               ip-domain-name: "pool1"
               ip-domain-expanded:
                 dnn: internet
