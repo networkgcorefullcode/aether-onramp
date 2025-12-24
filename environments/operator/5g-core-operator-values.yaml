@@ -57,6 +57,7 @@ omec-control-plane:
         command: ['sh', '-c', 'until nc -z sd-core-zookeeper 2181; do echo waiting for zookeeper; sleep 2; done;']
 
   mongodb:
+    deploy: true
     usePassword: false
     persistence:
       enabled: false
@@ -230,7 +231,7 @@ omec-control-plane:
       deploy: true
       serviceType: ClusterIP
       sbi:
-      port: 29504
+        port: 29504
       # Provide nodePort when serviceType is NodePort
       #nodePort: 30074
       cfgFiles:

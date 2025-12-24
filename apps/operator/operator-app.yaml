@@ -20,7 +20,7 @@ spec:
         #   command: ["./helm-patches/webui/post-render.sh"]
     - repoURL: ghcr.io/networkgcorefullcode  ## registro propio
       chart: sd-core
-      targetRevision: 3.1.8
+      targetRevision: 3.1.9
       helm:
         valueFiles:
           - $values-from-git/environments/operator/5g-core-operator-values.yaml
@@ -35,7 +35,7 @@ spec:
       ref: values-from-git
 
   destination:
-    # Apunta al clúster donde está instalado Argo CD
+    # Apunta al clúster donde este instalado Argo CD
     server: 'https://kubernetes.default.svc'
     # El namespace donde se despliegan los recursos del 5G Core
     namespace: aether-5gc
