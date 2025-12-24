@@ -1,20 +1,3 @@
-<<<<<<< HEAD
----
-
-- name: install 5gc/core
-  import_tasks: roles/core/tasks/install.yml
-  tags: install
-
-- name: uninstall 5gc/core
-  import_tasks: roles/core/tasks/uninstall.yml
-  tags: uninstall
-
-- name: render Helm values for 5gc/core
-  ansible.builtin.import_tasks: render.yml
-  tags:
-    - never
-    - gitops_render_values
-=======
 ---
 
 - name: install 5gc/core
@@ -28,4 +11,3 @@
 - name: upgrade 5gc/core
   import_tasks: roles/core/tasks/upgrade.yml
   tags: upgrade
->>>>>>> testing-local

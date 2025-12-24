@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 mirrors:
   192.168.12.15:8083:
     endpoint:
@@ -19,25 +18,3 @@ configs:
       password: user2023*   # this is the registry password
     tls:
       insecure_skip_verify: true
-=======
-mirrors:
-  192.168.12.15:8083:
-    endpoint:
-      - "http://192.168.12.15:8083"
-  docker.io:
-    endpoint:
-      - "http://192.168.12.15:8083"
-configs:
-  "192.168.12.15:8083":
-    auth:
-      username: user-1   # this is the registry username
-      password: user2023*   # this is the registry password
-    tls:
-      insecure_skip_verify: true
-  "docker.io":
-    auth:
-      username: user-1   # this is the registry username
-      password: user2023*   # this is the registry password
-    tls:
-      insecure_skip_verify: true
->>>>>>> testing-local
