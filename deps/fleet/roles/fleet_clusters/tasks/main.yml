@@ -1,0 +1,7 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for fleet_clusters
+- name: Apply Fleet GitRepo
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'gitrepo.yaml.j2') }}"

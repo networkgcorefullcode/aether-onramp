@@ -1,0 +1,14 @@
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  name: {{ fleet_name }}
+  namespace: fleet-local
+spec:
+  repo: {{ fleet_repo_url }}
+  branch: {{ fleet_branch }}
+  paths:
+    - {{ fleet_path }}
+  targets:
+    - clusterSelector:
+        matchLabels:
+          env: {{ env }}

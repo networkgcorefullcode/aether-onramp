@@ -1,0 +1,9 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for fleet_bootstrap
+- name: Create fleet namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: cattle-fleet-system
+    state: present

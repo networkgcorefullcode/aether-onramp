@@ -1,0 +1,10 @@
+- name: Fleet PROD setup
+  hosts: prod_cluster
+  roles:
+    - role: fleet_clusters
+      vars:
+        env: prod
+        fleet_name: aether-prod
+        fleet_repo_url: https://github.com/org/gitops-fleet
+        fleet_branch: main
+        fleet_path: prod
