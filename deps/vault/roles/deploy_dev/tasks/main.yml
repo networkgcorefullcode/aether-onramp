@@ -4,6 +4,10 @@
   import_tasks: install.yml
   tags: install
 
+- name: config to kubernetes
+  import_tasks: vault_kubernetes.yml
+  tags: vault-kubernetes
+
 - name: unseal vault
   import_tasks: unseal.yml
   tags: unseal

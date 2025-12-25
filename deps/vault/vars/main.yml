@@ -15,3 +15,21 @@ vault:
   # Unseal configuration
   unseal_keys_dir_output: "{{ playbook_dir }}/vault_keys/unseal_keys"
   root_token_dir_output: "{{ playbook_dir }}/vault_keys/root_token"
+
+  kubernetes:
+    # Source CA cert on the RKE2 server
+    rke2_server_ca_src: "/var/lib/rancher/rke2/server/tls/server-ca.crt"
+
+    # kubectl environment (optional)
+    kubectl_kubeconfig: ""
+
+    # Manifest for ServiceAccount + ClusterRoleBinding
+    sa_manifest_src: "{{ ROOT_DIR }}/kube_apply/sa-vault.yaml"
+    sa_manifest_remote: "/tmp/sa-vault.yaml"
+
+    # ServiceAccount used by Vault to review tokens
+    namespace: "aether-5gc"
+    serviceaccount: "vault-auth"
+
+    # Terraform tfvars to update (on the controller running Ansible)
+    tfvars_path: "{{ ROOT_DIR }}/terraform/enviroments/dev/terraform.tfvars"

@@ -1,0 +1,56 @@
+---
+
+- name: Detect kubectl binary (RKE2 fallback)
+  ansible.builtin.stat:
+    path: /var/lib/rancher/rke2/bin/kubectl
+  register: vault_rke2_kubectl
+
+- name: Set kubectl command
+  ansible.builtin.set_fact:
+    vault_kubectl_cmd: "{{ '/var/lib/rancher/rke2/bin/kubectl' if vault_rke2_kubectl.stat.exists else 'kubectl' }}"
+
+- name: Ensure destination directory for kube CA exists
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/.kube/certs"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: "0755"
+
+- name: Copy RKE2 server CA to ~/.kube/certs/ca.crt
+  ansible.builtin.copy:
+    src: "{{ vault.kubernetes.rke2_server_ca_src }}"
+    remote_src: true
+    dest: "{{ ansible_user_dir }}/.kube/certs/ca.crt"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: "0644"
+
+- name: Copy ServiceAccount manifest to remote
+  ansible.builtin.copy:
+    src: "{{ vault.kubernetes.sa_manifest_src }}"
+    dest: "{{ vault.kubernetes.sa_manifest_remote }}"
+    mode: "0644"
+
+- name: Apply ServiceAccount/ClusterRoleBinding for Vault auth
+  ansible.builtin.command: "{{ vault_kubectl_cmd }} apply -f {{ vault.kubernetes.sa_manifest_remote }}"
+  environment: "{{ (vault.kubernetes.kubectl_kubeconfig | length > 0) | ternary({'KUBECONFIG': vault.kubernetes.kubectl_kubeconfig}, {}) }}"
+  changed_when: true
+
+- name: Create ServiceAccount token for Vault token reviewer
+  ansible.builtin.command: "{{ vault_kubectl_cmd }} -n {{ vault.kubernetes.namespace }} create token {{ vault.kubernetes.serviceaccount }}"
+  environment: "{{ (vault.kubernetes.kubectl_kubeconfig | length > 0) | ternary({'KUBECONFIG': vault.kubernetes.kubectl_kubeconfig}, {}) }}"
+  register: vault_token_reviewer_jwt
+  no_log: true
+  changed_when: true
+
+- name: Update terraform.tfvars with k8s_token_reviewer_jwt (controller file)
+  ansible.builtin.lineinfile:
+    path: "{{ vault.kubernetes.tfvars_path }}"
+    regexp: '^\\s*k8s_token_reviewer_jwt\\s*='
+    line: "k8s_token_reviewer_jwt = \\\"{{ vault_token_reviewer_jwt.stdout | trim }}\\\""
+    create: false
+    backup: true
+  delegate_to: localhost
+  become: false
+  run_once: true

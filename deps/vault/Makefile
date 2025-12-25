@@ -29,6 +29,11 @@ vault-status-dev:
 		-a "VAULT_ADDR=http://127.0.0.1:8200 vault status" \
 		--become
 
+vault-kubernetes-auth-dev:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(VAULT_ROOT_DIR)/deploy_dev.yml \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS) \
+		--tags vault-kubernetes
+
 terraform-install:
 	@set -e; \
 	sudo apt-get update; \

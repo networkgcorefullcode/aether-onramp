@@ -168,7 +168,7 @@ omec-control-plane:
               tls-insecure: true
               
               # Kubernetes authentication
-              k8s-role: webui
+              k8s-role: udm
               k8s-jwt-path: /var/run/secrets/kubernetes.io/serviceaccount/token
               
               k8s-mount-path: "auth-dev-kubernetes"
@@ -616,6 +616,7 @@ omec-sub-provision:
       cfgFiles:
         simapp.yaml:
           configuration:
+            http-protocol: https
             http-timeout: 600 # in seconds
             provision-network-slice: True # if enabled, Device Groups & Slices configure by simapp
             sub-provision-endpt:

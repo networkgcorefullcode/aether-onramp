@@ -76,11 +76,14 @@ aether-argocd-uninstall: argocd-uninstall
 #### Provision Vault ####
 aether-vault-install-dev: vault-deploy-dev
 aether-vault-uninstall-dev: vault-uninstall-dev
+aether-vault-kubernetes-auth-dev: vault-kubernetes-auth-dev
 aether-vault-unseal-dev: vault-unseal-dev
 aether-vault-status-dev: vault-status-dev
 aether-vault-terraform-install: terraform-install
 aether-vault-terraform-apply-dev: apply-terraform-dev
 aether-vault-terraform-destroy-dev: destroy-terraform-dev
+
+aether-5gc-with-vault-install: aether-vault-install-dev aether-5gc-install aether-vault-kubernetes-auth-dev
 
 #### Manage cluster with kubeadmin ####
 aether-kubeadmin-install: kubeadmin-install
