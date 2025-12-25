@@ -83,7 +83,7 @@ aether-vault-terraform-install: terraform-install
 aether-vault-terraform-apply-dev: apply-terraform-dev
 aether-vault-terraform-destroy-dev: destroy-terraform-dev
 
-aether-5gc-with-vault-install: aether-vault-install-dev aether-5gc-install aether-vault-kubernetes-auth-dev
+aether-5gc-with-vault-install: aether-vault-install-dev aether-vault-kubernetes-auth-dev  aether-vault-terraform-apply-dev aether-5gc-uninstall aether-5gc-install
 
 #### Manage cluster with kubeadmin ####
 aether-kubeadmin-install: kubeadmin-install
