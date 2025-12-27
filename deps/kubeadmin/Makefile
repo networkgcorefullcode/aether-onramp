@@ -10,7 +10,7 @@ export EXTRA_VARS ?= "@$(5GC_ROOT_DIR)/vars/main.yml"
 
 # Makefile for kubeadmin
 
-KUBEADMIN_PLAYBOOK := $(KUBEADMIN_ROOT_DIR)/kubeadmin-playbook.yml
+KUBEADMIN_PLAYBOOK := $(KUBEADMIN_ROOT_DIR)/install.yml
 
 # Install kubeadm, kubelet, kubectl, and containerd
 kubeadmin-install:

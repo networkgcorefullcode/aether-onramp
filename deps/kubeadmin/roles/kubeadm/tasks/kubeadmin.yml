@@ -1,5 +1,22 @@
 # TODO implement playbook to setup nodes with kubeadm
----
+
+- name: Detect kubectl binary (RKE2 fallback)
+  ansible.builtin.stat:
+    path: /var/lib/rancher/rke2/bin/kubectl
+  register: vault_kubectl
+
+- name: Set kubectl command
+  ansible.builtin.set_fact:
+    vault_kubectl_cmd: "{{ '/var/lib/rancher/rke2/bin/kubectl' if vault_kubectl.stat.exists else 'kubectl' }}"
+  become: yes
+
+- name: Check if cluster is already initialized
+  become: yes
+  stat:
+    path: /etc/kubernetes/admin.conf
+  register: cluster_initialized
+  when: inventory_hostname in groups['master_nodes']
+
 - name: Initialize Kubernetes cluster
   become: yes
   command: >
@@ -7,7 +24,9 @@
     --pod-network-cidr 192.168.0.0/16 
     --cri-socket /var/run/containerd/containerd.sock
   register: kubeadm_init_result
-  when: inventory_hostname in groups['master_nodes']
+  when: 
+    - inventory_hostname in groups['master_nodes']
+    - not cluster_initialized.stat.exists
 
 - name: Create .kube directory
   file:
@@ -25,6 +44,29 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: '0644'
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Install python3-kubernetes via apt
+  ansible.builtin.apt:
+    name: pip3
+    state: present
+  become: true
+  when: inventory_hostname in groups['master_nodes']
+  ignore_errors: true
+
+- name: Install python3-kubernetes via apt
+  ansible.builtin.apt:
+    name: pip
+    state: present
+  become: true
+  when: inventory_hostname in groups['master_nodes']
+  ignore_errors: true
+
+- name: Install python3-kubernetes via apt
+  ansible.builtin.apt:
+    name: python3-kubernetes
+    state: present
+  become: true
   when: inventory_hostname in groups['master_nodes']
 
 - name: Install Calico Tigera Operator
@@ -131,13 +173,14 @@
   when: inventory_hostname in groups['master_nodes']
 
 - name: Taint master nodes to allow pod scheduling
-  kubernetes.core.k8s_exec:
-    namespace: default
-    pod: "{{ ansible_hostname }}"
-    command: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+  ansible.builtin.shell: |
+    {{ vault_kubectl_cmd }} taint nodes --all node-role.kubernetes.io/control-plane-
   environment:
     KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
-  ignore_errors: yes
+  register: taint_result
+  failed_when: 
+    - taint_result.rc != 0 
+    - "'not found' not in taint_result.stderr"
   when: inventory_hostname in groups['master_nodes']
 
 - name: Save cluster join command

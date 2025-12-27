@@ -25,8 +25,8 @@ export EXTRA_VARS ?= "@$(AETHER_ROOT_DIR)/vars/main.yml"
 
 #### Validate Ansible Configuration ####
 aether-pingall:
-    echo $(AETHER_ROOT_DIR)
-    ansible-playbook -i $(HOSTS_INI_FILE) $(AETHER_ROOT_DIR)/pingall.yml \
+	echo $(AETHER_ROOT_DIR)
+	ansible-playbook -i $(HOSTS_INI_FILE) $(AETHER_ROOT_DIR)/pingall.yml \
         --extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
 #### Provision AETHER Components for 5G ####
@@ -85,7 +85,7 @@ aether-vault-terraform-destroy-dev: destroy-terraform-dev
 aether-vault-terraform-apply-dev-kube: apply-terraform-dev-kube
 aether-vault-terraform-destroy-dev-kube: destroy-terraform-dev-kube
 
-aether-5gc-with-vault-install: aether-vault-install-dev aether-vault-kubernetes-auth-dev  aether-vault-terraform-apply-dev-kube aether-5gc-uninstall aether-5gc-install
+aether-5gc-with-vault-install: aether-vault-install-dev aether-vault-kubernetes-auth-dev aether-vault-terraform-apply-dev-kube aether-5gc-uninstall aether-5gc-install
 
 #### Manage cluster with kubeadmin ####
 aether-kubeadmin-install: kubeadmin-install
