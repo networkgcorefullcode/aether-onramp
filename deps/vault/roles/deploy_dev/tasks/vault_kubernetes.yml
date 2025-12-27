@@ -88,7 +88,7 @@
   ansible.builtin.lineinfile:
     path: /etc/environment
     regexp: '^TF_VAR_k8s_issuer='
-    line: "TF_VAR_k8s_issuer='{{ k8s_issuer_url }}'"
+    line: "TF_VAR_k8s_issuer= {{ k8s_issuer_url }} "
     create: true
     backup: true
   delegate_to: localhost
@@ -97,7 +97,7 @@
 
 - name: Export TF_VAR_k8s_issuer for current session
   ansible.builtin.shell: |
-    export TF_VAR_k8s_issuer='{{ k8s_issuer_url }}'
+    export TF_VAR_k8s_issuer={{ k8s_issuer_url }}
     echo "TF_VAR_k8s_issuer exported for current session: {{ k8s_issuer_url }}"
   delegate_to: localhost
   become: false
