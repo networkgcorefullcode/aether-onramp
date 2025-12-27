@@ -75,7 +75,7 @@
   changed_when: true
 
 - name: Get Kubernetes cluster issuer URL
-  ansible.builtin.command: "{{ vault_kubectl_cmd }} cluster-info"
+  ansible.builtin.command: "{{ vault_kubectl_cmd }} get --raw /.well-known/openid-configuration | jq .issuer"
   environment: "{{ (vault.kubernetes.kubectl_kubeconfig | length > 0) | ternary({'KUBECONFIG': vault.kubernetes.kubectl_kubeconfig}, {}) }}"
   register: k8s_cluster_info
   changed_when: false

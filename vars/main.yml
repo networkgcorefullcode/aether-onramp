@@ -166,7 +166,7 @@ amp:
       chart_version: 101.0.0+up19.0.3
 
 vault:
-  address_endpoint: "http://172.28.31.5:8200"
+  address_endpoint: "http://192.168.12.16:8200"
   version: "1.21.1"
   user: "vault"
   group: "vault"
@@ -186,7 +186,7 @@ vault:
   kubernetes:
     # Source CA cert on the RKE2 server
     server_ca_src: "/var/lib/rancher/rke2/server/tls/server-ca.crt"
-    api_server_url: "https://172.28.31.5:6443"
+    api_server_url: "https://192.168.12.16:6443"
 
     # kubectl environment (optional)
     kubectl_kubeconfig: ""
