@@ -6,6 +6,22 @@
   import_tasks: roles/kubeadm/tasks/install.yml
   tags: install
 
+- name: Init kubeadmin setup
+  import_tasks: roles/kubeadm/tasks/kubeadmin.yml
+  tags: kubeadmin
+
+- name: Init uninstall kubeadmin
+  import_tasks: roles/kubeadm/tasks/uninstall_kubeadmin.yml
+  tags: uninstall-kubeadmin
+
+- name: Add worker nodes
+  import_tasks: roles/kubeadm/tasks/add_worker_nodes.yml
+  tags: add-workers
+
+- name: Remove worker nodes
+  import_tasks: roles/kubeadm/tasks/remove_worker_nodes.yml
+  tags: remove-workers
+
 - name: Init uninstall
   import_tasks: roles/kubeadm/tasks/uninstall.yml
   tags: uninstall

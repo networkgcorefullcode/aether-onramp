@@ -1,3 +1,153 @@
 # TODO implement playbook to setup nodes with kubeadm
 ---
+- name: Initialize Kubernetes cluster
+  become: yes
+  command: >
+    kubeadm init 
+    --pod-network-cidr 192.168.0.0/16 
+    --cri-socket /var/run/containerd/containerd.sock
+  register: kubeadm_init_result
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Create .kube directory
+  file:
+    path: "{{ ansible_user_dir }}/.kube"
+    state: directory
+    mode: '0755'
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Copy admin.conf to user's kube config
+  become: yes
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ ansible_user_dir }}/.kube/config"
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Install Calico Tigera Operator
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: tigera-operator
+  environment:
+    KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Apply Calico Tigera Operator manifest
+  uri:
+    url: https://raw.githubusercontent.com/projectcalico/calico/v3.31.2/manifests/tigera-operator.yaml
+    method: GET
+    return_content: yes
+  register: tigera_manifest
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Create Calico Tigera Operator
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ tigera_manifest.content | from_yaml_all | list }}"
+  environment:
+    KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Apply Calico custom resources manifest
+  uri:
+    url: https://raw.githubusercontent.com/projectcalico/calico/v3.31.2/manifests/custom-resources.yaml
+    method: GET
+    return_content: yes
+  register: calico_custom_manifest
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Create Calico custom resources
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ calico_custom_manifest.content | from_yaml_all | list }}"
+  environment:
+    KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Apply local path provisioner
+  uri:
+    url: https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+    method: GET
+    return_content: yes
+  register: local_path_manifest
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Create local path provisioner
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ local_path_manifest.content | from_yaml_all | list }}"
+  environment:
+    KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Patch local-path storage class as default
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: local-path
+        annotations:
+          storageclass.kubernetes.io/is-default-class: "true"
+  environment:
+    KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Apply Multus CNI
+  uri:
+    url: https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset.yml
+    method: GET
+    return_content: yes
+  register: multus_manifest
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Create Multus CNI
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ multus_manifest.content | from_yaml_all | list }}"
+  environment:
+    KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Wait for network-attachment-definitions CRD
+  kubernetes.core.k8s_info:
+    api_version: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    name: network-attachment-definitions.k8s.cni.cncf.io
+  environment:
+    KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+  register: crd_result
+  until: crd_result.resources | length > 0
+  retries: 30
+  delay: 10
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Taint master nodes to allow pod scheduling
+  kubernetes.core.k8s_exec:
+    namespace: default
+    pod: "{{ ansible_hostname }}"
+    command: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+  environment:
+    KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+  ignore_errors: yes
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Save cluster join command
+  shell: kubeadm token create --print-join-command
+  register: join_command
+  become: yes
+  when: inventory_hostname in groups['master_nodes']
+
+- name: Store join command in fact
+  set_fact:
+    kubeadm_join_command: "{{ join_command.stdout }}"
+  when: inventory_hostname in groups['master_nodes']
 

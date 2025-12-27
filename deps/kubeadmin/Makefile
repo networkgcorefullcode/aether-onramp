@@ -8,20 +8,47 @@ export HOSTS_INI_FILE ?= $(5GC_ROOT_DIR)/hosts.ini
 
 export EXTRA_VARS ?= "@$(5GC_ROOT_DIR)/vars/main.yml"
 
+# Makefile for kubeadmin
+
+KUBEADMIN_PLAYBOOK := $(KUBEADMIN_ROOT_DIR)/kubeadmin-playbook.yml
+
 # Install kubeadm, kubelet, kubectl, and containerd
 kubeadmin-install:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/install.yml \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS) --tags install
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_PLAYBOOK) \
+		--tags "install" --extra-vars "ROOT_DIR=$(ROOT_DIR)" \
+		--extra-vars $(EXTRA_VARS)
+
+kubeadmin-setup:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_PLAYBOOK) \
+		--tags "kubeadmin" --extra-vars "ROOT_DIR=$(ROOT_DIR)" \
+		--extra-vars $(EXTRA_VARS)
+
+kubeadmin-uninstall-cluster:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_PLAYBOOK) \
+		--tags "uninstall-kubeadmin" --extra-vars "ROOT_DIR=$(ROOT_DIR)" \
+		--extra-vars $(EXTRA_VARS)
+
+kubeadmin-add-workers:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_PLAYBOOK) \
+		--tags "add-workers" --extra-vars "ROOT_DIR=$(ROOT_DIR)" \
+		--extra-vars $(EXTRA_VARS)
+
+kubeadmin-remove-workers:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_PLAYBOOK) \
+		--tags "remove-workers" --extra-vars "ROOT_DIR=$(ROOT_DIR)" \
+		--extra-vars $(EXTRA_VARS)
 
 # Uninstall kubeadm, kubelet, kubectl, and containerd
 kubeadmin-uninstall:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/uninstall.yml \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS) --tags uninstall
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_PLAYBOOK) \
+		--tags "uninstall" --extra-vars "ROOT_DIR=$(ROOT_DIR)" \
+		--extra-vars $(EXTRA_VARS)
 
 # Restore swap after uninstallation (optional)
 kubeadmin-restore-swap:
-	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/uninstall.yml \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS) --tags restore-swap
+	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_PLAYBOOK) \
+		--tags "restore-swap" --extra-vars "ROOT_DIR=$(ROOT_DIR)" \
+		--extra-vars $(EXTRA_VARS)
 
 install-helm:
 	sudo apt-get install curl gpg apt-transport-https --yes

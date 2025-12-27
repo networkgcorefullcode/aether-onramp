@@ -25,9 +25,9 @@ export EXTRA_VARS ?= "@$(AETHER_ROOT_DIR)/vars/main.yml"
 
 #### Validate Ansible Configuration ####
 aether-pingall:
-	echo $(AETHER_ROOT_DIR)
-	ansible-playbook -i $(HOSTS_INI_FILE) $(AETHER_ROOT_DIR)/pingall.yml \
-		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+    echo $(AETHER_ROOT_DIR)
+    ansible-playbook -i $(HOSTS_INI_FILE) $(AETHER_ROOT_DIR)/pingall.yml \
+        --extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
 #### Provision AETHER Components for 5G ####
 aether-k8s-install: k8s-install
@@ -89,67 +89,13 @@ aether-5gc-with-vault-install: aether-vault-install-dev aether-vault-kubernetes-
 
 #### Manage cluster with kubeadmin ####
 aether-kubeadmin-install: kubeadmin-install
+aether-kubeadmin-setup: kubeadmin-setup
+aether-kubeadmin-uninstall-cluster: kubeadmin-uninstall-cluster
+aether-kubeadmin-add-workers: kubeadmin-add-workers
+aether-kubeadmin-remove-workers: kubeadmin-remove-workers
 aether-kubeadmin-uninstall: kubeadmin-uninstall
 aether-kubeadmin-restore-swap: kubeadmin-restore-swap
 aether-install-helm: install-helm
-# ####  Makefile
-
-# Rules:
-#	amp-install: roc-install roc-load monitor-install monitor-load
-#	amp-uninstall: monitor-uninstall roc-uninstall
-
-#	5gc-install: 5gc-router-install 5gc-core-install
-#	5gc-uninstall: 5gc-core-uninstall 5gc-router-uninstall
-
-## run gnbsim-docker-install before running setup
-#	gnbsim-install: gnbsim-docker-router-install gnbsim-docker-start
-#	gnbsim-uninstall:  gnbsim-docker-stop gnbsim-docker-router-uninstall
-
-
-###  Provision k8s ####
-#	k8s-install
-#	k8s-uninstall
-
-### Provision router ####
-#	5gc-router-install
-#	5gc-router-uninstall
-
-### Provision core ####
-#	5gc-core-install
-#	5gc-core-uninstall
-#	5gc-core-reset
-
-### Provision  AMP ####
-# amp-install: k8s-install roc-install roc-load monitor-install monitor-load
-# amp-uninstall: monitor-uninstall roc-uninstall k8s-uninstall
-
-### Provision and load ROC ###
-# roc-install
-# roc-load
-# roc-uninstall
-
-### Provision and load Monitoring ###
-# monitor-install
-# monitor-load
-# monitor-uninstall
-
-### Provision and run gnbsim ###
-# 	gnbsim-docker-install
-# 	gnbsim-docker-uninstall
-
-# 	gnbsim-docker-router-install
-# 	gnbsim-docker-router-uninstall
-
-# 	gnbsim-docker-start
-# 	gnbsim-docker-stop
-
-# 	gnbsim-simulator-start
-
-### Provision and run ueransim     ###
-# 	ueransim-install
-# 	ueransim-run
-# 	ueransim-uninstall
-
 
 #include at the end so rules are not overwritten
 include $(K8S_ROOT_DIR)/Makefile
