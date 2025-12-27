@@ -85,7 +85,10 @@ aether-vault-terraform-destroy-dev: destroy-terraform-dev
 aether-vault-terraform-apply-dev-kube: apply-terraform-dev-kube
 aether-vault-terraform-destroy-dev-kube: destroy-terraform-dev-kube
 
-aether-5gc-with-vault-install: aether-vault-install-dev aether-vault-kubernetes-auth-dev aether-vault-terraform-apply-dev-kube aether-5gc-uninstall aether-5gc-install
+aether-5gc-with-vault-install-1: aether-vault-install-dev aether-vault-kubernetes-auth-dev
+# close all session and then run the next target
+aether-5gc-with-vault-install-2: aether-vault-terraform-apply-dev-kube aether-5gc-install 
+aether-5gc-with-vault-uninstall: aether-5gc-uninstall aether-vault-terraform-destroy-dev-kube aether-vault-uninstall-dev
 
 #### Manage cluster with kubeadmin ####
 aether-kubeadmin-install: kubeadmin-install
