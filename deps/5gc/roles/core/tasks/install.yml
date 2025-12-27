@@ -4,7 +4,8 @@
   kubernetes.core.helm_repository:
     name: aether
     repo_url: " {{ core.helm.repo_url }} "
-  when: inventory_hostname in groups['master_nodes'] and not core.helm.local_charts
+  when: inventory_hostname in groups['master_nodes'] and not core.helm.local_charts and helm_repo_check.stdout == ""
+  ignore_errors: true
 
 - name: find {{ core.data_iface }}'s subnet for RAN
   shell: ip route | grep {{ core.data_iface }} | awk '/kernel/ {print $1}' | head -1

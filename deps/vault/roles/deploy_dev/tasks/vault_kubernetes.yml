@@ -40,7 +40,7 @@
   ansible.builtin.command: "{{ vault_kubectl_cmd }} create namespace {{ vault.kubernetes.namespace }}"
   environment: "{{ (vault.kubernetes.kubectl_kubeconfig | length > 0) | ternary({'KUBECONFIG': vault.kubernetes.kubectl_kubeconfig}, {}) }}"
   changed_when: true
-  ignore_errors: True
+  ignore_errors: true
 
 - name: Apply ServiceAccount/ClusterRoleBinding for Vault auth
   ansible.builtin.command: "{{ vault_kubectl_cmd }} apply -f {{ vault.kubernetes.sa_manifest_remote }} -n {{ vault.kubernetes.namespace }}"
@@ -48,7 +48,7 @@
   changed_when: true
 
 - name: Create ServiceAccount token for Vault token reviewer
-  ansible.builtin.command: "{{ vault_kubectl_cmd }} -n {{ vault.kubernetes.namespace }} create token {{ vault.kubernetes.serviceaccount }}"
+  ansible.builtin.command: "{{ vault_kubectl_cmd }} -n {{ vault.kubernetes.namespace }} create token {{ vault.kubernetes.serviceaccount }} --duration=8760h"
   environment: "{{ (vault.kubernetes.kubectl_kubeconfig | length > 0) | ternary({'KUBECONFIG': vault.kubernetes.kubectl_kubeconfig}, {}) }}"
   register: vault_token_reviewer_jwt
   no_log: true
@@ -88,7 +88,7 @@
   ansible.builtin.lineinfile:
     path: /etc/environment
     regexp: '^TF_VAR_k8s_issuer='
-    line: "TF_VAR_k8s_issuer= {{ k8s_issuer_url }} "
+    line: "TF_VAR_k8s_issuer={{ k8s_issuer_url }}"
     create: true
     backup: true
   delegate_to: localhost
