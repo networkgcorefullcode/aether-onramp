@@ -3,11 +3,11 @@
 - name: Detect kubectl binary (RKE2 fallback)
   ansible.builtin.stat:
     path: /var/lib/rancher/rke2/bin/kubectl
-  register: vault_rke2_kubectl
+  register: vault_kubectl
 
 - name: Set kubectl command
   ansible.builtin.set_fact:
-    vault_kubectl_cmd: "{{ '/var/lib/rancher/rke2/bin/kubectl' if vault_rke2_kubectl.stat.exists else 'kubectl' }}"
+    vault_kubectl_cmd: "{{ '/var/lib/rancher/rke2/bin/kubectl' if vault_kubectl.stat.exists else 'kubectl' }}"
   become: yes
 
 - name: Ensure destination directory for kube CA exists
@@ -20,7 +20,7 @@
 
 - name: Copy RKE2 server CA to ~/.kube/certs/ca.crt
   ansible.builtin.copy:
-    src: "{{ vault.kubernetes.rke2_server_ca_src }}"
+    src: "{{ vault.kubernetes.server_ca_src }}"
     remote_src: true
     dest: "{{ ansible_user_dir }}/.kube/certs/ca.crt"
     owner: "{{ ansible_user_id }}"
@@ -36,8 +36,14 @@
     mode: "0644"
   become: yes
 
+- name: Create namespace for Vault Kubernetes auth
+  ansible.builtin.command: "{{ vault_kubectl_cmd }} create namespace {{ vault.kubernetes.namespace }}"
+  environment: "{{ (vault.kubernetes.kubectl_kubeconfig | length > 0) | ternary({'KUBECONFIG': vault.kubernetes.kubectl_kubeconfig}, {}) }}"
+  changed_when: true
+  ignore_errors: True
+
 - name: Apply ServiceAccount/ClusterRoleBinding for Vault auth
-  ansible.builtin.command: "{{ vault_kubectl_cmd }} apply -f {{ vault.kubernetes.sa_manifest_remote }}"
+  ansible.builtin.command: "{{ vault_kubectl_cmd }} apply -f {{ vault.kubernetes.sa_manifest_remote }} -n {{ vault.kubernetes.namespace }}"
   environment: "{{ (vault.kubernetes.kubectl_kubeconfig | length > 0) | ternary({'KUBECONFIG': vault.kubernetes.kubectl_kubeconfig}, {}) }}"
   changed_when: true
 
@@ -48,13 +54,72 @@
   no_log: true
   changed_when: true
 
-- name: Update terraform.tfvars with k8s_token_reviewer_jwt (controller file)
+- name: Set TF_VAR_k8s_token_reviewer_jwt as persistent global environment variable
   ansible.builtin.lineinfile:
-    path: "{{ vault.kubernetes.tfvars_path }}"
-    regexp: '^\\s*k8s_token_reviewer_jwt\\s*='
-    line: "k8s_token_reviewer_jwt = '{{ vault_token_reviewer_jwt.stdout | trim }}'"
-    create: false
+    path: /etc/environment
+    regexp: '^TF_VAR_k8s_token_reviewer_jwt='
+    line: "TF_VAR_k8s_token_reviewer_jwt='{{ vault_token_reviewer_jwt.stdout | trim }}'"
+    create: true
     backup: true
+  delegate_to: localhost
+  become: true
+  run_once: true
+
+- name: Export TF_VAR_k8s_token_reviewer_jwt for current session
+  ansible.builtin.shell: |
+    export TF_VAR_k8s_token_reviewer_jwt='{{ vault_token_reviewer_jwt.stdout | trim }}'
+    echo "TF_VAR_k8s_token_reviewer_jwt exported for current session"
   delegate_to: localhost
   become: false
   run_once: true
+  changed_when: true
+
+- name: Get Kubernetes cluster issuer URL
+  ansible.builtin.command: "{{ vault_kubectl_cmd }} cluster-info"
+  environment: "{{ (vault.kubernetes.kubectl_kubeconfig | length > 0) | ternary({'KUBECONFIG': vault.kubernetes.kubectl_kubeconfig}, {}) }}"
+  register: k8s_cluster_info
+  changed_when: false
+
+- name: Extract Kubernetes API server URL
+  ansible.builtin.set_fact:
+    k8s_issuer_url: "{{ k8s_cluster_info.stdout | regex_search('https://[^\\s]+') | default('https://kubernetes.default.svc.cluster.local') }}"
+
+- name: Set TF_VAR_k8s_issuer as persistent global environment variable
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    regexp: '^TF_VAR_k8s_issuer='
+    line: "TF_VAR_k8s_issuer='{{ k8s_issuer_url }}'"
+    create: true
+    backup: true
+  delegate_to: localhost
+  become: true
+  run_once: true
+
+- name: Export TF_VAR_k8s_issuer for current session
+  ansible.builtin.shell: |
+    export TF_VAR_k8s_issuer='{{ k8s_issuer_url }}'
+    echo "TF_VAR_k8s_issuer exported for current session: {{ k8s_issuer_url }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  changed_when: true
+
+- name: Set TF_VAR_k8s_api_server_url as persistent global environment variable
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    regexp: '^TF_VAR_k8s_api_server_url='
+    line: "TF_VAR_k8s_api_server_url='{{ vault.kubernetes.api_server_url }}'"
+    create: true
+    backup: true
+  delegate_to: localhost
+  become: true
+  run_once: true
+
+- name: Export TF_VAR_k8s_api_server_url for current session
+  ansible.builtin.shell: |
+    export TF_VAR_k8s_api_server_url='{{ vault.kubernetes.api_server_url }}'
+    echo "TF_VAR_k8s_api_server_url exported for current session: {{ vault.kubernetes.api_server_url }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  changed_when: true

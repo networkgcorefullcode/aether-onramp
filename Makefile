@@ -82,16 +82,16 @@ aether-vault-status-dev: vault-status-dev
 aether-vault-terraform-install: terraform-install
 aether-vault-terraform-apply-dev: apply-terraform-dev
 aether-vault-terraform-destroy-dev: destroy-terraform-dev
+aether-vault-terraform-apply-dev-kube: apply-terraform-dev-kube
+aether-vault-terraform-destroy-dev-kube: destroy-terraform-dev-kube
 
-aether-5gc-with-vault-install: aether-vault-install-dev aether-vault-kubernetes-auth-dev  aether-vault-terraform-apply-dev aether-5gc-uninstall aether-5gc-install
+aether-5gc-with-vault-install: aether-vault-install-dev aether-vault-kubernetes-auth-dev  aether-vault-terraform-apply-dev-kube aether-5gc-uninstall aether-5gc-install
 
 #### Manage cluster with kubeadmin ####
 aether-kubeadmin-install: kubeadmin-install
 aether-kubeadmin-uninstall: kubeadmin-uninstall
-aether-kubeadmin-config: kubeadmin-config
-aether-kubeadmin-health: kubeadmin-health
-aether-kubeadmin-health-master: kubeadmin-health-master
-aether-kubeadmin-health-worker: kubeadmin-health-worker
+aether-kubeadmin-restore-swap: kubeadmin-restore-swap
+aether-install-helm: install-helm
 # ####  Makefile
 
 # Rules:
@@ -163,3 +163,4 @@ include $(SDRAN_ROOT_DIR)/Makefile
 include $(UERANSIM_ROOT_DIR)/Makefile
 include $(ARGOCD_ROOT_DIR)/Makefile
 include $(VAULT_ROOT_DIR)/Makefile
+include $(KUBEADMIN_ROOT_DIR)/Makefile

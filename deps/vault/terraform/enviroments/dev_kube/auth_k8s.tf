@@ -10,10 +10,10 @@ module "k8s_auth_dev" {
   max_lease_ttl     = "86400s" # 24 hours
 
   # Kubernetes Configuration
-  kubernetes_host        = "https://192.168.12.16:6443"
+  kubernetes_host        = var.k8s_api_server_url
   kubernetes_ca_cert     = file("~/.kube/certs/ca.crt")
   token_reviewer_jwt     = var.k8s_token_reviewer_jwt
-  issuer                 = "https://kubernetes.default.svc.cluster.local"
+  issuer                 = var.k8s_issuer
   disable_iss_validation = false
 }
 

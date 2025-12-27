@@ -89,11 +89,14 @@ kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/re
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+
 kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
 
 kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset.yml
+
 kubectl get crd network-attachment-definitions.k8s.cni.cncf.io
+
 kubectl label node <node_name> node-role.aetherproject.org=omec-upf
 ```
 

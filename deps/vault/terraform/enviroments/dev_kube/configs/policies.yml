@@ -1,0 +1,65 @@
+policies:
+  - name: default
+    policy: |
+      path "secret/data/*" {
+        capabilities = ["read", "list"]
+      }
+  - name: dev_policy
+    policy: |
+      path "secret/data/dev/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      path "kv-dev/metadata/k4keys" {
+        capabilities = ["list", "read"]
+      }
+      path "kv-dev/data/k4keys/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      path "sys/mounts/transit" {
+        capabilities = [ "create", "read", "update", "delete", "list" ]
+      }
+      path "sys/mounts" {
+        capabilities = [ "read" ]
+      }
+      path "transit/*" {
+        capabilities = [ "create", "read", "update", "delete", "list" ]
+      }
+      path "transit-dev/keys" {
+        capabilities = ["list", "read", "delete"]
+      }
+      path "transit-dev/keys/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      path "transit-dev/decrypt/aes256-gcm" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      path "transit-dev/encrypt/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      path "transit-dev/rewrap/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      path "transit-dev/keys/*/rotate" {
+        capabilities = ["create", "update"]
+      }
+
+  - name: test_policy
+    policy: |
+      path "secret/data/test/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+  - name: audit_policy
+    policy: |
+      path "audit/logs/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+  - name: management_policy
+    policy: |
+      path "sys/*" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+      }
+  - name: admin_policy
+    policy: |
+      path "*" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+      }

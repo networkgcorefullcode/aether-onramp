@@ -22,3 +22,10 @@ kubeadmin-uninstall:
 kubeadmin-restore-swap:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(KUBEADMIN_ROOT_DIR)/uninstall.yml \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS) --tags restore-swap
+
+install-helm:
+	sudo apt-get install curl gpg apt-transport-https --yes
+	curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+	echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+	sudo apt-get update --yes
+	sudo apt-get install helm --yes

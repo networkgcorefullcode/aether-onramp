@@ -67,11 +67,17 @@
 # ============================================
 # 3. INSTALL CONTAINERD
 # ============================================
+- name: Check if containerd binary exists
+  stat:
+    path: /usr/local/bin/containerd
+  register: containerd_exists
+
 - name: Get tar.gz for containerd
   get_url:
     url: "{{ kubeadmin.containerd.url_targz }}"
     dest: /tmp/containerd.tar.gz
     mode: '0644'
+  when: not containerd_exists.stat.exists
 
 - name: Extract containerd binaries
   unarchive:
@@ -79,25 +85,39 @@
     dest: /usr/local
     remote_src: yes
     creates: /usr/local/bin/containerd
+  when: not containerd_exists.stat.exists
+
+- name: Check if containerd service file exists
+  stat:
+    path: /etc/systemd/system/containerd.service
+  register: containerd_service_exists
 
 - name: Create containerd systemd service file
   get_url:
     url: "https://raw.githubusercontent.com/containerd/containerd/main/containerd.service"
     dest: /etc/systemd/system/containerd.service
     mode: '0644'
+  when: not containerd_service_exists.stat.exists
 
 - name: Reload systemd daemon
   systemd:
     daemon_reload: yes
+  when: not containerd_service_exists.stat.exists
 
 # ============================================
 # 3.1. INSTALL RUNC
 # ============================================
+- name: Check if runc binary exists
+  stat:
+    path: /usr/local/sbin/runc
+  register: runc_exists
+
 - name: Get runc binary
   get_url:
     url: "{{ kubeadmin.runc.url_binary }}"
     dest: /tmp/runc.amd64
     mode: '0755'
+  when: not runc_exists.stat.exists
 
 - name: Install runc binary
   copy:
@@ -105,6 +125,7 @@
     dest: /usr/local/sbin/runc
     mode: '0755'
     remote_src: yes
+  when: not runc_exists.stat.exists
 
 - name: Verify runc installation
   command: /usr/local/sbin/runc --version
@@ -124,11 +145,17 @@
     state: directory
     mode: '0755'
 
+- name: Check if CNI plugins exist
+  stat:
+    path: /opt/cni/bin/bridge
+  register: cni_plugins_exist
+
 - name: Get CNI plugins tar.gz
   get_url:
     url: "{{ kubeadmin.cni_plugins.url_targz }}"
     dest: /tmp/cni-plugins.tar.gz
     mode: '0644'
+  when: not cni_plugins_exist.stat.exists
 
 - name: Extract CNI plugins to /opt/cni/bin
   unarchive:
@@ -136,6 +163,7 @@
     dest: /opt/cni/bin
     remote_src: yes
     creates: /opt/cni/bin/bridge
+  when: not cni_plugins_exist.stat.exists
 
 - name: Verify CNI plugins installation
   find:

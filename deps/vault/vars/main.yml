@@ -18,7 +18,7 @@ vault:
 
   kubernetes:
     # Source CA cert on the RKE2 server
-    rke2_server_ca_src: "/var/lib/rancher/rke2/server/tls/server-ca.crt"
+    server_ca_src: "/etc/kubernetes/pki/ca.crt"
 
     # kubectl environment (optional)
     kubectl_kubeconfig: ""

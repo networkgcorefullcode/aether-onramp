@@ -61,3 +61,11 @@ apply-terraform-dev:
 destroy-terraform-dev:
 	cd $(VAULT_ROOT_DIR)/terraform/enviroments/dev && terraform destroy --auto-approve
 	cd $(VAULT_ROOT_DIR)
+
+apply-terraform-dev-kube:
+	cd $(VAULT_ROOT_DIR)/terraform/enviroments/dev_kube && terraform init && terraform apply --auto-approve
+	cd $(VAULT_ROOT_DIR)
+
+destroy-terraform-dev-kube:
+	cd $(VAULT_ROOT_DIR)/terraform/enviroments/dev_kube && terraform destroy --auto-approve
+	cd $(VAULT_ROOT_DIR)

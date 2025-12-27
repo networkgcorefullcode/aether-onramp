@@ -25,6 +25,12 @@
   with_items: "{{ vault.install_prerequisites }}"
   become: yes
 
+- name: Check is the vault binary is already installed
+  stat: 
+    path: /usr/local/bin/vault
+  register: vault_binary_stat
+  become: yes
+
 # Download and install Vault binary
 - name: Download vault binary
   get_url:
@@ -35,6 +41,7 @@
     mode: 0755
   register: vault_download
   become: yes
+  when: not vault_binary_stat.stat.exists
 
 - name: Unzip vault archive
   unarchive:
@@ -45,6 +52,7 @@
     group: "{{ vault.group }}"
     mode: 0755
   become: yes
+  when: not vault_binary_stat.stat.exists
 
 - name: Set vault binary capabilities
   capabilities:

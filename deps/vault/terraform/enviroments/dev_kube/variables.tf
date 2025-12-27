@@ -15,3 +15,9 @@ variable "k8s_issuer" {
   type        = string
   default     = "https://kubernetes.default.svc.cluster.local"
 }
+
+variable "k8s_api_server_url" {
+  description = "The URL of the Kubernetes API server"
+  type        = string
+  default     = "https://localhost:6443"
+}

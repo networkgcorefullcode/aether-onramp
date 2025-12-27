@@ -166,6 +166,7 @@ amp:
       chart_version: 101.0.0+up19.0.3
 
 vault:
+  address_endpoint: "http://172.28.31.5:8200"
   version: "1.21.1"
   user: "vault"
   group: "vault"
@@ -184,13 +185,14 @@ vault:
   root_token_dir_output: "{{ playbook_dir }}/vault_keys/root_token"
   kubernetes:
     # Source CA cert on the RKE2 server
-    rke2_server_ca_src: "/var/lib/rancher/rke2/server/tls/server-ca.crt"
+    server_ca_src: "/etc/kubernetes/pki/ca.crt"
+    api_server_url: "https://172.28.31.5:6443"
 
     # kubectl environment (optional)
     kubectl_kubeconfig: ""
 
     # Manifest for ServiceAccount + ClusterRoleBinding
-    sa_manifest_src: "{{ ROOT_DIR }}/kube_apply/sa-vault.yaml"
+    sa_manifest_src: "{{ ROOT_DIR }}/deps/vault/kube_apply/sa-vault.yaml"
     sa_manifest_remote: "/tmp/sa-vault.yaml"
 
     # ServiceAccount used by Vault to review tokens

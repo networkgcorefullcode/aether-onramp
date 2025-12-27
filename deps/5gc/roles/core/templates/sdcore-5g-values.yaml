@@ -16,7 +16,7 @@ omec-control-plane:
 5g-control-plane:
   enable5G: true
   images:
-    repository: "192.168.12.15:8083/"
+    repository: "ghcr.io/networkgcorefullcode/"
     tags:
       amf: omecproject/5gc-amf:2.0.5-dev
       ausf: omecproject/5gc-ausf:2.0.5-dev
@@ -25,7 +25,7 @@ omec-control-plane:
       udr: omecproject/5gc-udr:2.1.7-dev
       pcf: omecproject/5gc-pcf:2.0.3-dev
       nrf: omecproject/5gc-nrf:2.0.8-dev
-      webui: omecproject/5gc-webui:2.1.2-dev
+      webui: omecproject/5gc-webui:2.0.5-dev
       nssf: omecproject/5gc-nssf:1.7.2-dev
       init: omecproject/pod-init:rel-1.1.3
       upfadapter: omecproject/upfadapter:2.0.6-dev
@@ -99,7 +99,7 @@ omec-control-plane:
               syncUrl: http://roc-service:8080/sync
               enabled: false
             vault:
-              vault-uri: "http://192.168.12.16:8200"
+              vault-uri: {{ vault.address_endpoint }}
               allow-vault: true
               tls-insecure: true
               
@@ -163,7 +163,7 @@ omec-control-plane:
               udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
               udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
             vault:
-              vault-uri: "http://192.168.12.16:8200"
+              vault-uri: {{ vault.address_endpoint }}
               enable: true
               tls-insecure: true
               
@@ -606,7 +606,7 @@ omec-control-plane:
 omec-sub-provision:
   enable: true
   images:
-    repository: "192.168.12.15:8083/"
+    repository: "ghcr.io/networkgcorefullcode/"
     tags:
       simapp: omecproject/simapp:1.6.12-dev
       init: omecproject/pod-init:rel-1.1.3
@@ -630,7 +630,7 @@ omec-sub-provision:
             # This block is always necessary to establish range(s) of valid IMSIs
             subscribers:
             - ueId-start: "208930100007487"
-              ueId-end: "208930100017487"
+              ueId-end: "20893010009487"
               plmnId: "20893"
               opc: "981d464c7c52eb6e5036234984ad0bcf"
               op: ""
@@ -641,7 +641,7 @@ omec-sub-provision:
             device-groups:
             - name:  "test5g-gnbsim-user-group1"
               imsi-start: "208930100007487"
-              imsi-end: "208930100017487"
+              imsi-end: "208930100009487"
               ip-domain-name: "pool1"
               ip-domain-expanded:
                 dnn: internet
@@ -711,7 +711,7 @@ omec-user-plane:
   resources:
     enabled: false
   images:
-    repository: "192.168.12.15:8082/"
+    repository: "ghcr.io/networkgcorefullcode/"
     # tags:
       # bess: <bess image tag>
       # pfcpiface: <pfcp image tag>
