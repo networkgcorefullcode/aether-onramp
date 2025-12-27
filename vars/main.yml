@@ -185,7 +185,7 @@ vault:
   root_token_dir_output: "{{ playbook_dir }}/vault_keys/root_token"
   kubernetes:
     # Source CA cert on the RKE2 server
-    server_ca_src: "/etc/kubernetes/pki/ca.crt"
+    server_ca_src: "/var/lib/rancher/rke2/server/tls/server-ca.crt"
     api_server_url: "https://172.28.31.5:6443"
 
     # kubectl environment (optional)
