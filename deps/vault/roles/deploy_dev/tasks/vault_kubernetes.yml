@@ -75,14 +75,14 @@
   changed_when: true
 
 - name: Get Kubernetes cluster issuer URL
-  ansible.builtin.command: "{{ vault_kubectl_cmd }} get --raw /.well-known/openid-configuration | jq .issuer"
+  ansible.builtin.shell: "{{ vault_kubectl_cmd }} get --raw /.well-known/openid-configuration | jq .issuer"
   environment: "{{ (vault.kubernetes.kubectl_kubeconfig | length > 0) | ternary({'KUBECONFIG': vault.kubernetes.kubectl_kubeconfig}, {}) }}"
   register: k8s_cluster_info
   changed_when: false
 
 - name: Extract Kubernetes API server URL
   ansible.builtin.set_fact:
-    k8s_issuer_url: "{{ k8s_cluster_info.stdout | regex_search('https://[^\\s]+') | default('https://kubernetes.default.svc.cluster.local') }}"
+    k8s_issuer_url: "{{ k8s_cluster_info.stdout }}"
 
 - name: Set TF_VAR_k8s_issuer as persistent global environment variable
   ansible.builtin.lineinfile:
