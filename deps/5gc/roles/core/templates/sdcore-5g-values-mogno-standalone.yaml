@@ -102,6 +102,10 @@ omec-control-plane:
             managedByConfigPod:
               syncUrl: http://roc-service:8080/sync
               enabled: false
+            ssm:
+              allow-ssm: false
+              ssm-synchronize:
+                enable: false
             vault:
               vault-uri: {{ vault.address_endpoint }}
               allow-vault: true
