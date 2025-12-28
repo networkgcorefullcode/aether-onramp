@@ -36,7 +36,7 @@ omec-control-plane:
     pullPolicy: IfNotPresent
 
   kafka:
-    deploy: true
+    deploy: false
 
   mongodb:
     deploy: true
