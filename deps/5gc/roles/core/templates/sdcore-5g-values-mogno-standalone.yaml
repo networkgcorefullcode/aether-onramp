@@ -640,7 +640,7 @@ omec-sub-provision:
             # This block is always necessary to establish range(s) of valid IMSIs
             subscribers:
             - ueId-start: "208930100007487"
-              ueId-end: "20893010009487"
+              ueId-end: "208930100009487"
               plmnId: "20893"
               opc: "981d464c7c52eb6e5036234984ad0bcf"
               op: ""
@@ -680,7 +680,7 @@ omec-sub-provision:
                 sst: 1
               site-device-group:
               - "test5g-gnbsim-user-group1"   # All UEs in this device-group are assigned to this slice
-              - "test5g-gnbsim-user-group2"   # Added second group with 500 UEs
+              # - "test5g-gnbsim-user-group2"   # Added second group with 500 UEs
               # Applicaiton filters control what each user can access.
               # Default, allow access to all applications
               application-filtering-rules:
