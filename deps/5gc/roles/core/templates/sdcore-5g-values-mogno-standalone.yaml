@@ -40,8 +40,8 @@ omec-control-plane:
 
   mongodb:
     deploy: true
-    architecture: replicaset
-    replicaCount: 2
+    architecture: standalone
+    #replicaCount: 2
     usePassword: false
     persistence:
       enabled: false
@@ -49,9 +49,9 @@ omec-control-plane:
   config:
     mongodb:
       name: aether
-      url: mongodb://mongodb-arbiter-headless # Enable if cluster deployment required
+      url: mongodb://mongodb # Enable if cluster deployment required
       authKeysDbName: authentication
-      authUrl: mongodb://mongodb-arbiter-headless
+      authUrl: mongodb://mongodb
 
     webui:
       serviceType: NodePort
@@ -83,11 +83,11 @@ omec-control-plane:
             # MongoDB configuration
             mongodb:
               name: aether
-              url: "mongodb://mongodb-arbiter-headless"
+              url: "mongodb://mongodb"
               authKeysDbName: authentication
-              authUrl: "mongodb://mongodb-arbiter-headless"
+              authUrl: "mongodb://mongodb"
               webuiDbName: aether
-              webuiDbUrl: "mongodb://mongodb-arbiter-headless"
+              webuiDbUrl: "mongodb://mongodb"
               checkReplica: true
               concurrency-ops: 5
               defaultConns: 500
